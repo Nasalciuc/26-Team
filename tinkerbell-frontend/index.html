@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ Tinkerbell - Your Marketing Magic</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Page 1: Conversational Onboarding -->
+    <div id="page-onboarding" class="page active">
+        <div class="container">
+            <header class="hero">
+                <h1>✨ Tinkerbell</h1>
+                <p class="tagline">Your magical companion for effortless small business growth</p>
+                <h2 class="headline">Transformă descrierea afacerii tale în marketing. Cu un singur click.</h2>
+            </header>
+
+            <form id="onboarding-form" class="conversation-form">
+                <div class="question-group">
+                    <label for="businessName">Care este numele afacerii tale? 🏪</label>
+                    <input type="text" id="businessName" name="businessName" placeholder="ex: Florărie Marta" required>
+                </div>
+
+                <div class="question-group">
+                    <label for="businessDescription">Spune-mi pe scurt despre produsele/serviciile tale 📦</label>
+                    <textarea id="businessDescription" name="businessDescription" placeholder="ex: Florărie locală în Chișinău care vinde aranjamente unice pentru nunți și evenimente speciale" required></textarea>
+                </div>
+
+                <div class="question-group">
+                    <label for="targetCustomers">Cine sunt clienții tăi ideali? Care sunt obiectivele tale? 🎯</label>
+                    <textarea id="targetCustomers" name="targetCustomers" placeholder="ex: Mirese, organizatori de evenimente, persoane care vor să facă cadouri speciale"></textarea>
+                </div>
+
+                <div class="question-group">
+                    <label for="businessGoals">Care sunt obiectivele tale de business? 🚀</label>
+                    <textarea id="businessGoals" name="businessGoals" placeholder="ex: Să atrag mai mulți clienți pentru evenimente mari, să cresc vizibilitatea online"></textarea>
+                </div>
+
+                <div class="question-group">
+                    <label for="websiteUrl">Lipește un link către Facebook-ul sau website-ul tău (opțional) 🌐</label>
+                    <input type="url" id="websiteUrl" name="websiteUrl" placeholder="ex: https://www.facebook.com/florariamaarta">
+                    <small>Vom analiza conținutul pentru a înțelege mai bine afacerea ta</small>
+                </div>
+
+                <button type="submit" class="magic-button">
+                    🪄 Generează-mi Planul de Marketing
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Page 2: Persona Editor -->
+    <div id="page-personas" class="page">
+        <div class="container">
+            <header>
+                <h1>✨ Personele Tale de Client</h1>
+                <p>Am generat profilurile clienților tăi ideali. Poți să le editezi dacă ceva nu pare corect.</p>
+            </header>
+
+            <div id="loading-log" class="loading-section">
+                <h3>🔮 Magia se întâmplă...</h3>
+                <div class="progress-log">
+                    <div class="log-item completed">
+                        <span class="checkmark">✓</span>
+                        <span>Analizăm contextul afacerii tale...</span>
+                    </div>
+                    <div class="log-item completed">
+                        <span class="checkmark">✓</span>
+                        <span>Identificăm audiența țintă și creăm persona...</span>
+                    </div>
+                    <div class="log-item completed">
+                        <span class="checkmark">✓</span>
+                        <span>Generăm idei de campanii personalizate...</span>
+                    </div>
+                    <div class="log-item completed">
+                        <span class="checkmark">✓</span>
+                        <span>Creăm postări și ad-uri cu AI...</span>
+                    </div>
+                    <div class="log-item completed">
+                        <span class="checkmark">✓</span>
+                        <span>Evaluăm potențialul de leads...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="personas-editor" class="personas-section">
+                <div id="personas-container">
+                    <!-- Personas will be populated by JavaScript -->
+                </div>
+
+                <button id="confirm-personas" class="magic-button">
+                    🎯 Confirmă Personele & Construiește Strategia
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page 3: Campaign Dashboard -->
+    <div id="page-campaign" class="page">
+        <div class="container">
+            <header>
+                <h1>🚀 Dashboard-ul Campaniei Tale</h1>
+                <p>Iată strategia ta de marketing și postările generate cu AI!</p>
+            </header>
+
+            <div id="strategy-section" class="strategy-card">
+                <h3>📈 Strategia Ta de Marketing</h3>
+                <p id="marketing-strategy">Strategia se încarcă...</p>
+            </div>
+
+            <div id="posts-section" class="posts-grid">
+                <h3>📱 Postările Tale pe Rețelele Sociale</h3>
+                <div id="posts-container">
+                    <!-- Posts will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="campaign-stats">
+                <div class="stat-card">
+                    <h4>💰 Buget Sugerat</h4>
+                    <p class="stat-value">$50</p>
+                </div>
+                <div class="stat-card">
+                    <h4>🎯 Leads Calificate Estimat</h4>
+                    <p class="stat-value">5-8</p>
+                </div>
+                <div class="stat-card">
+                    <h4>💵 Cost/Lead Estimat</h4>
+                    <p class="stat-value">$7 - $10</p>
+                </div>
+            </div>
+
+            <button id="schedule-campaign" class="magic-button large">
+                🎉 Aprobă și Lansează Campaniile
+            </button>
+        </div>
+    </div>
+
+    <!-- Page 4: Success -->
+    <div id="page-success" class="page">
+        <div class="container">
+            <header class="success-header">
+                <div class="success-animation">🎉</div>
+                <h1>🌟 Magia S-a Întâmplat!</h1>
+                <p>Campania ta a fost creată și programată cu succes în Planable!</p>
+            </header>
+
+            <div class="success-content">
+                <div class="success-card">
+                    <h3>✅ Ce s-a întâmplat:</h3>
+                    <ul id="success-details">
+                        <li>✨ Workspace creat în Planable</li>
+                        <li>📱 <span id="posts-count">3</span> postări programate</li>
+                        <li>🎯 Campania gata de lansare</li>
+                    </ul>
+                </div>
+
+                <div class="workspace-card">
+                    <h3>🔗 Accesează-ți Campania</h3>
+                    <p>Vezi și gestionează toate postările în noul tău workspace Planable:</p>
+                    <a id="workspace-link" href="#" target="_blank" class="workspace-button">
+                        🚀 Deschide Workspace-ul Planable
+                    </a>
+                </div>
+
+                <div class="next-steps">
+                    <h3>🎯 Următorii Pași</h3>
+                    <ol>
+                        <li>Accesează workspace-ul Planable</li>
+                        <li>Revizuiește și personalizează postările</li>
+                        <li>Aprobă și publică campaniile</li>
+                        <li>Monitorizează rezultatele</li>
+                    </ol>
+                </div>
+
+                <button onclick="location.reload()" class="magic-button">
+                    ✨ Creează O Nouă Campanie
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
