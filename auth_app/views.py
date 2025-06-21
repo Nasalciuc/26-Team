@@ -11,6 +11,8 @@ import sys
 import os
 import json
 from datetime import datetime
+import openai
+import requests
 
 # Import scraper-ul
 try:
@@ -394,3 +396,89 @@ def export_site_data(request, site_id):
 def debug_csrf(request):
     """A simple view to help debug CSRF issues."""
     return render(request, 'auth_app/debug_csrf.html')
+
+@csrf_exempt
+@login_required
+def generate_personas_view(request):
+    """API view to generate user personas based on a description."""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Only POST method is allowed'}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        description = data.get('description')
+        if not description:
+            return JsonResponse({'error': 'Description is required'}, status=400)
+
+        api_key = os.getenv('OPENAI_API_KEY')
+        if not api_key:
+            return JsonResponse({'error': 'OPENAI_API_KEY not configured'}, status=500)
+        
+        client = openai.OpenAI(api_key=api_key)
+
+        prompt = f"""
+        Based on the following business description, generate 4 distinct user personas that would be the ideal customers.
+        The business owner is not an expert in marketing, so make the personas easy to understand.
+        For each persona, provide a name, a short description (2-3 sentences), their main goals, and their primary pain points.
+        Return the result as a JSON object with a single key "personas", which is an array of the 4 persona objects.
+        Business Description: --- {description} ---
+        """
+
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful marketing assistant."},
+                {"role": "user", "content": prompt}
+            ],
+            response_format={"type": "json_object"}
+        )
+
+        personas_data = json.loads(response.choices[0].message.content)
+        return JsonResponse(personas_data)
+
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON in request body'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': f'An unexpected error occurred: {str(e)}'}, status=500)
+
+@csrf_exempt
+@login_required
+def post_to_facebook_view(request):
+    """API view to post content to a Facebook Page."""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Only POST method is allowed'}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        message = data.get('message')
+        image_url = data.get('image_url')
+
+        if not message:
+            return JsonResponse({'error': 'Message is required'}, status=400)
+
+        access_token = os.getenv('META_ACCESS_TOKEN')
+        page_id = os.getenv('FACEBOOK_PAGE_ID')
+
+        if not access_token or not page_id:
+            return JsonResponse({'error': 'Meta API credentials not configured'}, status=500)
+
+        if image_url:
+            endpoint = f"https://graph.facebook.com/v20.0/{page_id}/photos"
+            params = {'url': image_url, 'caption': message, 'access_token': access_token}
+            response = requests.post(endpoint, params=params)
+        else:
+            endpoint = f"https://graph.facebook.com/v20.0/{page_id}/feed"
+            params = {'message': message, 'access_token': access_token}
+            response = requests.post(endpoint, params=params)
+
+        response_data = response.json()
+
+        if response.status_code == 200:
+            return JsonResponse({'success': True, 'post_id': response_data.get('id')})
+        else:
+            return JsonResponse({'success': False, 'error': response_data.get('error')}, status=response.status_code)
+
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON in request body'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': f'An unexpected error occurred: {str(e)}'}, status=500)

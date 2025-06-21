@@ -26,4 +26,8 @@ urlpatterns = [
     path('personas/<int:persona_id>/', views.persona_detail, name='persona_detail'),
     path('personas/<int:persona_id>/delete/', views.delete_persona, name='delete_persona'),
     path('personas/<int:persona_id>/export/', views.export_persona, name='export_persona'),
+
+    # New AI and Social Media Endpoints
+    path('personas/generate/', views.generate_personas_view, name='generate_personas'),
+    path('facebook/post/', views.post_to_facebook_view, name='post_to_facebook'),
 ] 
