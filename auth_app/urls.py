@@ -18,7 +18,7 @@ urlpatterns = [
     path('sites/<int:site_id>/', views.site_detail, name='site_detail'),
     path('sites/<int:site_id>/delete/', views.delete_site, name='delete_site'),
     path('sites/<int:site_id>/export/', views.export_site_data, name='export_site_data'),
-    path('sites/<int:site_id>/generate-personas/', views.generate_personas_from_site, name='generate_personas_from_site'),
+    path('sites/<int:site_id>/generate-personas/', views.generate_personas_from_site, name='generate_personas'),
     
     # AI Personas
     path('ai-personas/', views.ai_personas_view, name='ai_personas'),
