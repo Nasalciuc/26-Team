@@ -1,82 +1,154 @@
 {% extends 'base.html' %}
 
-{% block title %}Autentificare - Team 26 App{% endblock %}
+{% block title %}Login - Team 26{% endblock %}
 
 {% block content %}
-<div class="container-fluid d-flex align-items-center justify-content-center" style="min-height: 100vh;">
-    <div class="row w-100 justify-content-center">
-        <div class="col-12 col-sm-8 col-md-6 col-lg-4">
-            <div class="card">
-                <div class="card-body p-5">
-                    <!-- Header -->
-                    <div class="text-center mb-4">
-                        <div class="mb-3">
-                            <i class="bi bi-shield-lock text-primary" style="font-size: 3rem;"></i>
-                        </div>
-                        <h2 class="card-title fw-bold text-dark">Autentificare</h2>
-                        <p class="text-muted">Introduceți credențialele pentru a accesa aplicația</p>
-                    </div>
+<div class="min-h-screen flex items-center justify-center bg-black py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8 animate-fade-in">
+        <!-- Logo Section -->
+        <div class="text-center">
+            <div class="mx-auto w-20 h-20 rounded-2xl bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center shadow-2xl border-4 border-yellow-400/50 mb-6">
+                <span class="text-black font-black text-3xl">T</span>
+            </div>
+            <h2 class="text-4xl font-black text-yellow-400 tracking-tight mb-2">
+                Team 26
+            </h2>
+            <p class="text-lg text-yellow-400/70 font-bold uppercase tracking-wider mb-8">
+                Universal Super Scraper
+            </p>
+        </div>
 
-                    <!-- Login Form -->
-                    <form method="post" novalidate>
-                        {% csrf_token %}
-                        
-                        <!-- Username Field -->
-                        <div class="mb-3">
-                            <label for="{{ form.username.id_for_label }}" class="form-label fw-semibold">
-                                <i class="bi bi-person"></i> Nume utilizator
-                            </label>
-                            <input type="text" 
-                                   class="form-control {% if form.username.errors %}is-invalid{% endif %}" 
-                                   id="{{ form.username.id_for_label }}" 
-                                   name="{{ form.username.name }}" 
-                                   value="{{ form.username.value|default:'' }}"
-                                   placeholder="Introduceți numele de utilizator"
-                                   required>
-                            {% if form.username.errors %}
-                            <div class="invalid-feedback">
-                                {% for error in form.username.errors %}
+        <!-- Login Form -->
+        <div class="robust-card rounded-2xl p-8 shadow-2xl">
+            <div class="text-center mb-8">
+                <h3 class="text-2xl font-bold text-yellow-400 mb-2">
+                    <i class="bi bi-shield-lock text-3xl mb-4 block"></i>
+                    Autentificare
+                </h3>
+                <p class="text-gray-400 text-sm">
+                    Introdu credențialele pentru a accesa platforma
+                </p>
+            </div>
+
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- Username Field -->
+                <div>
+                    <label for="{{ form.username.id_for_label }}" class="block text-sm font-bold text-yellow-400 mb-2">
+                        <i class="bi bi-person text-yellow-400 mr-2"></i>
+                        Username
+                    </label>
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            name="{{ form.username.name }}"
+                            id="{{ form.username.id_for_label }}"
+                            class="w-full px-4 py-4 bg-black border-2 border-gray-700 rounded-lg text-yellow-400 placeholder-gray-500 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 transition-all duration-300 font-medium"
+                            placeholder="Introdu username-ul"
+                            required
+                        >
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <i class="bi bi-person text-gray-500"></i>
+                        </div>
+                    </div>
+                    {% if form.username.errors %}
+                        <div class="mt-2 text-red-400 text-sm">
+                            {% for error in form.username.errors %}
+                                <i class="bi bi-exclamation-circle mr-1"></i>{{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Password Field -->
+                <div>
+                    <label for="{{ form.password.id_for_label }}" class="block text-sm font-bold text-yellow-400 mb-2">
+                        <i class="bi bi-lock text-yellow-400 mr-2"></i>
+                        Parolă
+                    </label>
+                    <div class="relative">
+                        <input 
+                            type="password" 
+                            name="{{ form.password.name }}"
+                            id="{{ form.password.id_for_label }}"
+                            class="w-full px-4 py-4 bg-black border-2 border-gray-700 rounded-lg text-yellow-400 placeholder-gray-500 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 transition-all duration-300 font-medium"
+                            placeholder="Introdu parola"
+                            required
+                        >
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <i class="bi bi-lock text-gray-500"></i>
+                        </div>
+                    </div>
+                    {% if form.password.errors %}
+                        <div class="mt-2 text-red-400 text-sm">
+                            {% for error in form.password.errors %}
+                                <i class="bi bi-exclamation-circle mr-1"></i>{{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Form Errors -->
+                {% if form.non_field_errors %}
+                    <div class="bg-red-900/50 border-2 border-red-400 rounded-lg p-4">
+                        <div class="flex items-center space-x-3">
+                            <i class="bi bi-exclamation-triangle text-red-400 text-xl"></i>
+                            <div class="text-red-400 text-sm font-medium">
+                                {% for error in form.non_field_errors %}
                                     {{ error }}
                                 {% endfor %}
                             </div>
-                            {% endif %}
                         </div>
-
-                        <!-- Password Field -->
-                        <div class="mb-4">
-                            <label for="{{ form.password.id_for_label }}" class="form-label fw-semibold">
-                                <i class="bi bi-lock"></i> Parolă
-                            </label>
-                            <input type="password" 
-                                   class="form-control {% if form.password.errors %}is-invalid{% endif %}" 
-                                   id="{{ form.password.id_for_label }}" 
-                                   name="{{ form.password.name }}"
-                                   placeholder="Introduceți parola"
-                                   required>
-                            {% if form.password.errors %}
-                            <div class="invalid-feedback">
-                                {% for error in form.password.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                            {% endif %}
-                        </div>
-
-                        <!-- Submit Button -->
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="bi bi-box-arrow-in-right"></i> Conectare
-                            </button>
-                        </div>
-                    </form>
-
-                    <!-- Footer -->
-                    <div class="text-center mt-4">
-                        <small class="text-muted">
-                            <i class="bi bi-info-circle"></i> 
-                            Contactați administratorul pentru crearea unui cont
-                        </small>
                     </div>
+                {% endif %}
+
+                <!-- Submit Button -->
+                <div class="pt-4">
+                    <button 
+                        type="submit" 
+                        class="w-full robust-button py-4 px-6 rounded-lg text-lg font-bold uppercase tracking-wider transition-all duration-300 hover:scale-105"
+                    >
+                        <i class="bi bi-box-arrow-in-right mr-3"></i>
+                        Autentificare
+                    </button>
+                </div>
+            </form>
+
+            <!-- Demo Credentials -->
+            <div class="mt-8 p-4 bg-gray-900/50 rounded-lg border-2 border-gray-700">
+                <h4 class="text-sm font-bold text-yellow-400 mb-3 flex items-center">
+                    <i class="bi bi-info-circle mr-2"></i>
+                    Credențiale Demo
+                </h4>
+                <div class="space-y-2 text-xs text-gray-400">
+                    <div class="flex items-center space-x-2">
+                        <span class="font-bold text-yellow-400">Username:</span>
+                        <code class="bg-black px-2 py-1 rounded border border-gray-600">admin</code>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="font-bold text-yellow-400">Password:</span>
+                        <code class="bg-black px-2 py-1 rounded border border-gray-600">admin123</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Preview -->
+        <div class="text-center space-y-4">
+            <h4 class="text-lg font-bold text-yellow-400">Funcționalități Principale</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="robust-card rounded-lg p-4 text-center">
+                    <i class="bi bi-search text-2xl text-yellow-400 mb-2"></i>
+                    <p class="text-xs text-gray-400 font-medium">Scraping Universal</p>
+                </div>
+                <div class="robust-card rounded-lg p-4 text-center">
+                    <i class="bi bi-database text-2xl text-yellow-400 mb-2"></i>
+                    <p class="text-xs text-gray-400 font-medium">Salvare Date</p>
+                </div>
+                <div class="robust-card rounded-lg p-4 text-center">
+                    <i class="bi bi-download text-2xl text-yellow-400 mb-2"></i>
+                    <p class="text-xs text-gray-400 font-medium">Export JSON/CSV</p>
                 </div>
             </div>
         </div>

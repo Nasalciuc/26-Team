@@ -3,117 +3,343 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Team 26 App{% endblock %}</title>
+    <title>{% block title %}Team 26 - Universal Scraper{% endblock %}</title>
     
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
     <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        background: 'hsl(0, 0%, 3%)',
+                        foreground: 'hsl(45, 100%, 85%)',
+                        card: 'hsl(0, 0%, 8%)',
+                        'card-foreground': 'hsl(45, 100%, 85%)',
+                        popover: 'hsl(0, 0%, 5%)',
+                        'popover-foreground': 'hsl(45, 100%, 85%)',
+                        primary: 'hsl(0, 0%, 12%)',
+                        'primary-foreground': 'hsl(45, 100%, 85%)',
+                        secondary: 'hsl(0, 0%, 10%)',
+                        'secondary-foreground': 'hsl(45, 100%, 85%)',
+                        muted: 'hsl(0, 0%, 15%)',
+                        'muted-foreground': 'hsl(45, 50%, 70%)',
+                        accent: 'hsl(0, 0%, 18%)',
+                        'accent-foreground': 'hsl(45, 100%, 85%)',
+                        destructive: 'hsl(0, 84.2%, 60.2%)',
+                        'destructive-foreground': 'hsl(45, 100%, 85%)',
+                        border: 'hsl(0, 0%, 20%)',
+                        input: 'hsl(0, 0%, 18%)',
+                        ring: 'hsl(0, 0%, 25%)',
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out',
+                        'slide-in-left': 'slideInFromLeft 0.5s ease-out',
+                        'pulse-robust': 'pulse-robust 3s infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        slideInFromLeft: {
+                            '0%': { opacity: '0', transform: 'translateX(-30px)' },
+                            '100%': { opacity: '1', transform: 'translateX(0)' },
+                        },
+                        'pulse-robust': {
+                            '0%, 100%': { boxShadow: '0 0 0 0 rgba(250, 204, 21, 0.4)' },
+                            '50%': { boxShadow: '0 0 0 10px rgba(250, 204, 21, 0)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                    },
+                },
+            },
+        }
+    </script>
     
     <style>
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #000000, #1a1a1a);
+            color: hsl(45, 100%, 85%);
         }
-        .card {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #000000, #1a1a1a);
         }
-        .btn-primary {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            border: none;
-            border-radius: 25px;
-            padding: 12px 30px;
-            font-weight: 600;
+        
+        .gradient-secondary-bg {
+            background: linear-gradient(135deg, #0a0a0a, #1f1f1f);
         }
-        .btn-primary:hover {
-            background: linear-gradient(45deg, #5a6fd8, #6a4190);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-        .form-control {
-            border-radius: 10px;
-            border: 2px solid #e9ecef;
-            padding: 12px 15px;
-        }
-        .form-control:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-        }
-        .navbar-nav .nav-link {
-            border-radius: 8px;
-            margin: 0 2px;
+        
+        .card-hover {
             transition: all 0.3s ease;
         }
-        .navbar-nav .nav-link:hover {
-            background-color: rgba(255,255,255,0.1);
+        
+        .card-hover:hover {
+            transform: scale(1.02);
+            box-shadow: 0 25px 50px -12px rgba(250, 204, 21, 0.2);
+            border-color: rgba(250, 204, 21, 0.3);
+        }
+        
+        .text-gradient {
+            background: linear-gradient(to right, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .glass-effect {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(55, 65, 81, 0.5);
+        }
+        
+        .glow-effect {
+            box-shadow: 0 0 30px rgba(250, 204, 21, 0.2);
+        }
+        
+        .robust-card {
+            background: #000000;
+            border: 2px solid #374151;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            transition: all 0.3s ease;
+        }
+        
+        .robust-card:hover {
+            border-color: rgba(250, 204, 21, 0.5);
+        }
+        
+        .robust-button {
+            background: #000000;
+            border: 2px solid #fbbf24;
+            color: #fbbf24;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .robust-button:hover {
+            background: #fbbf24;
+            color: #000000;
+            box-shadow: 0 0 20px rgba(250, 204, 21, 0.5);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #000000;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #333333;
+            border-radius: 6px;
+            border: 2px solid #000000;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555555;
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        .animate-slide-in-left {
+            animation: slideInFromLeft 0.5s ease-out;
+        }
+        
+        .animate-pulse-robust {
+            animation: pulse-robust 3s infinite;
+        }
+        
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
         }
     </style>
 </head>
-<body>
-    <!-- Navigation -->
-    {% if user.is_authenticated %}
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="{% url 'auth_app:dashboard' %}">
-                <i class="bi bi-shield-check"></i> Team 26 App
-            </a>
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'auth_app:dashboard' %}">
-                            <i class="bi bi-house"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'auth_app:scraping' %}">
-                            <i class="bi bi-globe"></i> Scrapează Site
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'auth_app:site_list' %}">
-                            <i class="bi bi-list-ul"></i> Site-uri
-                        </a>
-                    </li>
-                </ul>
-                
-                <div class="navbar-nav">
-                    <span class="navbar-text me-3">
-                        <i class="bi bi-person-circle"></i> {{ user.username }}
-                    </span>
-                    <a class="nav-link" href="{% url 'auth_app:logout' %}">
-                        <i class="bi bi-box-arrow-right"></i> Deconectare
-                    </a>
+<body class="min-h-screen bg-black">
+    <!-- Robust Black Header -->
+    <header class="sticky top-0 z-50 bg-black/95 backdrop-blur-md border-b-2 border-gray-800">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo Section - Robust Design -->
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center shadow-xl border-2 border-yellow-400/50">
+                        <span class="text-black font-black text-xl">T</span>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-black text-yellow-400 tracking-tight">
+                            Team 26
+                        </h1>
+                        <p class="text-xs text-yellow-400/70 font-bold uppercase tracking-wider">
+                            Universal Super Scraper
+                        </p>
+                    </div>
                 </div>
+                
+                <!-- Desktop Navigation - Robust Style -->
+                <nav class="hidden md:flex items-center space-x-2">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'auth_app:dashboard' %}" 
+                           class="flex items-center space-x-3 px-6 py-4 rounded-lg transition-all duration-300 border-2 font-bold text-yellow-400 border-gray-800 hover:bg-gray-900 hover:border-yellow-400/50 hover:shadow-lg hover:shadow-yellow-400/20">
+                            <i class="bi bi-house-door text-xl"></i>
+                            <span class="font-bold text-sm uppercase tracking-wide">Dashboard</span>
+                        </a>
+                        <a href="{% url 'auth_app:scraping' %}" 
+                           class="flex items-center space-x-3 px-6 py-4 rounded-lg transition-all duration-300 border-2 font-bold text-yellow-400 border-gray-800 hover:bg-gray-900 hover:border-yellow-400/50 hover:shadow-lg hover:shadow-yellow-400/20">
+                            <i class="bi bi-search text-xl"></i>
+                            <span class="font-bold text-sm uppercase tracking-wide">Scraping</span>
+                        </a>
+                        <a href="{% url 'auth_app:site_list' %}" 
+                           class="flex items-center space-x-3 px-6 py-4 rounded-lg transition-all duration-300 border-2 font-bold text-yellow-400 border-gray-800 hover:bg-gray-900 hover:border-yellow-400/50 hover:shadow-lg hover:shadow-yellow-400/20">
+                            <i class="bi bi-list-ul text-xl"></i>
+                            <span class="font-bold text-sm uppercase tracking-wide">Site-uri</span>
+                        </a>
+                        <a href="{% url 'auth_app:logout' %}" 
+                           class="flex items-center space-x-3 px-6 py-4 rounded-lg transition-all duration-300 border-2 font-bold text-red-400 border-red-800 hover:bg-red-900 hover:border-red-400/50 hover:shadow-lg hover:shadow-red-400/20">
+                            <i class="bi bi-box-arrow-right text-xl"></i>
+                            <span class="font-bold text-sm uppercase tracking-wide">Logout</span>
+                        </a>
+                    {% else %}
+                        <a href="{% url 'auth_app:login' %}" 
+                           class="flex items-center space-x-3 px-6 py-4 rounded-lg transition-all duration-300 border-2 font-bold text-yellow-400 border-gray-800 hover:bg-gray-900 hover:border-yellow-400/50 hover:shadow-lg hover:shadow-yellow-400/20">
+                            <i class="bi bi-person text-xl"></i>
+                            <span class="font-bold text-sm uppercase tracking-wide">Login</span>
+                        </a>
+                    {% endif %}
+                </nav>
+
+                <!-- Mobile Menu Button - Robust -->
+                <button id="mobile-menu-button"
+                        class="md:hidden p-3 rounded-lg border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black transition-all duration-300">
+                    <i class="bi bi-list text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Navigation - Robust -->
+            <div id="mobile-menu" class="md:hidden hidden pb-6 animate-fade-in">
+                <nav class="space-y-3 bg-gray-900/50 p-4 rounded-lg border-2 border-gray-800">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'auth_app:dashboard' %}" 
+                           class="flex items-center space-x-4 px-6 py-4 rounded-lg transition-all duration-300 border-2 font-bold text-yellow-400 border-gray-700 hover:bg-gray-800 hover:border-yellow-400/50">
+                            <i class="bi bi-house-door text-xl"></i>
+                            <span class="font-bold uppercase tracking-wide">Dashboard</span>
+                        </a>
+                        <a href="{% url 'auth_app:scraping' %}" 
+                           class="flex items-center space-x-4 px-6 py-4 rounded-lg transition-all duration-300 border-2 font-bold text-yellow-400 border-gray-700 hover:bg-gray-800 hover:border-yellow-400/50">
+                            <i class="bi bi-search text-xl"></i>
+                            <span class="font-bold uppercase tracking-wide">Scraping</span>
+                        </a>
+                        <a href="{% url 'auth_app:site_list' %}" 
+                           class="flex items-center space-x-4 px-6 py-4 rounded-lg transition-all duration-300 border-2 font-bold text-yellow-400 border-gray-700 hover:bg-gray-800 hover:border-yellow-400/50">
+                            <i class="bi bi-list-ul text-xl"></i>
+                            <span class="font-bold uppercase tracking-wide">Site-uri</span>
+                        </a>
+                        <a href="{% url 'auth_app:logout' %}" 
+                           class="flex items-center space-x-4 px-6 py-4 rounded-lg transition-all duration-300 border-2 font-bold text-red-400 border-red-700 hover:bg-red-800 hover:border-red-400/50">
+                            <i class="bi bi-box-arrow-right text-xl"></i>
+                            <span class="font-bold uppercase tracking-wide">Logout</span>
+                        </a>
+                    {% else %}
+                        <a href="{% url 'auth_app:login' %}" 
+                           class="flex items-center space-x-4 px-6 py-4 rounded-lg transition-all duration-300 border-2 font-bold text-yellow-400 border-gray-700 hover:bg-gray-800 hover:border-yellow-400/50">
+                            <i class="bi bi-person text-xl"></i>
+                            <span class="font-bold uppercase tracking-wide">Login</span>
+                        </a>
+                    {% endif %}
+                </nav>
             </div>
         </div>
-    </nav>
-    {% endif %}
-
-    <!-- Messages -->
-    {% if messages %}
-    <div class="container mt-3">
-        {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-
+    </header>
+    
     <!-- Main Content -->
-    <main class="container-fluid">
+    <main class="relative bg-black min-h-screen">
+        <!-- Messages -->
+        {% if messages %}
+            <div class="max-w-6xl mx-auto px-6 pt-6">
+                {% for message in messages %}
+                    <div class="mb-4 p-4 rounded-lg border-2 font-bold animate-fade-in
+                                {% if message.tags == 'success' %}
+                                    bg-green-900/50 border-green-400 text-green-400
+                                {% elif message.tags == 'error' %}
+                                    bg-red-900/50 border-red-400 text-red-400
+                                {% elif message.tags == 'warning' %}
+                                    bg-yellow-900/50 border-yellow-400 text-yellow-400
+                                {% else %}
+                                    bg-blue-900/50 border-blue-400 text-blue-400
+                                {% endif %}">
+                        <div class="flex items-center space-x-3">
+                            {% if message.tags == 'success' %}
+                                <i class="bi bi-check-circle text-xl"></i>
+                            {% elif message.tags == 'error' %}
+                                <i class="bi bi-x-circle text-xl"></i>
+                            {% elif message.tags == 'warning' %}
+                                <i class="bi bi-exclamation-triangle text-xl"></i>
+                            {% else %}
+                                <i class="bi bi-info-circle text-xl"></i>
+                            {% endif %}
+                            <span>{{ message }}</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <!-- Page Content -->
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Bootstrap 5 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Robust Footer -->
+    <footer class="border-t-2 border-gray-800 mt-20 bg-black">
+        <div class="max-w-6xl mx-auto px-6 py-12">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center border-2 border-yellow-400/50">
+                        <span class="text-black font-black text-lg">T</span>
+                    </div>
+                    <span class="text-sm text-yellow-400 font-bold">
+                        © 2024 Team 26 - Universal Super Scraper
+                    </span>
+                </div>
+                <div class="text-xs text-yellow-400/70 font-bold uppercase tracking-wider">
+                    Creat cu ❤️ pentru analiza web
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Mobile Menu JavaScript -->
+    <script>
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const button = this;
+            
+            if (mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.remove('hidden');
+                button.innerHTML = '<i class="bi bi-x text-xl"></i>';
+            } else {
+                mobileMenu.classList.add('hidden');
+                button.innerHTML = '<i class="bi bi-list text-xl"></i>';
+            }
+        });
+    </script>
 </body>
 </html> 
