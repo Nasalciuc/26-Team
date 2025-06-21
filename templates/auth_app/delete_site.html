@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Șterge {{ site.domain }} - Team 26 App{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="card">
+                <div class="card-body text-center p-5">
+                    <div class="mb-4">
+                        <i class="bi bi-exclamation-triangle text-danger" style="font-size: 4rem;"></i>
+                    </div>
+                    
+                    <h3 class="card-title text-danger mb-3">Confirmă ștergerea</h3>
+                    
+                    <p class="text-muted mb-4">
+                        Ești sigur că vrei să ștergi site-ul <strong>{{ site.domain }}</strong>?
+                    </p>
+                    
+                    <div class="alert alert-warning">
+                        <i class="bi bi-info-circle"></i>
+                        Această acțiune va șterge permanent toate datele scrapate pentru acest site și nu poate fi anulată.
+                    </div>
+                    
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{% url 'auth_app:site_detail' site.id %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Anulează
+                        </a>
+                        <form method="post" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash"></i> Șterge Definitiv
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

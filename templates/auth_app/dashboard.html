@@ -1,0 +1,258 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Team 26 App{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Welcome Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h2 class="card-title mb-2">
+                                <i class="bi bi-house-door"></i> Bine ai venit, {{ user.username }}!
+                            </h2>
+                            <p class="card-text mb-0">
+                                Aplicația ta de scraping universal pentru analiza site-urilor web
+                            </p>
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <a href="{% url 'auth_app:scraping' %}" class="btn btn-light btn-lg">
+                                <i class="bi bi-plus-circle"></i> Scrapează Site Nou
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-12 col-md-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="bi bi-globe text-primary" style="font-size: 3rem;"></i>
+                    </div>
+                    <h3 class="text-primary">{{ total_sites }}</h3>
+                    <p class="card-text">Site-uri Analizate</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="bi bi-check-circle text-success" style="font-size: 3rem;"></i>
+                    </div>
+                    <h3 class="text-success">{{ completed_sites }}</h3>
+                    <p class="card-text">Scraping-uri Reușite</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="bi bi-graph-up text-warning" style="font-size: 3rem;"></i>
+                    </div>
+                    <h3 class="text-warning">
+                        {% if total_sites > 0 %}
+                            {{ completed_sites|floatformat:0 }}%
+                        {% else %}
+                            0%
+                        {% endif %}
+                    </h3>
+                    <p class="card-text">Rata de Succes</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="bi bi-gear text-info" style="font-size: 3rem;"></i>
+                    </div>
+                    <h3 class="text-info">
+                        {% if scraper_available %}
+                            <i class="bi bi-check-circle text-success"></i>
+                        {% else %}
+                            <i class="bi bi-x-circle text-danger"></i>
+                        {% endif %}
+                    </h3>
+                    <p class="card-text">
+                        {% if scraper_available %}
+                            Scraper Activ
+                        {% else %}
+                            Scraper Inactiv
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row g-4 mb-4">
+        <div class="col-12 col-lg-8">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-lightning"></i> Acțiuni Rapide
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <a href="{% url 'auth_app:scraping' %}" class="btn btn-primary btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center">
+                                <i class="bi bi-plus-circle mb-2" style="font-size: 2rem;"></i>
+                                <span>Scrapează Site Nou</span>
+                                <small class="text-light">Analizează un website</small>
+                            </a>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <a href="{% url 'auth_app:site_list' %}" class="btn btn-outline-primary btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center">
+                                <i class="bi bi-list-ul mb-2" style="font-size: 2rem;"></i>
+                                <span>Vezi Toate Site-urile</span>
+                                <small class="text-muted">Lista completă</small>
+                            </a>
+                        </div>
+                        {% if recent_sites %}
+                        <div class="col-12 col-md-6">
+                            <a href="{% url 'auth_app:site_detail' recent_sites.0.id %}" class="btn btn-outline-success btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center">
+                                <i class="bi bi-eye mb-2" style="font-size: 2rem;"></i>
+                                <span>Ultimul Site Analizat</span>
+                                <small class="text-muted">{{ recent_sites.0.domain }}</small>
+                            </a>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <a href="{% url 'auth_app:export_site_data' recent_sites.0.id %}?format=json" class="btn btn-outline-info btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center">
+                                <i class="bi bi-download mb-2" style="font-size: 2rem;"></i>
+                                <span>Exportă Date</span>
+                                <small class="text-muted">JSON/CSV</small>
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-clock-history"></i> Site-uri Recente
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_sites %}
+                        <div class="list-group list-group-flush">
+                            {% for site in recent_sites %}
+                            <div class="list-group-item px-0">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">{{ site.domain }}</h6>
+                                        <small class="text-muted">{{ site.scraped_at|date:"d.m.Y H:i" }}</small>
+                                    </div>
+                                    <div class="d-flex gap-1">
+                                        {% if site.status == 'completed' %}
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-check-circle"></i>
+                                            </span>
+                                        {% elif site.status == 'processing' %}
+                                            <span class="badge bg-warning">
+                                                <i class="bi bi-hourglass-split"></i>
+                                            </span>
+                                        {% elif site.status == 'failed' %}
+                                            <span class="badge bg-danger">
+                                                <i class="bi bi-x-circle"></i>
+                                            </span>
+                                        {% endif %}
+                                        <a href="{% url 'auth_app:site_detail' site.id %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% if total_sites > 5 %}
+                        <div class="text-center mt-3">
+                            <a href="{% url 'auth_app:site_list' %}" class="btn btn-outline-primary btn-sm">
+                                Vezi toate ({{ total_sites }})
+                            </a>
+                        </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-inbox text-muted mb-3" style="font-size: 3rem;"></i>
+                            <p class="text-muted">Nu ai încă site-uri analizate</p>
+                            <a href="{% url 'auth_app:scraping' %}" class="btn btn-primary">
+                                Începe Primul Scraping
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Status -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-info-circle"></i> Status Sistem
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    {% if scraper_available %}
+                                        <i class="bi bi-check-circle text-success" style="font-size: 1.5rem;"></i>
+                                    {% else %}
+                                        <i class="bi bi-x-circle text-danger" style="font-size: 1.5rem;"></i>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">Scraper Universal</h6>
+                                    <small class="text-muted">
+                                        {% if scraper_available %}
+                                            DrissionPage este disponibil pentru scraping complet
+                                        {% else %}
+                                            DrissionPage nu este instalat. Funcționalitatea este limitată.
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <i class="bi bi-database text-primary" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">Baza de Date</h6>
+                                    <small class="text-muted">
+                                        {{ total_sites }} site-uri înregistrate, {{ completed_sites }} cu date complete
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

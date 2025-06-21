@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block title %}Site-uri Scrapate - Team 26 App{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="card-title mb-1">
+                                <i class="bi bi-list-ul"></i> Site-uri Scrapate
+                            </h2>
+                            <p class="text-muted mb-0">Toate site-urile pe care le-ai analizat</p>
+                        </div>
+                        <a href="{% url 'auth_app:scraping' %}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle"></i> Scrapează Site Nou
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sites List -->
+    {% if sites %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Domain</th>
+                                    <th>Titlu</th>
+                                    <th>Status</th>
+                                    <th>Data Scraping</th>
+                                    <th>Acțiuni</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for site in sites %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-globe text-primary me-2"></i>
+                                            <div>
+                                                <strong>{{ site.domain }}</strong>
+                                                <br>
+                                                <small class="text-muted">{{ site.url|truncatechars:50 }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if site.page_title %}
+                                            {{ site.page_title|truncatechars:60 }}
+                                        {% else %}
+                                            <span class="text-muted">Fără titlu</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if site.status == 'completed' %}
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-check-circle"></i> Completat
+                                            </span>
+                                        {% elif site.status == 'processing' %}
+                                            <span class="badge bg-warning">
+                                                <i class="bi bi-hourglass-split"></i> Se procesează
+                                            </span>
+                                        {% elif site.status == 'failed' %}
+                                            <span class="badge bg-danger">
+                                                <i class="bi bi-x-circle"></i> Eșuat
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">
+                                                <i class="bi bi-clock"></i> În așteptare
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <strong>{{ site.scraped_at|date:"d.m.Y" }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ site.scraped_at|date:"H:i" }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{% url 'auth_app:site_detail' site.id %}" 
+                                               class="btn btn-outline-primary" 
+                                               title="Vezi detalii">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            {% if site.status == 'completed' %}
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="{% url 'auth_app:export_site_data' site.id %}?format=json" 
+                                                   class="btn btn-outline-info"
+                                                   title="Export JSON">
+                                                    <i class="bi bi-filetype-json"></i>
+                                                </a>
+                                                <a href="{% url 'auth_app:export_site_data' site.id %}?format=csv" 
+                                                   class="btn btn-outline-success"
+                                                   title="Export CSV">
+                                                    <i class="bi bi-filetype-csv"></i>
+                                                </a>
+                                            </div>
+                                            {% endif %}
+                                            <a href="{% url 'auth_app:delete_site' site.id %}" 
+                                               class="btn btn-outline-danger"
+                                               title="Șterge">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <div class="mb-4">
+                        <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
+                    </div>
+                    <h4 class="text-muted">Nu ai încă site-uri scrapate</h4>
+                    <p class="text-muted mb-4">Începe prin a adăuga primul tău site pentru analiză</p>
+                    <a href="{% url 'auth_app:scraping' %}" class="btn btn-primary btn-lg">
+                        <i class="bi bi-plus-circle"></i> Scrapează Primul Site
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

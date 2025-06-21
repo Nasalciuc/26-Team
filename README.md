@@ -10,6 +10,7 @@ team26/
 ├── Dockerfile
 ├── requirements.txt
 ├── env.example
+├── setup-env.sh
 ├── startup.sh
 ├── manage.py
 ├── README.md
@@ -26,10 +27,13 @@ team26/
 
 ## 🚀 Instrucțiuni de pornire
 
-### 1. Configurare inițială
+### 1. Configurare automată a mediului
 
 ```bash
-# Copiază fișierul de configurare
+# Rulează scriptul de setup (recomandat)
+./setup-env.sh
+
+# SAU copiază manual
 cp env.example .env
 ```
 
@@ -45,15 +49,68 @@ docker-compose up --build
 Scriptul de startup va:
 - ✅ Aștepta ca baza de date să fie gata
 - ✅ Rula migrările automat
-- ✅ Crea un superuser (admin/admin123) dacă nu există
+- ✅ Crea un superuser din variabilele de mediu
 - ✅ Porni serverul Django
 
 ## 🌐 Accesare aplicație
 
 - **Aplicație Django**: http://localhost:8000/
 - **Django Admin**: http://localhost:8000/admin/
-  - **Username**: admin
-  - **Password**: admin123
+  - **Username**: admin (configurabil în .env)
+  - **Password**: admin123 (configurabil în .env)
+
+## 🔧 Configurare variabile de mediu
+
+### Variabile disponibile în `.env`:
+
+```env
+# PostgreSQL Database Configuration
+POSTGRES_DB=django_db
+POSTGRES_USER=django_user
+POSTGRES_PASSWORD=django_pass
+
+# Django Configuration
+DJANGO_SECRET_KEY=your-secret-key-here
+DJANGO_DEBUG=True
+DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
+
+# Database Connection
+DB_ENGINE=django.db.backends.postgresql
+DB_HOST=db
+DB_PORT=5432
+
+# Admin User Configuration
+ADMIN_USERNAME=admin
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=admin123
+
+# Application Settings
+APP_NAME=Team26 Django App
+APP_VERSION=1.0.0
+TIME_ZONE=UTC
+LANGUAGE_CODE=en-us
+
+# Development Settings
+DEVELOPMENT_MODE=True
+LOG_LEVEL=DEBUG
+```
+
+### Personalizare:
+
+1. **Schimbă parola admin**:
+   ```env
+   ADMIN_PASSWORD=your_secure_password
+   ```
+
+2. **Schimbă numele bazei de date**:
+   ```env
+   POSTGRES_DB=your_database_name
+   ```
+
+3. **Dezactivează debug mode**:
+   ```env
+   DJANGO_DEBUG=False
+   ```
 
 ## 🛠️ Comenzi utile
 
@@ -83,31 +140,23 @@ docker-compose logs db
 docker-compose run web python manage.py shell
 ```
 
-### Creare superuser manual (dacă e necesar)
+### Creare superuser manual
 ```bash
 docker-compose run web python manage.py createsuperuser
+```
+
+### Regenerare fișier .env
+```bash
+./setup-env.sh
 ```
 
 ## 📊 Baza de date
 
 - **Tip**: PostgreSQL 15
 - **Host**: localhost:5432
-- **Database**: django_db
-- **User**: django_user
-- **Password**: django_pass
-
-## 🔧 Configurare
-
-### Variabile de mediu (.env)
-```env
-POSTGRES_DB=django_db
-POSTGRES_USER=django_user
-POSTGRES_PASSWORD=django_pass
-```
-
-### Dependințe Python (requirements.txt)
-- Django>=4.2
-- psycopg2-binary>=2.9
+- **Database**: django_db (configurabil)
+- **User**: django_user (configurabil)
+- **Password**: django_pass (configurabil)
 
 ## 📝 Note importante
 
@@ -115,7 +164,8 @@ POSTGRES_PASSWORD=django_pass
 2. Portul 8000 trebuie să fie liber pentru aplicația Django
 3. Portul 5432 trebuie să fie liber pentru PostgreSQL
 4. Prima rulare poate dura mai mult din cauza descărcării imaginilor Docker
-5. Superuser-ul se creează automat la prima rulare
+5. Superuser-ul se creează automat la prima rulare din variabilele de mediu
+6. Toate setările sunt configurabile prin fișierul `.env`
 
 ## 🐛 Depanare
 
@@ -150,4 +200,10 @@ docker-compose up --build
 docker-compose down -v
 docker system prune -a
 docker-compose up --build
+```
+
+### Dacă ai probleme cu .env
+```bash
+# Regenerază fișierul .env
+./setup-env.sh
 ``` 

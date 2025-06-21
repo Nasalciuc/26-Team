@@ -1,0 +1,340 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ site.domain }} - Detalii - Team 26 App{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <nav aria-label="breadcrumb">
+                                <ol class="breadcrumb mb-2">
+                                    <li class="breadcrumb-item"><a href="{% url 'auth_app:dashboard' %}">Dashboard</a></li>
+                                    <li class="breadcrumb-item"><a href="{% url 'auth_app:site_list' %}">Site-uri</a></li>
+                                    <li class="breadcrumb-item active">{{ site.domain }}</li>
+                                </ol>
+                            </nav>
+                            <h2 class="card-title mb-1">
+                                <i class="bi bi-globe"></i> {{ site.domain }}
+                            </h2>
+                            <p class="text-muted mb-0">{{ site.url }}</p>
+                        </div>
+                        <div class="text-end">
+                            <div class="mb-2">
+                                {% if site.status == 'completed' %}
+                                    <span class="badge bg-success fs-6">
+                                        <i class="bi bi-check-circle"></i> Completat
+                                    </span>
+                                {% elif site.status == 'processing' %}
+                                    <span class="badge bg-warning fs-6">
+                                        <i class="bi bi-hourglass-split"></i> Se procesează
+                                    </span>
+                                {% elif site.status == 'failed' %}
+                                    <span class="badge bg-danger fs-6">
+                                        <i class="bi bi-x-circle"></i> Eșuat
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary fs-6">
+                                        <i class="bi bi-clock"></i> În așteptare
+                                    </span>
+                                {% endif %}
+                            </div>
+                            <small class="text-muted">
+                                Scrapat la: {{ site.scraped_at|date:"d.m.Y H:i" }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if site.status == 'completed' and data %}
+    <!-- Export Buttons -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-download"></i> Exportă Date
+                            </h5>
+                            <small class="text-muted">Descarcă toate datele scrapate în format JSON sau CSV</small>
+                        </div>
+                        <div class="btn-group">
+                            <a href="{% url 'auth_app:export_site_data' site.id %}?format=json" 
+                               class="btn btn-outline-primary">
+                                <i class="bi bi-filetype-json"></i> Export JSON
+                            </a>
+                            <a href="{% url 'auth_app:export_site_data' site.id %}?format=csv" 
+                               class="btn btn-outline-success">
+                                <i class="bi bi-filetype-csv"></i> Export CSV
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-12 col-md-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="mb-2">
+                        <i class="bi bi-link-45deg text-primary" style="font-size: 2rem;"></i>
+                    </div>
+                    <h4 class="text-primary">{{ summary.total_links }}</h4>
+                    <p class="card-text">Linkuri</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="mb-2">
+                        <i class="bi bi-image text-success" style="font-size: 2rem;"></i>
+                    </div>
+                    <h4 class="text-success">{{ summary.total_images }}</h4>
+                    <p class="card-text">Imagini</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="mb-2">
+                        <i class="bi bi-file-text text-warning" style="font-size: 2rem;"></i>
+                    </div>
+                    <h4 class="text-warning">{{ summary.total_paragraphs }}</h4>
+                    <p class="card-text">Paragrafe</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="mb-2">
+                        <i class="bi bi-type-h1 text-info" style="font-size: 2rem;"></i>
+                    </div>
+                    <h4 class="text-info">{{ summary.total_headings }}</h4>
+                    <p class="card-text">Titluri</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Information -->
+    <div class="row g-4">
+        <!-- Basic Info -->
+        <div class="col-12 col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-info-circle"></i> Informații de Bază
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if site.page_title %}
+                    <div class="mb-3">
+                        <strong>Titlu Pagină:</strong>
+                        <p class="mb-1">{{ site.page_title }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if data.company_info.description %}
+                    <div class="mb-3">
+                        <strong>Descriere:</strong>
+                        <p class="mb-1">{{ data.company_info.description|truncatechars:200 }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if data.contact_info.emails %}
+                    <div class="mb-3">
+                        <strong>Email-uri:</strong>
+                        <ul class="list-unstyled mb-1">
+                            {% for email in data.contact_info.emails %}
+                            <li><i class="bi bi-envelope"></i> {{ email }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    
+                    {% if data.contact_info.phones %}
+                    <div class="mb-3">
+                        <strong>Telefoane:</strong>
+                        <ul class="list-unstyled mb-1">
+                            {% for phone in data.contact_info.phones %}
+                            <li><i class="bi bi-telephone"></i> {{ phone }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Social Media -->
+        <div class="col-12 col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-share"></i> Rețele Sociale
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if data.social_media %}
+                        <div class="row g-2">
+                            {% for platform, url in data.social_media.items %}
+                            <div class="col-6">
+                                <a href="{{ url }}" target="_blank" class="btn btn-outline-primary btn-sm w-100">
+                                    <i class="bi bi-{{ platform }}"></i> {{ platform|title }}
+                                </a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Nu au fost găsite rețele sociale</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Links -->
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-link-45deg"></i> Linkuri ({{ data.links|length }})
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if data.links %}
+                    <div class="row g-2">
+                        {% for link in data.links|slice:":20" %}
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <a href="{{ link.url }}" target="_blank" class="btn btn-outline-secondary btn-sm w-100 text-start">
+                                <i class="bi bi-box-arrow-up-right"></i> {{ link.text|truncatechars:30 }}
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% if data.links|length > 20 %}
+                    <div class="mt-3 text-center">
+                        <small class="text-muted">... și încă {{ data.links|length|add:"-20" }} linkuri</small>
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <p class="text-muted">Nu au fost găsite linkuri</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Images -->
+        {% if data.images %}
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-image"></i> Imagini ({{ data.images|length }})
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        {% for image in data.images|slice:":12" %}
+                        <div class="col-6 col-md-4 col-lg-2">
+                            <div class="text-center">
+                                <img src="{{ image.src }}" alt="{{ image.alt|default:'Image' }}" 
+                                     class="img-fluid rounded" style="max-height: 100px; object-fit: cover;"
+                                     onerror="this.style.display='none'">
+                                {% if image.alt %}
+                                <small class="d-block text-muted mt-1">{{ image.alt|truncatechars:20 }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% if data.images|length > 12 %}
+                    <div class="mt-3 text-center">
+                        <small class="text-muted">... și încă {{ data.images|length|add:"-12" }} imagini</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Statistics -->
+        {% if data.statistics %}
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-graph-up"></i> Statistici și Numere ({{ data.statistics|length }})
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        {% for stat in data.statistics|slice:":20" %}
+                        <div class="col-6 col-md-4 col-lg-3">
+                            <span class="badge bg-info fs-6">{{ stat }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% if data.statistics|length > 20 %}
+                    <div class="mt-3 text-center">
+                        <small class="text-muted">... și încă {{ data.statistics|length|add:"-20" }} statistici</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% elif site.status == 'failed' %}
+    <!-- Error State -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <div class="mb-4">
+                        <i class="bi bi-exclamation-triangle text-danger" style="font-size: 4rem;"></i>
+                    </div>
+                    <h4 class="text-danger">Scraping-ul a eșuat</h4>
+                    <p class="text-muted mb-4">{{ site.error_message }}</p>
+                    <a href="{% url 'auth_app:scraping' %}" class="btn btn-primary">
+                        <i class="bi bi-arrow-clockwise"></i> Încearcă Din Nou
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <!-- Processing State -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <div class="mb-4">
+                        <i class="bi bi-hourglass-split text-warning" style="font-size: 4rem;"></i>
+                    </div>
+                    <h4 class="text-warning">Se procesează...</h4>
+                    <p class="text-muted mb-4">Site-ul este în curs de analiză</p>
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

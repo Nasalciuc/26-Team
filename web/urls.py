@@ -15,8 +15,14 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from django.shortcuts import redirect
+
+def redirect_to_login(request):
+    return redirect('auth_app:login')
 
 urlpatterns = [
+    path('', redirect_to_login, name='home'),
     path('admin/', admin.site.urls),
+    path('', include('auth_app.urls')),
 ]
