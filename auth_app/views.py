@@ -32,10 +32,10 @@ from .forms import ScrapingForm
 
 # OpenAI Configuration
 try:
-    import openai
+    from openai import OpenAI
     # Load the API key from an environment variable
-    openai.api_key = os.environ.get("OPENAI_API_KEY")
-    if not openai.api_key:
+    api_key = os.environ.get("OPENAI_API_KEY")
+    if not api_key:
         OPENAI_AVAILABLE = False
         print("Warning: OPENAI_API_KEY environment variable not set. AI Personas functionality will be limited.")
     else:
@@ -120,11 +120,11 @@ def generate_personas_from_site(request, site_id):
         messages.error(request, f"A apărut o eroare la preluarea datelor site-ului: {e}")
         return redirect('auth_app:ai_personas')
 
+    # Build the prompt using the working approach
     prompt_parts = [
-        "Analizează următoarele date extrase de pe un site web și generează 5 profiluri de client (personas) distincte și detaliate. Fiecare profil trebuie să fie în format JSON și să includă: nume, vârstă, ocupație, nevoi, frustrări, și un scurt scenariu de utilizare a site-ului. Prezintă toate cele 5 profiluri într-un singur array JSON numit 'personas'. Datele site-ului sunt:",
-        f"- URL: {site.url}",
-        f"- Titlul paginii: {getattr(data, 'page_title', 'N/A')}",
-        f"- Meta Descriere: {getattr(data, 'meta_tags', {}).get('description', 'N/A')}",
+        f"Create 5 customer personas for a website: {site.url}",
+        f"Website title: {getattr(data, 'page_title', 'N/A')}",
+        f"Meta description: {getattr(data, 'meta_tags', {}).get('description', 'N/A')}",
     ]
 
     # Flatten the list of lists of headings into a single list of strings
@@ -137,32 +137,59 @@ def generate_personas_from_site(request, site_id):
                 all_headings.extend([str(item) for item in heading_list])
 
     if all_headings:
-        prompt_parts.append(f"- Titluri principale (H1, H2, etc.): {', '.join(all_headings[:10])}")
+        prompt_parts.append(f"Main headings: {', '.join(all_headings[:10])}")
 
     paragraphs = getattr(data, 'paragraphs', [])
     if paragraphs and isinstance(paragraphs, list):
-        prompt_parts.append(f"- Primele paragrafe: {' '.join(paragraphs[:3])}")
+        prompt_parts.append(f"Content: {' '.join(paragraphs[:3])}")
     
     links = getattr(data, 'links', [])
     if links and isinstance(links, list):
         link_texts = [link.get('text', '') for link in links if link.get('text')]
         if link_texts:
-            prompt_parts.append(f"- Text ancore linkuri: {', '.join(link_texts[:10])}")
+            prompt_parts.append(f"Navigation links: {', '.join(link_texts[:10])}")
 
-    prompt = "\n".join(prompt_parts)
+    prompt = "\n".join(prompt_parts) + """
+
+Return only JSON format:
+{
+  "personas": [
+    {
+      "name": "Full Name",
+      "age": "25-35",
+      "description": "Brief description",
+      "interests": ["interest1", "interest2"],
+      "needs": ["need1", "need2"],
+      "frustrations": ["frustration1", "frustration2"],
+      "usage_scenario": "How they would use this website"
+    }
+  ]
+}"""
 
     try:
-        response = openai.chat.completions.create(
-            model="gpt-4-turbo",
+        # Use the working OpenAI client approach
+        client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+        
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "Ești un asistent de marketing specializat în crearea de profiluri de clienți (personas). Răspunsul tău trebuie să fie un obiect JSON valid care conține un singur array, numit 'personas'."},
+                {"role": "system", "content": "You are a marketing expert. Return only valid JSON."},
                 {"role": "user", "content": prompt}
             ],
-            response_format={"type": "json_object"}
+            max_tokens=1000,
+            temperature=0.7
         )
         
-        response_content = response.choices[0].message.content
-        personas_data = json.loads(response_content)
+        # Get and clean the response
+        content = response.choices[0].message.content.strip()
+        
+        # Clean JSON if needed (handle markdown code blocks)
+        if "```json" in content:
+            content = content.split("```json")[1].split("```")[0].strip()
+        elif "```" in content:
+            content = content.split("```")[1].strip()
+        
+        personas_data = json.loads(content)
 
         if "personas" not in personas_data or not isinstance(personas_data["personas"], list):
              raise ValueError("Răspunsul JSON de la AI nu are formatul așteptat (lipsește array-ul 'personas').")
@@ -174,17 +201,17 @@ def generate_personas_from_site(request, site_id):
             AIPersona.objects.create(
                 user=request.user,
                 source_site=site,
-                name=persona_info.get("nume", "N/A"),
-                age=persona_info.get("vârstă", 0),
-                occupation=persona_info.get("ocupație", "N/A"),
+                name=persona_info.get("name", "N/A"),
+                age=persona_info.get("age", "N/A"),
+                occupation=persona_info.get("description", "N/A"),
                 details=persona_info
             )
         
         messages.success(request, f'✅ Au fost generate și salvate cu succes {len(personas_data["personas"])} noi profiluri AI pentru {site.domain}!')
         return redirect('auth_app:personas_list')
 
-    except json.JSONDecodeError:
-        messages.error(request, f"Eroare: AI-ul a returnat un răspuns invalid (nu este JSON). Răspuns primit: {response_content}")
+    except json.JSONDecodeError as e:
+        messages.error(request, f"Eroare: AI-ul a returnat un răspuns invalid (nu este JSON). Eroare: {e}")
         return redirect('auth_app:site_detail', site_id=site_id)
     except Exception as e:
         messages.error(request, f'A apărut o eroare la generarea profilurilor: {str(e)}')
