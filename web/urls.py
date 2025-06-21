@@ -16,15 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.shortcuts import redirect
-
-def redirect_to_login(request):
-    if request.user.is_authenticated:
-        return redirect('auth_app:dashboard')
-    return redirect('auth_app:login')
+from django.views.generic import RedirectView
 
 urlpatterns = [
-    path('', redirect_to_login, name='home'),
     path('admin/', admin.site.urls),
     path('', include('auth_app.urls')),
+    path('', RedirectView.as_view(pattern_name='auth_app:login', permanent=False)),
 ]

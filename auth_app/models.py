@@ -83,3 +83,60 @@ class ScrapedData(models.Model):
             'total_tables': len(self.tables),
             'total_forms': len(self.forms)
         }
+
+class AIPersona(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    age = models.IntegerField()
+    location = models.CharField(max_length=255)
+    occupation = models.CharField(max_length=255)
+    income = models.CharField(max_length=100)
+    education = models.CharField(max_length=255)
+    marital_status = models.CharField(max_length=100)
+    interests = models.JSONField(default=list)
+    problems = models.JSONField(default=list)
+    motivations = models.JSONField(default=list)
+    online_behavior = models.TextField()
+    buying_preferences = models.TextField()
+    communication_channels = models.JSONField(default=list)
+    objections = models.JSONField(default=list)
+    business_type = models.CharField(max_length=100)
+    product_description = models.TextField()
+    target_market = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.name} - {self.user.username}"
+
+    def get_interests_display(self):
+        """Returnează interesele ca string"""
+        if isinstance(self.interests, list):
+            return ', '.join(self.interests)
+        return str(self.interests)
+
+    def get_problems_display(self):
+        """Returnează problemele ca string"""
+        if isinstance(self.problems, list):
+            return ', '.join(self.problems)
+        return str(self.problems)
+
+    def get_motivations_display(self):
+        """Returnează motivațiile ca string"""
+        if isinstance(self.motivations, list):
+            return ', '.join(self.motivations)
+        return str(self.motivations)
+
+    def get_communication_channels_display(self):
+        """Returnează canalele de comunicare ca string"""
+        if isinstance(self.communication_channels, list):
+            return ', '.join(self.communication_channels)
+        return str(self.communication_channels)
+
+    def get_objections_display(self):
+        """Returnează obiecțiile ca string"""
+        if isinstance(self.objections, list):
+            return ', '.join(self.objections)
+        return str(self.objections)

@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Generează Personas AI - Team 26{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-6 py-24 animate-fade-in">
+    <div class="text-center mb-12">
+        <i class="bi bi-robot text-6xl text-gradient"></i>
+        <h1 class="text-4xl lg:text-5xl font-bold text-gradient mt-4">Generează Personas cu AI</h1>
+        <p class="text-lg text-yellow-400/70 mt-2">Selectează un site analizat pentru a genera automat profiluri de clienți.</p>
+    </div>
+
+    <div class="robust-card p-8">
+        {% if not openai_available %}
+            <div class="text-center p-8 bg-red-900/50 rounded-lg border-2 border-red-400">
+                <i class="bi bi-exclamation-triangle-fill text-5xl text-red-400 mb-4"></i>
+                <h3 class="text-xl font-bold text-white">Funcționalitate Indisponibilă</h3>
+                <p class="text-red-300">Cheia API pentru OpenAI nu este configurată. Te rugăm să contactezi administratorul.</p>
+            </div>
+        {% elif sites %}
+            <form id="persona-form" method="post" class="space-y-6">
+                {% csrf_token %}
+                <div>
+                    <label for="site_select" class="block text-sm font-bold text-yellow-400 mb-2">Selectează Site-ul</label>
+                    <select id="site_select" name="site_id" class="w-full px-4 py-4 bg-black border-2 border-gray-700 rounded-lg text-yellow-400 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 transition-all duration-300 font-medium">
+                        <option value="">Alege un site...</option>
+                        {% for site in sites %}
+                            <option value="{{ site.id }}">{{ site.page_title|default:site.domain }} (Analizat la: {{ site.scraped_at|date:"d M Y" }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="pt-4">
+                    <button type="submit" class="w-full robust-button py-4 px-6 rounded-lg text-lg font-bold uppercase tracking-wider transition-all duration-300 hover:scale-105">
+                        <i class="bi bi-magic mr-3"></i>
+                        Generează 4 Personas
+                    </button>
+                </div>
+            </form>
+        {% else %}
+             <div class="text-center p-8 bg-gray-900/50 rounded-lg border-2 border-gray-700">
+                <i class="bi bi-search text-5xl text-yellow-400 mb-4"></i>
+                <h3 class="text-xl font-bold text-white">Niciun Site Analizat</h3>
+                <p class="text-gray-400">Trebuie mai întâi să analizezi un site pentru a putea genera personas.</p>
+                <a href="{% url 'auth_app:scraping' %}" class="robust-button inline-block mt-6">Analizează un site acum</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('persona-form');
+    const select = document.getElementById('site_select');
+
+    if (form && select) {
+        form.addEventListener('submit', function(e) {
+            const selectedSiteId = select.value;
+            if (selectedSiteId) {
+                // Dynamically set the form's action URL
+                form.action = `/sites/${selectedSiteId}/generate-personas/`;
+            } else {
+                // Prevent form submission if no site is selected
+                e.preventDefault();
+                alert('Te rugăm să selectezi un site.');
+            }
+        });
+    }
+});
+</script>
+{% endblock %} 

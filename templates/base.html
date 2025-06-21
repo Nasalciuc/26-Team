@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Team 26 - Universal Scraper{% endblock %}</title>
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>{% block title %}Team 26 - AI Platform{% endblock %}</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -174,6 +175,58 @@
             animation: float 6s ease-in-out infinite;
         }
     </style>
+    
+    <!-- CSRF Token for JavaScript -->
+    <script>
+        // Get CSRF token from cookie or meta tag
+        function getCSRFToken() {
+            let csrfToken = null;
+            
+            // Try to get from meta tag first
+            const metaTag = document.querySelector('meta[name="csrf-token"]');
+            if (metaTag) {
+                csrfToken = metaTag.getAttribute('content');
+            }
+            
+            // If not found in meta tag, try to get from cookie
+            if (!csrfToken) {
+                const name = 'csrftoken';
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                csrfToken = cookieValue;
+            }
+            
+            return csrfToken;
+        }
+        
+        // Add CSRF token to all forms automatically
+        document.addEventListener('DOMContentLoaded', function() {
+            const forms = document.querySelectorAll('form[method="post"]');
+            forms.forEach(function(form) {
+                // Check if form already has CSRF token
+                const existingToken = form.querySelector('input[name="csrfmiddlewaretoken"]');
+                if (!existingToken) {
+                    const csrfToken = getCSRFToken();
+                    if (csrfToken) {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'csrfmiddlewaretoken';
+                        input.value = csrfToken;
+                        form.appendChild(input);
+                    }
+                }
+            });
+        });
+    </script>
 </head>
 <body class="min-h-screen bg-black">
     <!-- Robust Black Header -->
@@ -190,7 +243,7 @@
                             Team 26
                         </h1>
                         <p class="text-xs text-yellow-400/70 font-bold uppercase tracking-wider">
-                            Universal Super Scraper
+                            AI Platform
                         </p>
                     </div>
                 </div>
@@ -205,13 +258,13 @@
                         </a>
                         <a href="{% url 'auth_app:scraping' %}" 
                            class="flex items-center space-x-3 px-6 py-4 rounded-lg transition-all duration-300 border-2 font-bold text-yellow-400 border-gray-800 hover:bg-gray-900 hover:border-yellow-400/50 hover:shadow-lg hover:shadow-yellow-400/20">
-                            <i class="bi bi-search text-xl"></i>
-                            <span class="font-bold text-sm uppercase tracking-wide">Scraping</span>
+                            <i class="bi bi-globe text-xl"></i>
+                            <span class="font-bold text-sm uppercase tracking-wide">Site Info</span>
                         </a>
-                        <a href="{% url 'auth_app:site_list' %}" 
+                        <a href="{% url 'auth_app:ai_personas' %}" 
                            class="flex items-center space-x-3 px-6 py-4 rounded-lg transition-all duration-300 border-2 font-bold text-yellow-400 border-gray-800 hover:bg-gray-900 hover:border-yellow-400/50 hover:shadow-lg hover:shadow-yellow-400/20">
-                            <i class="bi bi-list-ul text-xl"></i>
-                            <span class="font-bold text-sm uppercase tracking-wide">Site-uri</span>
+                            <i class="bi bi-robot text-xl"></i>
+                            <span class="font-bold text-sm uppercase tracking-wide">AI Personas</span>
                         </a>
                         <a href="{% url 'auth_app:logout' %}" 
                            class="flex items-center space-x-3 px-6 py-4 rounded-lg transition-all duration-300 border-2 font-bold text-red-400 border-red-800 hover:bg-red-900 hover:border-red-400/50 hover:shadow-lg hover:shadow-red-400/20">
@@ -245,13 +298,13 @@
                         </a>
                         <a href="{% url 'auth_app:scraping' %}" 
                            class="flex items-center space-x-4 px-6 py-4 rounded-lg transition-all duration-300 border-2 font-bold text-yellow-400 border-gray-700 hover:bg-gray-800 hover:border-yellow-400/50">
-                            <i class="bi bi-search text-xl"></i>
-                            <span class="font-bold uppercase tracking-wide">Scraping</span>
+                            <i class="bi bi-globe text-xl"></i>
+                            <span class="font-bold uppercase tracking-wide">Site Info</span>
                         </a>
-                        <a href="{% url 'auth_app:site_list' %}" 
+                        <a href="{% url 'auth_app:ai_personas' %}" 
                            class="flex items-center space-x-4 px-6 py-4 rounded-lg transition-all duration-300 border-2 font-bold text-yellow-400 border-gray-700 hover:bg-gray-800 hover:border-yellow-400/50">
-                            <i class="bi bi-list-ul text-xl"></i>
-                            <span class="font-bold uppercase tracking-wide">Site-uri</span>
+                            <i class="bi bi-robot text-xl"></i>
+                            <span class="font-bold uppercase tracking-wide">AI Personas</span>
                         </a>
                         <a href="{% url 'auth_app:logout' %}" 
                            class="flex items-center space-x-4 px-6 py-4 rounded-lg transition-all duration-300 border-2 font-bold text-red-400 border-red-700 hover:bg-red-800 hover:border-red-400/50">
@@ -316,11 +369,11 @@
                         <span class="text-black font-black text-lg">T</span>
                     </div>
                     <span class="text-sm text-yellow-400 font-bold">
-                        © 2024 Team 26 - Universal Super Scraper
+                        © 2024 Team 26 - AI Platform
                     </span>
                 </div>
                 <div class="text-xs text-yellow-400/70 font-bold uppercase tracking-wider">
-                    Creat cu ❤️ pentru analiza web
+                    Creat cu ❤️ pentru succesul tău
                 </div>
             </div>
         </div>

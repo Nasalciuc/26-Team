@@ -1,340 +1,160 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}{{ site.domain }} - Detalii - Team 26 App{% endblock %}
+{% block title %}{{ site.page_title|default:site.domain }} - Detalii Raport{% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4">
-    <!-- Header -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <nav aria-label="breadcrumb">
-                                <ol class="breadcrumb mb-2">
-                                    <li class="breadcrumb-item"><a href="{% url 'auth_app:dashboard' %}">Dashboard</a></li>
-                                    <li class="breadcrumb-item"><a href="{% url 'auth_app:site_list' %}">Site-uri</a></li>
-                                    <li class="breadcrumb-item active">{{ site.domain }}</li>
-                                </ol>
-                            </nav>
-                            <h2 class="card-title mb-1">
-                                <i class="bi bi-globe"></i> {{ site.domain }}
-                            </h2>
-                            <p class="text-muted mb-0">{{ site.url }}</p>
-                        </div>
-                        <div class="text-end">
-                            <div class="mb-2">
-                                {% if site.status == 'completed' %}
-                                    <span class="badge bg-success fs-6">
-                                        <i class="bi bi-check-circle"></i> Completat
-                                    </span>
-                                {% elif site.status == 'processing' %}
-                                    <span class="badge bg-warning fs-6">
-                                        <i class="bi bi-hourglass-split"></i> Se procesează
-                                    </span>
-                                {% elif site.status == 'failed' %}
-                                    <span class="badge bg-danger fs-6">
-                                        <i class="bi bi-x-circle"></i> Eșuat
-                                    </span>
-                                {% else %}
-                                    <span class="badge bg-secondary fs-6">
-                                        <i class="bi bi-clock"></i> În așteptare
-                                    </span>
-                                {% endif %}
-                            </div>
-                            <small class="text-muted">
-                                Scrapat la: {{ site.scraped_at|date:"d.m.Y H:i" }}
-                            </small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-fade-in">
+
+    <!-- Header: Breadcrumbs and Title -->
+    <div class="mb-8">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="flex items-center space-x-2 text-sm text-gray-400">
+                <li><a href="{% url 'auth_app:dashboard' %}" class="hover:text-yellow-400 transition-colors">Dashboard</a></li>
+                <li><span class="text-gray-600">/</span></li>
+                <li><a href="{% url 'auth_app:site_list' %}" class="hover:text-yellow-400 transition-colors">Site-uri Analizate</a></li>
+                <li><span class="text-gray-600">/</span></li>
+                <li class="font-semibold text-yellow-400" aria-current="page">{{ site.page_title|default:site.domain }}</li>
+            </ol>
+        </nav>
+        <h1 class="text-4xl font-bold text-gradient">Raport de Analiză</h1>
     </div>
 
-    {% if site.status == 'completed' and data %}
-    <!-- Export Buttons -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h5 class="card-title mb-0">
-                                <i class="bi bi-download"></i> Exportă Date
-                            </h5>
-                            <small class="text-muted">Descarcă toate datele scrapate în format JSON sau CSV</small>
-                        </div>
-                        <div class="btn-group">
-                            <a href="{% url 'auth_app:export_site_data' site.id %}?format=json" 
-                               class="btn btn-outline-primary">
-                                <i class="bi bi-filetype-json"></i> Export JSON
-                            </a>
-                            <a href="{% url 'auth_app:export_site_data' site.id %}?format=csv" 
-                               class="btn btn-outline-success">
-                                <i class="bi bi-filetype-csv"></i> Export CSV
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-    <!-- Summary Cards -->
-    <div class="row g-4 mb-4">
-        <div class="col-12 col-md-3">
-            <div class="card h-100">
-                <div class="card-body text-center">
-                    <div class="mb-2">
-                        <i class="bi bi-link-45deg text-primary" style="font-size: 2rem;"></i>
+        <!-- Left Column: Site Info & Actions -->
+        <div class="lg:col-span-1 space-y-6">
+            <div class="robust-card p-6 sticky top-24">
+                <h2 class="text-2xl font-bold text-yellow-400 mb-4">{{ site.page_title|default:"Site Analizat" }}</h2>
+                
+                <div class="space-y-3 text-sm">
+                    <div class="flex items-start">
+                        <i class="bi bi-globe text-gray-400 mt-1 mr-3"></i>
+                        <a href="{{ site.url }}" target="_blank" class="text-yellow-400 hover:underline break-all">{{ site.url }}</a>
                     </div>
-                    <h4 class="text-primary">{{ summary.total_links }}</h4>
-                    <p class="card-text">Linkuri</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-md-3">
-            <div class="card h-100">
-                <div class="card-body text-center">
-                    <div class="mb-2">
-                        <i class="bi bi-image text-success" style="font-size: 2rem;"></i>
+                    <div class="flex items-center">
+                        <i class="bi bi-clock text-gray-400 mr-3"></i>
+                        <span>Analizat la: {{ site.scraped_at|date:"d M Y, H:i" }}</span>
                     </div>
-                    <h4 class="text-success">{{ summary.total_images }}</h4>
-                    <p class="card-text">Imagini</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-md-3">
-            <div class="card h-100">
-                <div class="card-body text-center">
-                    <div class="mb-2">
-                        <i class="bi bi-file-text text-warning" style="font-size: 2rem;"></i>
+                    <div class="flex items-center">
+                        <i class="bi bi-check-circle text-gray-400 mr-3"></i>
+                        <span>Status: 
+                            {% if site.status == 'completed' %}
+                                <span class="font-semibold text-green-400">Completat</span>
+                            {% elif site.status == 'failed' %}
+                                <span class="font-semibold text-red-400">Eșuat</span>
+                            {% else %}
+                                <span class="font-semibold text-gray-500">{{ site.status|title }}</span>
+                            {% endif %}
+                        </span>
                     </div>
-                    <h4 class="text-warning">{{ summary.total_paragraphs }}</h4>
-                    <p class="card-text">Paragrafe</p>
                 </div>
-            </div>
-        </div>
-        <div class="col-12 col-md-3">
-            <div class="card h-100">
-                <div class="card-body text-center">
-                    <div class="mb-2">
-                        <i class="bi bi-type-h1 text-info" style="font-size: 2rem;"></i>
-                    </div>
-                    <h4 class="text-info">{{ summary.total_headings }}</h4>
-                    <p class="card-text">Titluri</p>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Detailed Information -->
-    <div class="row g-4">
-        <!-- Basic Info -->
-        <div class="col-12 col-lg-6">
-            <div class="card h-100">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-info-circle"></i> Informații de Bază
-                    </h5>
-                </div>
-                <div class="card-body">
-                    {% if site.page_title %}
-                    <div class="mb-3">
-                        <strong>Titlu Pagină:</strong>
-                        <p class="mb-1">{{ site.page_title }}</p>
-                    </div>
-                    {% endif %}
-                    
-                    {% if data.company_info.description %}
-                    <div class="mb-3">
-                        <strong>Descriere:</strong>
-                        <p class="mb-1">{{ data.company_info.description|truncatechars:200 }}</p>
-                    </div>
-                    {% endif %}
-                    
-                    {% if data.contact_info.emails %}
-                    <div class="mb-3">
-                        <strong>Email-uri:</strong>
-                        <ul class="list-unstyled mb-1">
-                            {% for email in data.contact_info.emails %}
-                            <li><i class="bi bi-envelope"></i> {{ email }}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                    {% endif %}
-                    
-                    {% if data.contact_info.phones %}
-                    <div class="mb-3">
-                        <strong>Telefoane:</strong>
-                        <ul class="list-unstyled mb-1">
-                            {% for phone in data.contact_info.phones %}
-                            <li><i class="bi bi-telephone"></i> {{ phone }}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+                <hr class="my-6 border-gray-700">
 
-        <!-- Social Media -->
-        <div class="col-12 col-lg-6">
-            <div class="card h-100">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-share"></i> Rețele Sociale
-                    </h5>
-                </div>
-                <div class="card-body">
-                    {% if data.social_media %}
-                        <div class="row g-2">
-                            {% for platform, url in data.social_media.items %}
-                            <div class="col-6">
-                                <a href="{{ url }}" target="_blank" class="btn btn-outline-primary btn-sm w-100">
-                                    <i class="bi bi-{{ platform }}"></i> {{ platform|title }}
-                                </a>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <p class="text-muted">Nu au fost găsite rețele sociale</p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <!-- Links -->
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-link-45deg"></i> Linkuri ({{ data.links|length }})
-                    </h5>
-                </div>
-                <div class="card-body">
-                    {% if data.links %}
-                    <div class="row g-2">
-                        {% for link in data.links|slice:":20" %}
-                        <div class="col-12 col-md-6 col-lg-4">
-                            <a href="{{ link.url }}" target="_blank" class="btn btn-outline-secondary btn-sm w-100 text-start">
-                                <i class="bi bi-box-arrow-up-right"></i> {{ link.text|truncatechars:30 }}
-                            </a>
-                        </div>
-                        {% endfor %}
-                    </div>
-                    {% if data.links|length > 20 %}
-                    <div class="mt-3 text-center">
-                        <small class="text-muted">... și încă {{ data.links|length|add:"-20" }} linkuri</small>
-                    </div>
-                    {% endif %}
-                    {% else %}
-                    <p class="text-muted">Nu au fost găsite linkuri</p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <!-- Images -->
-        {% if data.images %}
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-image"></i> Imagini ({{ data.images|length }})
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="row g-2">
-                        {% for image in data.images|slice:":12" %}
-                        <div class="col-6 col-md-4 col-lg-2">
-                            <div class="text-center">
-                                <img src="{{ image.src }}" alt="{{ image.alt|default:'Image' }}" 
-                                     class="img-fluid rounded" style="max-height: 100px; object-fit: cover;"
-                                     onerror="this.style.display='none'">
-                                {% if image.alt %}
-                                <small class="d-block text-muted mt-1">{{ image.alt|truncatechars:20 }}</small>
-                                {% endif %}
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                    {% if data.images|length > 12 %}
-                    <div class="mt-3 text-center">
-                        <small class="text-muted">... și încă {{ data.images|length|add:"-12" }} imagini</small>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        {% endif %}
-
-        <!-- Statistics -->
-        {% if data.statistics %}
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-graph-up"></i> Statistici și Numere ({{ data.statistics|length }})
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="row g-2">
-                        {% for stat in data.statistics|slice:":20" %}
-                        <div class="col-6 col-md-4 col-lg-3">
-                            <span class="badge bg-info fs-6">{{ stat }}</span>
-                        </div>
-                        {% endfor %}
-                    </div>
-                    {% if data.statistics|length > 20 %}
-                    <div class="mt-3 text-center">
-                        <small class="text-muted">... și încă {{ data.statistics|length|add:"-20" }} statistici</small>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        {% endif %}
-    </div>
-
-    {% elif site.status == 'failed' %}
-    <!-- Error State -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body text-center py-5">
-                    <div class="mb-4">
-                        <i class="bi bi-exclamation-triangle text-danger" style="font-size: 4rem;"></i>
-                    </div>
-                    <h4 class="text-danger">Scraping-ul a eșuat</h4>
-                    <p class="text-muted mb-4">{{ site.error_message }}</p>
-                    <a href="{% url 'auth_app:scraping' %}" class="btn btn-primary">
-                        <i class="bi bi-arrow-clockwise"></i> Încearcă Din Nou
+                <h3 class="text-lg font-semibold text-yellow-400 mb-4">Acțiuni</h3>
+                <div class="space-y-3">
+                    <form action="{% url 'auth_app:generate_personas_from_site' site.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="w-full robust-button flex items-center justify-center gap-2" title="Generează 4 profiluri de clienți (personas) pe baza datelor acestui site, folosind AI.">
+                            <i class="bi bi-robot"></i>
+                            <span>Generează Personas AI</span>
+                        </button>
+                    </form>
+                    <a href="{% url 'auth_app:export_site_data' site.id %}" class="w-full robust-button flex items-center justify-center gap-2">
+                        <i class="bi bi-download"></i>
+                        <span>Exportă Date</span>
                     </a>
+                    <form action="{% url 'auth_app:delete_site' site.id %}" method="post" onsubmit="return confirm('Ești sigur că vrei să ștergi acest site și toate datele asociate?');">
+                        {% csrf_token %}
+                        <button type="submit" class="w-full robust-button-destructive flex items-center justify-center gap-2">
+                            <i class="bi bi-trash"></i>
+                            <span>Șterge Site</span>
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
-    </div>
-    {% else %}
-    <!-- Processing State -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body text-center py-5">
-                    <div class="mb-4">
-                        <i class="bi bi-hourglass-split text-warning" style="font-size: 4rem;"></i>
-                    </div>
-                    <h4 class="text-warning">Se procesează...</h4>
-                    <p class="text-muted mb-4">Site-ul este în curs de analiză</p>
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
+
+        <!-- Right Column: Scraped Data -->
+        <div class="lg:col-span-2 space-y-6">
+            {% if site.status == 'completed' and data %}
+                <!-- Summary -->
+                <div class="robust-card p-6">
+                    <h3 class="text-xl font-bold text-yellow-400 mb-4">Sumar Extragere Date</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                        <div class="p-4 bg-gray-900/50 rounded-lg">
+                            <p class="text-2xl font-bold text-yellow-400">{{ summary.total_links }}</p>
+                            <p class="text-sm text-gray-400">Linkuri</p>
+                        </div>
+                        <div class="p-4 bg-gray-900/50 rounded-lg">
+                            <p class="text-2xl font-bold text-yellow-400">{{ summary.total_images }}</p>
+                            <p class="text-sm text-gray-400">Imagini</p>
+                        </div>
+                        <div class="p-4 bg-gray-900/50 rounded-lg">
+                            <p class="text-2xl font-bold text-yellow-400">{{ summary.total_paragraphs }}</p>
+                            <p class="text-sm text-gray-400">Paragrafe</p>
+                        </div>
+                        <div class="p-4 bg-gray-900/50 rounded-lg">
+                            <p class="text-2xl font-bold text-yellow-400">{{ summary.total_headings }}</p>
+                            <p class="text-sm text-gray-400">Titluri</p>
+                        </div>
                     </div>
                 </div>
-            </div>
+
+                <!-- Headings -->
+                <div class="robust-card p-6">
+                    <h3 class="text-xl font-bold text-yellow-400 mb-4">Titluri (H1, H2, etc.)</h3>
+                    <ul class="space-y-2 text-sm">
+                        {% for tag, text in data.headings.items|slice:":10" %}
+                            <li class="flex items-start">
+                                <span class="inline-block bg-yellow-400 text-black font-bold text-xs px-2 py-1 rounded-md mr-3">{{ tag|upper }}</span>
+                                <span class="text-gray-300">{{ text }}</span>
+                            </li>
+                        {% empty %}
+                            <p class="text-gray-500">Nu au fost găsite titluri.</p>
+                        {% endfor %}
+                    </ul>
+                </div>
+                
+                <!-- Paragraphs -->
+                <div class="robust-card p-6">
+                    <h3 class="text-xl font-bold text-yellow-400 mb-4">Paragrafe Reprezentative</h3>
+                    <div class="space-y-4 text-sm text-gray-400">
+                        {% for p in data.paragraphs|slice:":5" %}
+                            <p class="border-l-2 border-yellow-400 pl-4">{{ p|truncatewords:50 }}</p>
+                        {% empty %}
+                            <p class="text-gray-500">Nu au fost găsite paragrafe.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Links -->
+                <div class="robust-card p-6">
+                    <h3 class="text-xl font-bold text-yellow-400 mb-4">Link-uri Externe și Interne</h3>
+                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                        {% for link in data.links|slice:":10" %}
+                            <a href="{{ link.url }}" target="_blank" class="flex items-center p-2 rounded-md hover:bg-gray-900/50 transition-colors">
+                                <i class="bi bi-link-45deg text-gray-400 mr-2"></i>
+                                <span class="text-yellow-400 truncate">{{ link.text|default:link.url }}</span>
+                            </a>
+                        {% empty %}
+                            <p class="text-gray-500">Nu au fost găsite linkuri.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="robust-card p-12 text-center">
+                    <i class="bi bi-exclamation-triangle text-5xl text-yellow-400 mb-4"></i>
+                    <h3 class="text-xl font-bold text-white">Date Indisponibile</h3>
+                    <p class="text-gray-400">Procesul de scraping nu a fost finalizat sau a eșuat pentru acest site.</p>
+                    {% if site.error_message %}
+                        <p class="text-red-400 text-sm mt-2">Motiv: {{ site.error_message }}</p>
+                    {% endif %}
+                </div>
+            {% endif %}
         </div>
     </div>
-    {% endif %}
 </div>
 {% endblock %} 

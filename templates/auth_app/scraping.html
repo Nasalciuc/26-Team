@@ -1,240 +1,43 @@
 {% extends 'base.html' %}
 
-{% block title %}Scraping - Team 26{% endblock %}
+{% block title %}Analiză Site - Team 26{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto p-6 space-y-8 animate-fade-in">
-    <!-- Header -->
-    <div class="text-center space-y-4">
-        <div class="flex items-center justify-center mb-6">
-            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center shadow-2xl border-4 border-yellow-400/50 mr-6">
-                <i class="bi bi-search text-black text-2xl"></i>
-            </div>
-            <div class="text-left">
-                <h1 class="text-4xl font-black text-yellow-400 tracking-tight mb-2">
-                    Scraping Universal
-                </h1>
-                <p class="text-lg text-yellow-400/70 font-bold uppercase tracking-wider">
-                    Analizează site-uri web și extrage date structurate
-                </p>
-            </div>
-        </div>
+<div class="max-w-3xl mx-auto px-6 py-24 animate-fade-in">
+    <div class="text-center mb-12">
+        <i class="bi bi-search-heart text-6xl text-gradient"></i>
+        <h1 class="text-4xl lg:text-5xl font-bold text-gradient mt-4">Analiză Rapidă Site</h1>
+        <p class="text-lg text-yellow-400/70 mt-2">Introdu adresa URL a site-ului pe care vrei să-l analizezi.</p>
     </div>
 
-    <!-- Scraping Form -->
-    <div class="robust-card rounded-2xl p-8">
-        <div class="text-center mb-8">
-            <h2 class="text-3xl font-bold text-yellow-400 mb-4">
-                <i class="bi bi-globe text-4xl mb-4 block"></i>
-                Introdu URL-ul Site-ului
-            </h2>
-            <p class="text-gray-400 text-lg max-w-2xl mx-auto">
-                Scraper-ul va extrage toate informațiile importante: meta tags, linkuri, imagini, 
-                contact info, rețele sociale și multe altele.
-            </p>
-        </div>
-
-        {% if form %}
-        <form method="post" class="max-w-2xl mx-auto space-y-6">
+    <div class="robust-card p-8">
+        <form method="post" action="{% url 'auth_app:scraping' %}" class="space-y-6">
             {% csrf_token %}
-            
             <div>
-                <label for="{{ form.url.id_for_label }}" class="block text-lg font-bold text-yellow-400 mb-3">
-                    <i class="bi bi-link-45deg text-yellow-400 mr-2"></i>
-                    URL Site Web
-                </label>
+                <label for="url" class="block text-sm font-bold text-yellow-400 mb-2">Adresa URL a site-ului</label>
                 <div class="relative">
+                    <i class="bi bi-link-45deg absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
                     <input 
-                        type="url" 
-                        name="{{ form.url.name }}"
-                        id="{{ form.url.id_for_label }}"
-                        class="w-full px-6 py-6 bg-black border-2 border-gray-700 rounded-xl text-yellow-400 placeholder-gray-500 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 transition-all duration-300 font-medium text-lg"
-                        placeholder="https://example.com"
+                        type="text" 
+                        name="url"
+                        id="url"
+                        class="w-full pl-12 pr-4 py-4 bg-black border-2 border-gray-700 rounded-lg text-yellow-400 placeholder-gray-500 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 transition-all duration-300 font-medium"
+                        placeholder="exemplu.ro"
                         required
                     >
-                    <div class="absolute inset-y-0 right-0 pr-6 flex items-center pointer-events-none">
-                        <i class="bi bi-globe text-gray-500 text-xl"></i>
-                    </div>
                 </div>
-                {% if form.url.errors %}
-                    <div class="mt-3 text-red-400 text-sm">
-                        {% for error in form.url.errors %}
-                            <i class="bi bi-exclamation-circle mr-1"></i>{{ error }}
-                        {% endfor %}
-                    </div>
-                {% endif %}
             </div>
-
-            <div class="pt-6">
+            
+            <div class="pt-4">
                 <button 
                     type="submit" 
-                    class="w-full robust-button py-6 px-8 rounded-xl text-xl font-bold uppercase tracking-wider transition-all duration-300 hover:scale-105"
+                    class="w-full robust-button py-4 px-6 rounded-lg text-lg font-bold uppercase tracking-wider transition-all duration-300 hover:scale-105"
                 >
-                    <i class="bi bi-search mr-3"></i>
-                    Începe Scraping-ul
+                    <i class="bi bi-arrow-right-circle mr-3"></i>
+                    Pornește Analiza
                 </button>
             </div>
         </form>
-        {% else %}
-        <div class="text-center py-12">
-            <div class="w-24 h-24 rounded-2xl bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center mx-auto mb-6 shadow-2xl border-4 border-red-400/50">
-                <i class="bi bi-exclamation-triangle text-white text-3xl"></i>
-            </div>
-            <h3 class="text-2xl font-bold text-red-400 mb-4">Scraper-ul nu este disponibil</h3>
-            <p class="text-gray-400 text-lg mb-6">
-                DrissionPage nu este instalat în container. Funcționalitatea de scraping este limitată.
-            </p>
-            <div class="robust-card rounded-xl p-6 max-w-md mx-auto">
-                <h4 class="text-lg font-bold text-yellow-400 mb-4">Pentru a instala DrissionPage:</h4>
-                <div class="text-left space-y-2 text-sm text-gray-400">
-                    <div class="flex items-center space-x-2">
-                        <i class="bi bi-terminal text-yellow-400"></i>
-                        <span>docker exec -it team26-web-1 pip install DrissionPage</span>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <i class="bi bi-arrow-clockwise text-yellow-400"></i>
-                        <span>Restart container-ul web</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-    </div>
-
-    <!-- Features Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div class="robust-card rounded-xl p-6 text-center card-hover">
-            <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mx-auto mb-4 shadow-xl border-2 border-blue-400/50">
-                <i class="bi bi-tags text-white text-2xl"></i>
-            </div>
-            <h3 class="text-lg font-bold text-blue-400 mb-2">Meta Tags</h3>
-            <p class="text-sm text-gray-400">Extrage toate meta tag-urile, titluri și descrieri</p>
-        </div>
-
-        <div class="robust-card rounded-xl p-6 text-center card-hover">
-            <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center mx-auto mb-4 shadow-xl border-2 border-green-400/50">
-                <i class="bi bi-link-45deg text-white text-2xl"></i>
-            </div>
-            <h3 class="text-lg font-bold text-green-400 mb-2">Linkuri & Imagini</h3>
-            <p class="text-sm text-gray-400">Toate linkurile, imaginile și resursele</p>
-        </div>
-
-        <div class="robust-card rounded-xl p-6 text-center card-hover">
-            <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mx-auto mb-4 shadow-xl border-2 border-purple-400/50">
-                <i class="bi bi-envelope text-white text-2xl"></i>
-            </div>
-            <h3 class="text-lg font-bold text-purple-400 mb-2">Contact Info</h3>
-            <p class="text-sm text-gray-400">Email-uri, telefoane și informații de contact</p>
-        </div>
-
-        <div class="robust-card rounded-xl p-6 text-center card-hover">
-            <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-yellow-500 to-yellow-600 flex items-center justify-center mx-auto mb-4 shadow-xl border-2 border-yellow-400/50">
-                <i class="bi bi-share text-white text-2xl"></i>
-            </div>
-            <h3 class="text-lg font-bold text-yellow-400 mb-2">Rețele Sociale</h3>
-            <p class="text-sm text-gray-400">Linkuri către platforme sociale</p>
-        </div>
-
-        <div class="robust-card rounded-xl p-6 text-center card-hover">
-            <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center mx-auto mb-4 shadow-xl border-2 border-red-400/50">
-                <i class="bi bi-graph-up text-white text-2xl"></i>
-            </div>
-            <h3 class="text-lg font-bold text-red-400 mb-2">Statistici</h3>
-            <p class="text-sm text-gray-400">Numere, procente și date statistice</p>
-        </div>
-
-        <div class="robust-card rounded-xl p-6 text-center card-hover">
-            <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center mx-auto mb-4 shadow-xl border-2 border-indigo-400/50">
-                <i class="bi bi-download text-white text-2xl"></i>
-            </div>
-            <h3 class="text-lg font-bold text-indigo-400 mb-2">Export Date</h3>
-            <p class="text-sm text-gray-400">Salvare în baza de date și export JSON/CSV</p>
-        </div>
-    </div>
-
-    <!-- Recent Sites -->
-    {% if recent_sites %}
-    <div class="robust-card rounded-xl p-6">
-        <h3 class="text-2xl font-bold text-yellow-400 mb-6 flex items-center">
-            <i class="bi bi-clock-history text-3xl mr-3"></i>
-            Site-uri Recente
-        </h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {% for site in recent_sites %}
-            <div class="robust-card rounded-lg p-4 card-hover">
-                <div class="flex items-center justify-between mb-3">
-                    <h4 class="font-bold text-yellow-400">{{ site.domain }}</h4>
-                    <div class="flex items-center space-x-2">
-                        {% if site.status == 'completed' %}
-                            <span class="w-3 h-3 bg-green-400 rounded-full"></span>
-                        {% elif site.status == 'processing' %}
-                            <span class="w-3 h-3 bg-yellow-400 rounded-full animate-pulse"></span>
-                        {% elif site.status == 'failed' %}
-                            <span class="w-3 h-3 bg-red-400 rounded-full"></span>
-                        {% endif %}
-                    </div>
-                </div>
-                <p class="text-xs text-gray-400 mb-3">{{ site.scraped_at|date:"d.m.Y H:i" }}</p>
-                <div class="flex space-x-2">
-                    <a href="{% url 'auth_app:site_detail' site.id %}" class="flex-1 robust-button py-2 px-3 rounded text-sm font-bold text-center">
-                        <i class="bi bi-eye mr-1"></i> Vezi
-                    </a>
-                    {% if site.status == 'completed' %}
-                    <a href="{% url 'auth_app:export_site_data' site.id %}?format=json" class="flex-1 bg-purple-900 border-2 border-purple-400 text-purple-400 py-2 px-3 rounded text-sm font-bold text-center hover:bg-purple-400 hover:text-black transition-all duration-300">
-                        <i class="bi bi-download mr-1"></i> Export
-                    </a>
-                    {% endif %}
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        <div class="text-center mt-6">
-            <a href="{% url 'auth_app:site_list' %}" class="robust-button px-6 py-3 rounded-lg font-bold">
-                Vezi Toate Site-urile
-            </a>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- System Info -->
-    <div class="robust-card rounded-xl p-6">
-        <h3 class="text-2xl font-bold text-yellow-400 mb-6 flex items-center">
-            <i class="bi bi-info-circle text-3xl mr-3"></i>
-            Informații Sistem
-        </h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="flex items-center space-x-4">
-                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
-                    {% if scraper_available %}
-                        <i class="bi bi-check-circle text-white text-xl"></i>
-                    {% else %}
-                        <i class="bi bi-x-circle text-white text-xl"></i>
-                    {% endif %}
-                </div>
-                <div>
-                    <h4 class="text-lg font-bold text-yellow-400">Scraper Status</h4>
-                    <p class="text-sm text-gray-400">
-                        {% if scraper_available %}
-                            ✅ DrissionPage disponibil pentru scraping complet
-                        {% else %}
-                            ❌ DrissionPage nu este instalat
-                        {% endif %}
-                    </p>
-                </div>
-            </div>
-            
-            <div class="flex items-center space-x-4">
-                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
-                    <i class="bi bi-database text-white text-xl"></i>
-                </div>
-                <div>
-                    <h4 class="text-lg font-bold text-yellow-400">Baza de Date</h4>
-                    <p class="text-sm text-gray-400">
-                        {{ total_sites }} site-uri înregistrate în sistem
-                    </p>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 {% endblock %} 

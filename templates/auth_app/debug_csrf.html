@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}CSRF Debug - Team 26{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-black py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-yellow-400 mb-4">CSRF Debug Information</h1>
+            <p class="text-gray-400">This page helps diagnose CSRF token issues</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- CSRF Token Info -->
+            <div class="robust-card rounded-lg p-6">
+                <h2 class="text-xl font-bold text-yellow-400 mb-4">CSRF Token</h2>
+                <div class="space-y-2">
+                    <div>
+                        <span class="text-gray-400">Token:</span>
+                        <code class="block bg-gray-800 p-2 rounded text-sm text-yellow-400 break-all">{{ csrf_token }}</code>
+                    </div>
+                    <div>
+                        <span class="text-gray-400">Session ID:</span>
+                        <code class="block bg-gray-800 p-2 rounded text-sm text-yellow-400">{{ session_id|default:"No session" }}</code>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Request Info -->
+            <div class="robust-card rounded-lg p-6">
+                <h2 class="text-xl font-bold text-yellow-400 mb-4">Request Information</h2>
+                <div class="space-y-2">
+                    <div>
+                        <span class="text-gray-400">Method:</span>
+                        <span class="text-yellow-400 font-mono">{{ method }}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-400">User Agent:</span>
+                        <code class="block bg-gray-800 p-2 rounded text-xs text-yellow-400 break-all">{{ user_agent }}</code>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cookies -->
+            <div class="robust-card rounded-lg p-6 md:col-span-2">
+                <h2 class="text-xl font-bold text-yellow-400 mb-4">Cookies</h2>
+                <div class="space-y-2">
+                    {% for name, value in cookies.items %}
+                    <div class="flex justify-between items-start">
+                        <span class="text-gray-400 font-mono text-sm">{{ name }}:</span>
+                        <code class="bg-gray-800 p-2 rounded text-xs text-yellow-400 break-all max-w-xs">{{ value }}</code>
+                    </div>
+                    {% empty %}
+                    <p class="text-gray-500">No cookies found</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Test Form -->
+            <div class="robust-card rounded-lg p-6 md:col-span-2">
+                <h2 class="text-xl font-bold text-yellow-400 mb-4">Test CSRF Form</h2>
+                <form method="post" class="space-y-4">
+                    {% csrf_token %}
+                    <div>
+                        <label class="block text-sm font-bold text-yellow-400 mb-2">Test Input:</label>
+                        <input type="text" name="test_input" class="w-full px-4 py-2 bg-black border-2 border-gray-700 rounded-lg text-yellow-400" placeholder="Enter test data">
+                    </div>
+                    <button type="submit" class="robust-button px-6 py-2 rounded-lg">
+                        Test CSRF Protection
+                    </button>
+                </form>
+                {% if request.method == 'POST' %}
+                <div class="mt-4 p-4 bg-green-900/50 border-2 border-green-400 rounded-lg">
+                    <p class="text-green-400">✅ CSRF token is working correctly!</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Troubleshooting Tips -->
+        <div class="robust-card rounded-lg p-6 mt-6">
+            <h2 class="text-xl font-bold text-yellow-400 mb-4">Troubleshooting Tips</h2>
+            <div class="space-y-3 text-gray-400">
+                <div class="flex items-start space-x-3">
+                    <span class="text-yellow-400">1.</span>
+                    <p>Clear your browser cookies and cache, then try again</p>
+                </div>
+                <div class="flex items-start space-x-3">
+                    <span class="text-yellow-400">2.</span>
+                    <p>Make sure cookies are enabled in your browser</p>
+                </div>
+                <div class="flex items-start space-x-3">
+                    <span class="text-yellow-400">3.</span>
+                    <p>Try using an incognito/private browsing window</p>
+                </div>
+                <div class="flex items-start space-x-3">
+                    <span class="text-yellow-400">4.</span>
+                    <p>Check if you're accessing the site via HTTPS in production</p>
+                </div>
+                <div class="flex items-start space-x-3">
+                    <span class="text-yellow-400">5.</span>
+                    <p>Ensure all forms include the {% csrf_token %} template tag</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
