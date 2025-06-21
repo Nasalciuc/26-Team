@@ -19,6 +19,8 @@ from django.urls import path, include
 from django.shortcuts import redirect
 
 def redirect_to_login(request):
+    if request.user.is_authenticated:
+        return redirect('auth_app:dashboard')
     return redirect('auth_app:login')
 
 urlpatterns = [
