@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tinkerbell - AI Marketing Assistant That Never Sleeps</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>        :root {
-            --primary-50: #f0fdf4;
+    <style>
+         :root {            --primary-50: #f0fdf4;
             --primary-100: #dcfce7;
             --primary-200: #bbf7d0;
             --primary-300: #86efac;
@@ -15,19 +15,17 @@
             --primary-500: #22c55e;
             --primary-600: #16a34a;
             --primary-700: #15803d;
-            --primary-800: #166534;
-            --primary-900: #14532d;
-            --gray-50: #f8fafc;
-            --gray-100: #f1f5f9;
-            --gray-200: #e2e8f0;
-            --gray-300: #cbd5e1;
-            --gray-400: #94a3b8;
-            --gray-500: #64748b;
-            --gray-600: #475569;
-            --gray-700: #334155;
-            --gray-800: #1e293b;
-            --gray-900: #0f172a;
-            --success-500: #22c55e;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --success-500: #10b981;
         }
         
         * {
@@ -37,9 +35,10 @@
         }
         
         body {
-            font-family: 'Inter', sans-serif;            line-height: 1.6;
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
             color: var(--gray-800);
-            background-color: var(--primary-50);
+            background-color: white;
         }
         
         .container {
@@ -122,7 +121,7 @@
         
         .btn-primary {
             background: var(--primary-500);
-            color: white !important;
+            color: white;
         }
         
         .btn-primary:hover {
@@ -214,203 +213,6 @@
         .stat-label {
             font-size: 0.875rem;
             color: var(--gray-600);
-        }
-        /* Dashboard Preview */
-        
-        .dashboard-preview {
-            background: white;
-            border-radius: 1rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            overflow: hidden;
-            animation: float 6s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-            0%,
-            100% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-10px);
-            }
-        }
-        
-        .preview-header {
-            background: var(--gray-50);
-            padding: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid var(--gray-200);
-        }
-        
-        .preview-controls {
-            display: flex;
-            gap: 0.5rem;
-        }
-        
-        .control {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--gray-300);
-        }
-        
-        .control:nth-child(1) {
-            background: #ff5f57;
-        }
-        
-        .control:nth-child(2) {
-            background: #ffbd2e;
-        }
-        
-        .control:nth-child(3) {
-            background: #28ca42;
-        }
-        
-        .preview-title {
-            font-weight: 600;
-            color: var(--gray-700);
-            font-size: 0.875rem;
-        }
-        
-        .preview-content {
-            padding: 1.5rem;
-        }
-        
-        .campaign-card {
-            background: var(--gray-50);
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            border: 1px solid var(--gray-200);
-        }
-        
-        .campaign-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-        
-        .campaign-header h3 {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--gray-900);
-        }
-        
-        .status-badge {
-            padding: 0.25rem 0.75rem;
-            border-radius: 1rem;
-            font-size: 0.75rem;
-            font-weight: 500;
-            background: var(--success-500);
-            color: white;
-            animation: pulse 2s ease-in-out infinite;
-        }
-        
-        @keyframes pulse {
-            0%,
-            100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.7;
-            }
-        }
-        
-        .campaign-metrics {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-        }
-        
-        .metric {
-            text-align: center;
-        }
-        
-        .metric-value {
-            display: block;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-500);
-        }
-        
-        .metric-label {
-            font-size: 0.75rem;
-            color: var(--gray-600);
-            margin-top: 0.25rem;
-        }
-        
-        .posts-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-        }
-        
-        .post-card {
-            background: white;
-            border-radius: 0.5rem;
-            border: 1px solid var(--gray-200);
-            overflow: hidden;
-            transition: transform 0.2s ease;
-        }
-        
-        .post-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-        
-        .post-image {
-            height: 80px;
-            background: linear-gradient(135deg, var(--primary-200), var(--primary-300));
-            animation: shimmer 3s ease-in-out infinite;
-        }
-        
-        @keyframes shimmer {
-            0%,
-            100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.8;
-            }
-        }
-        
-        .post-content {
-            padding: 0.75rem;
-        }
-        
-        .post-text {
-            height: 30px;
-            background: var(--gray-100);
-            border-radius: 0.25rem;
-            margin-bottom: 0.5rem;
-            animation: loading 2s ease-in-out infinite;
-        }
-        
-        @keyframes loading {
-            0%,
-            100% {
-                background: var(--gray-100);
-            }
-            50% {
-                background: var(--gray-200);
-            }
-        }
-        
-        .post-platform {
-            width: 20px;
-            height: 20px;
-            border-radius: 0.25rem;
-        }
-        
-        .post-platform.facebook {
-            background: #1877f2;
-        }
-        
-        .post-platform.instagram {
-            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
         }
         /* Features */
         
@@ -797,20 +599,6 @@
                 flex-direction: column;
                 gap: 0.5rem;
             }
-            .dashboard-preview {
-                max-height: 300px;
-                overflow-y: auto;
-            }
-            .campaign-metrics {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 0.75rem;
-            }
-            .posts-grid {
-                grid-template-columns: 1fr;
-            }
-            .preview-content {
-                padding: 1rem;
-            }
         }
         
         @media (max-width: 480px) {
@@ -842,7 +630,7 @@
                 <a href="#features">Features</a>
                 <a href="#how-it-works">How it works</a>
                 <a href="#pricing">Pricing</a>
-                <a href="#" onclick="navigateToApp(); return false;" class="btn btn-primary">Get Started</a>
+                <a href="index.html" class="btn btn-primary">Get Started</a>
             </div>
         </div>
     </nav>
@@ -859,7 +647,8 @@
                     <p class="hero-description">
                         Build, grow, and scale your business with AI-powered marketing campaigns. Create professional social media content, target the right audience, and launch campaigns in minutes.
                     </p>
-                    <div class="hero-actions"> <a href="#" onclick="navigateToApp(); return false;" class="btn btn-primary btn-large">
+                    <div class="hero-actions">
+                        <a href="index.html" class="btn btn-primary btn-large">
                             Start free trial →
                         </a>
                         <a href="#demo" class="btn btn-secondary btn-large">
@@ -882,53 +671,8 @@
                     </div>
                 </div>
                 <div class="hero-visual">
-                    <div class="dashboard-preview">
-                        <div class="preview-header">
-                            <div class="preview-controls">
-                                <span class="control"></span>
-                                <span class="control"></span>
-                                <span class="control"></span>
-                            </div>
-                            <span class="preview-title">Tinkerbell Dashboard</span>
-                        </div>
-                        <div class="preview-content">
-                            <div class="campaign-card">
-                                <div class="campaign-header">
-                                    <h3>Summer Sale Campaign</h3>
-                                    <span class="status-badge active">Live</span>
-                                </div>
-                                <div class="campaign-metrics">
-                                    <div class="metric">
-                                        <span class="metric-value">2.4k</span>
-                                        <span class="metric-label">Impressions</span>
-                                    </div>
-                                    <div class="metric">
-                                        <span class="metric-value">127</span>
-                                        <span class="metric-label">Clicks</span>
-                                    </div>
-                                    <div class="metric">
-                                        <span class="metric-value">12</span>
-                                        <span class="metric-label">Leads</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="posts-grid">
-                                <div class="post-card">
-                                    <div class="post-image"></div>
-                                    <div class="post-content">
-                                        <div class="post-text"></div>
-                                        <div class="post-platform facebook"></div>
-                                    </div>
-                                </div>
-                                <div class="post-card">
-                                    <div class="post-image"></div>
-                                    <div class="post-content">
-                                        <div class="post-text"></div>
-                                        <div class="post-platform instagram"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div style="background: linear-gradient(135deg, #22c55e, #16a34a); border-radius: 1rem; height: 400px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; font-weight: 600;">
+                        Dashboard Preview
                     </div>
                 </div>
             </div>
@@ -1110,7 +854,7 @@
                         <li>Facebook & Instagram</li>
                         <li>Email support</li>
                     </ul>
-                    <a href="#" onclick="navigateToApp(); return false;" class="btn btn-outline">Start free</a>
+                    <a href="index.html" class="btn btn-outline">Start free</a>
                 </div>
                 <div class="pricing-card featured">
                     <div class="popular-badge">Most Popular</div>
@@ -1131,7 +875,7 @@
                         <li>Priority support</li>
                         <li>Custom integrations</li>
                     </ul>
-                    <a href="#" onclick="navigateToApp(); return false;" class="btn btn-primary">Start free trial</a>
+                    <a href="index.html" class="btn btn-primary">Start free trial</a>
                 </div>
                 <div class="pricing-card">
                     <div class="price-header">
@@ -1151,7 +895,7 @@
                         <li>Advanced analytics</li>
                         <li>API access</li>
                     </ul>
-                    <a href="#" onclick="navigateToApp(); return false;" class="btn btn-outline">Contact sales</a>
+                    <a href="index.html" class="btn btn-outline">Contact sales</a>
                 </div>
             </div>
         </div>
@@ -1163,7 +907,8 @@
             <div class="cta-content">
                 <h2>Ready to transform your marketing?</h2>
                 <p>Join thousands of businesses already growing with Tinkerbell. Start your free trial today.</p>
-                <div class="cta-actions"> <a href="#" onclick="navigateToApp(); return false;" class="btn btn-primary btn-large" style="background: white; color: var(--primary-500);">
+                <div class="cta-actions">
+                    <a href="index.html" class="btn btn-primary btn-large" style="background: white; color: var(--primary-500);">
                         Start free trial →
                     </a>
                     <div class="cta-features">
@@ -1215,13 +960,8 @@
             </div>
         </div>
     </footer>
-    <script>
-        // Handle app navigation - simpler approach
-        function navigateToApp() {
-            sessionStorage.setItem('fromLanding', 'true');
-            window.location.href = 'index.html?app=true';
-        }
 
+    <script>
         // Smooth scrolling for navigation links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
@@ -1245,26 +985,6 @@
                 navbar.style.background = 'white';
             }
         });
-
-        // Add subtle animations to dashboard preview elements
-        window.addEventListener('load', () => {
-            const metrics = document.querySelectorAll('.metric-value');
-            metrics.forEach((metric, index) => {
-                setTimeout(() => {
-                    metric.style.animation = 'countUp 2s ease-out';
-                }, index * 300);
-            });
-        });
-
-        // Add CSS for countUp animation
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes countUp {
-                from { transform: scale(0.5); opacity: 0; }
-                to { transform: scale(1); opacity: 1; }
-            }
-        `;
-        document.head.appendChild(style);
     </script>
 </body>
 
