@@ -575,8 +575,20 @@ def ai_personas_view(request):
     Displays the list of sites to choose from for generating AI personas.
     """
     sites = ScrapedSite.objects.filter(user=request.user, status='completed').order_by('-scraped_at')
+    
+    # Get existing personas for each site
+    sites_with_personas = []
+    for site in sites:
+        personas = AIPersona.objects.filter(user=request.user, scraped_site=site).order_by('-created_at')
+        sites_with_personas.append({
+            'site': site,
+            'personas': personas,
+            'personas_count': personas.count()
+        })
+    
     context = {
-        'sites': sites,
+        'sites_with_personas': sites_with_personas,
+        'sites': sites,  # Keep for backward compatibility
         'openai_available': OPENAI_AVAILABLE,
     }
     return render(request, 'auth_app/ai_personas.html', context)
