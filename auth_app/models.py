@@ -272,7 +272,7 @@ class Post(models.Model):
         ('general', 'General'),
     ], default='general')
     
-    # Status și programare
+    # Status și tracking
     status = models.CharField(max_length=20, choices=[
         ('draft', 'Ciornă'),
         ('ready', 'Gata de publicare'),
@@ -280,6 +280,8 @@ class Post(models.Model):
         ('published', 'Publicată'),
         ('archived', 'Arhivată'),
     ], default='draft')
+    facebook_posted = models.BooleanField(default=False, help_text="Indică dacă postarea a fost trimisă pe Facebook")
+    facebook_post_id = models.CharField(max_length=255, blank=True, null=True, help_text="ID-ul postării pe Facebook")
     
     # Programare
     scheduled_date = models.DateTimeField(null=True, blank=True)

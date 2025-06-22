@@ -16,6 +16,9 @@ import openai
 import requests
 from django.urls import reverse
 from .image_generator import ImageGenerator
+from django.conf import settings
+from .facebook_poster import FacebookPoster
+import logging
 
 # Import scraper-ul
 try:
@@ -1465,6 +1468,8 @@ IMPORTANT:
         # Creează postările în baza de date
         created_posts = []
         image_generator = ImageGenerator()
+        facebook_poster = FacebookPoster()
+        
         for post_info in posts_data["posts"]:
             post = Post.objects.create(
                 user=request.user,
@@ -1476,14 +1481,40 @@ IMPORTANT:
                 platform=post_info.get("platform", "general"),
                 tags=post_info.get("tags", [])
             )
-            # Adaugă persoanele la postare
-            post.personas.set(personas)
+            
+            # Adaugă persoanele asociate
+            if strategy.personas.exists():
+                post.personas.set(strategy.personas.all())
+            
             # Generează imaginea dacă există prompt
             if post.image_prompt:
-                result = image_generator.generate_image(post.image_prompt, strategy.title)
-                if result.get('success') and result.get('local_path'):
-                    post.generated_image = result['local_path']
-                    post.save(update_fields=['generated_image'])
+                try:
+                    image_result = image_generator.generate_image(post.image_prompt, strategy.scraped_site.domain)
+                    if image_result and image_result.get('success'):
+                        # Salvează imaginea în câmpul generated_image
+                        image_path = image_result.get('path')
+                        if image_path:
+                            post.generated_image = image_path
+                            post.save()
+                except Exception as e:
+                    logger.error(f"Failed to generate image for post {post.id}: {str(e)}")
+            
+            # Postează pe Facebook dacă platforma este Facebook
+            if post.platform == 'facebook':
+                try:
+                    facebook_result = facebook_poster.post_post_to_facebook(post)
+                    if facebook_result.get('success'):
+                        post.facebook_posted = True
+                        post.facebook_post_id = facebook_result.get('post_id', '')
+                        post.status = 'published'
+                        post.published_date = timezone.now()
+                        post.save()
+                        logger.info(f"Posted to Facebook: {post.title}")
+                    else:
+                        logger.warning(f"Failed to post to Facebook: {facebook_result.get('message', 'Unknown error')}")
+                except Exception as e:
+                    logger.error(f"Error posting to Facebook: {str(e)}")
+            
             created_posts.append(post)
         
         messages.success(request, f'✅ Au fost generate cu succes {len(created_posts)} postări pentru strategia "{strategy.title}"!')
@@ -1602,3 +1633,26 @@ def export_post(request, post_id):
     )
     response['Content-Disposition'] = f'attachment; filename="post_{post.id}_{post.title.replace(" ", "_")}.json"'
     return response
+
+@login_required
+def debug_media(request):
+    """Debug view to test media file serving"""
+    posts_with_images = Post.objects.filter(generated_image__isnull=False)[:5]
+    
+    debug_info = []
+    for post in posts_with_images:
+        debug_info.append({
+            'post_id': post.id,
+            'post_title': post.title,
+            'image_name': post.generated_image.name if post.generated_image else None,
+            'image_url': post.generated_image.url if post.generated_image else None,
+            'image_exists': post.generated_image and post.generated_image.storage.exists(post.generated_image.name) if post.generated_image else False,
+        })
+    
+    context = {
+        'debug_info': debug_info,
+        'media_url': settings.MEDIA_URL,
+        'media_root': settings.MEDIA_ROOT,
+    }
+    
+    return render(request, 'auth_app/debug_media.html', context)

@@ -40,6 +40,17 @@
                                 <span class="px-2 py-1 text-xs rounded-full font-medium bg-indigo-900/50 text-indigo-300 border border-indigo-700">
                                     {{ post.get_platform_display }}
                                 </span>
+                                {% if post.platform == 'facebook' %}
+                                <span class="px-2 py-1 text-xs rounded-full font-medium
+                                    {% if post.facebook_posted %}bg-green-900/50 text-green-300 border border-green-700
+                                    {% else %}bg-red-900/50 text-red-300 border border-red-700{% endif %}">
+                                    {% if post.facebook_posted %}
+                                        <i class="bi bi-facebook mr-1"></i>Facebook ✓
+                                    {% else %}
+                                        <i class="bi bi-facebook mr-1"></i>Facebook ✗
+                                    {% endif %}
+                                </span>
+                                {% endif %}
                             </div>
                         </div>
                         

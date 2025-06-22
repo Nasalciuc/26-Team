@@ -149,3 +149,9 @@ CSRF_COOKIE_HTTPONLY = False  # Must be False for JavaScript access
 CSRF_COOKIE_AGE = 31449600  # 1 year in seconds
 CSRF_TRUSTED_ORIGINS = []  # Add your domain in production
 CSRF_USE_SESSIONS = True  # Store CSRF token in session instead of cookie
+
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Facebook/Meta API Configuration
+FACEBOOK_ACCESS_TOKEN = os.environ.get('META_ACCESS_TOKEN')
+FACEBOOK_PAGE_ID = os.environ.get('FACEBOOK_PAGE_ID', '532394313287326')
