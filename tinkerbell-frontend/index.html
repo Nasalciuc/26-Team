@@ -6,13 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tinkerbell - AI marketing assistant</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">    <script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
         // Debug logging
         console.log('Index.html loading...');
         console.log('Session storage fromLanding:', sessionStorage.getItem('fromLanding'));
         console.log('URL search:', window.location.search);
         console.log('URL includes app:', window.location.search.includes('app'));
-        
+
         // Check if user came from landing page or redirect to landing page
         if (!sessionStorage.getItem('fromLanding') && !window.location.search.includes('app')) {
             console.log('Redirecting to landing page...');

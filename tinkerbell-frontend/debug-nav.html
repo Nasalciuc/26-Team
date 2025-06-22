@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Debug Navigation</title>
+</head>
+
+<body>
+    <h1>Debug Navigation Test</h1>
+    <p>Testing navigation flow...</p>
+
+    <button onclick="testLandingToApp()">Test Landing → App Flow</button>
+    <button onclick="testDirectApp()">Test Direct App Access</button>
+    <button onclick="clearStorage()">Clear Session Storage</button>
+
+    <div id="debug-info"></div>
+
+    <script>
+        function updateDebugInfo() {
+            const info = document.getElementById('debug-info');
+            info.innerHTML = `
+                <h3>Debug Info:</h3>
+                <p>Session Storage 'fromLanding': ${sessionStorage.getItem('fromLanding')}</p>
+                <p>Current URL: ${window.location.href}</p>
+                <p>URL Search: ${window.location.search}</p>
+            `;
+        }
+
+        function testLandingToApp() {
+            sessionStorage.setItem('fromLanding', 'true');
+            window.location.href = 'index.html?app=true';
+        }
+
+        function testDirectApp() {
+            window.location.href = 'index.html';
+        }
+
+        function clearStorage() {
+            sessionStorage.clear();
+            updateDebugInfo();
+        }
+
+        // Update debug info on load
+        updateDebugInfo();
+    </script>
+</body>
+
+</html>

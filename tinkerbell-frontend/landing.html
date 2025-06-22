@@ -837,7 +837,7 @@
                 <a href="#features">Features</a>
                 <a href="#how-it-works">How it works</a>
                 <a href="#pricing">Pricing</a>
-                <a href="index.html" class="btn btn-primary">Get Started</a>
+                <a href="#" onclick="navigateToApp(); return false;" class="btn btn-primary">Get Started</a>
             </div>
         </div>
     </nav>
@@ -854,8 +854,7 @@
                     <p class="hero-description">
                         Build, grow, and scale your business with AI-powered marketing campaigns. Create professional social media content, target the right audience, and launch campaigns in minutes.
                     </p>
-                    <div class="hero-actions">
-                        <a href="index.html" class="btn btn-primary btn-large">
+                    <div class="hero-actions">                        <a href="#" onclick="navigateToApp(); return false;" class="btn btn-primary btn-large">
                             Start free trial →
                         </a>
                         <a href="#demo" class="btn btn-secondary btn-large">
@@ -1106,7 +1105,7 @@
                         <li>Facebook & Instagram</li>
                         <li>Email support</li>
                     </ul>
-                    <a href="index.html" class="btn btn-outline">Start free</a>
+                    <a href="#" onclick="navigateToApp(); return false;" class="btn btn-outline">Start free</a>
                 </div>
                 <div class="pricing-card featured">
                     <div class="popular-badge">Most Popular</div>
@@ -1127,7 +1126,7 @@
                         <li>Priority support</li>
                         <li>Custom integrations</li>
                     </ul>
-                    <a href="index.html" class="btn btn-primary">Start free trial</a>
+                    <a href="#" onclick="navigateToApp(); return false;" class="btn btn-primary">Start free trial</a>
                 </div>
                 <div class="pricing-card">
                     <div class="price-header">
@@ -1147,7 +1146,7 @@
                         <li>Advanced analytics</li>
                         <li>API access</li>
                     </ul>
-                    <a href="index.html" class="btn btn-outline">Contact sales</a>
+                    <a href="#" onclick="navigateToApp(); return false;" class="btn btn-outline">Contact sales</a>
                 </div>
             </div>
         </div>
@@ -1159,8 +1158,7 @@
             <div class="cta-content">
                 <h2>Ready to transform your marketing?</h2>
                 <p>Join thousands of businesses already growing with Tinkerbell. Start your free trial today.</p>
-                <div class="cta-actions">
-                    <a href="index.html" class="btn btn-primary btn-large" style="background: white; color: var(--primary-500);">
+                <div class="cta-actions">                    <a href="#" onclick="navigateToApp(); return false;" class="btn btn-primary btn-large" style="background: white; color: var(--primary-500);">
                         Start free trial →
                     </a>
                     <div class="cta-features">
@@ -1212,19 +1210,11 @@
             </div>
         </div>
     </footer>
-    <script>        // Handle app navigation links
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('a[href="index.html"]').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    // Set session storage to indicate user came from landing page
-                    sessionStorage.setItem('fromLanding', 'true');
-                    console.log('Session storage set, navigating to app...');
-                    // Update the href to include the app parameter
-                    this.href = 'index.html?app=true';
-                    // Let the default navigation happen
-                });
-            });
-        });
+    <script>        // Handle app navigation - simpler approach
+        function navigateToApp() {
+            sessionStorage.setItem('fromLanding', 'true');
+            window.location.href = 'index.html?app=true';
+        }
 
         // Smooth scrolling for navigation links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
