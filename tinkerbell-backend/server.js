@@ -237,12 +237,10 @@ app.post('/api/schedule-campaign', async(req, res) => {
 
     try {
         const { businessData, confirmedPersonas } = req.body; // Use embedded AI functionality to generate campaign content
-        const campaignContent = await AI.generateCampaignContent(businessData, confirmedPersonas);
-
-        // Nicolae's Planable integration (Hour 3)
+        const campaignContent = await AI.generateCampaignContent(businessData, confirmedPersonas); // Nicolae's Planable integration (Hour 3)
         const workspaceName = `${businessData.businessName || 'Tinkerbell'} Campaign - ${new Date().toLocaleDateString()}`;
         console.log('📋 Creating Planable workspace...');
-        const workspace = await Planable.getOrCreateWorkspace(workspaceName);
+        const workspace = await Planable.createWorkspace(workspaceName);
 
         console.log('📝 Scheduling posts to Planable...');
         const schedulingResults = await Planable.scheduleMultiplePosts(workspace.id, campaignContent.posts);
