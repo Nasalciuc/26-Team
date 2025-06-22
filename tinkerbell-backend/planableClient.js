@@ -11,11 +11,12 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 
-class PlanableClient {
-    constructor() {
+class PlanableClient {    constructor() {
             this.apiKey = process.env.PLANABLE_ACCESS_TOKEN;
             this.baseUrl = 'https://app.planable.io/api/v1'; // Updated from api.planable.io to app.planable.io/api
             this.facebookPageId = process.env.FACEBOOK_PAGE_ID; // Your Facebook page ID
+            this.facebookAppId = process.env.FACEBOOK_APP_ID; // Facebook App ID
+            this.facebookAppSecret = process.env.FACEBOOK_APP_SECRET; // Facebook App Secret
             this.autoPost = process.env.AUTO_POST_ENABLED === 'true'; // Enable auto-posting
 
             if (!this.apiKey) {
@@ -24,6 +25,10 @@ class PlanableClient {
 
             if (this.autoPost && !this.facebookPageId) {
                 console.warn('⚠️ FACEBOOK_PAGE_ID not found - auto-posting may not work correctly');
+            }
+
+            if (this.autoPost && (!this.facebookAppId || !this.facebookAppSecret)) {
+                console.warn('⚠️ Facebook App credentials missing - auto-posting may not work correctly');
             }
         }
         /**
@@ -275,13 +280,13 @@ class PlanableClient {
         if (!this.apiKey || !this.autoPost) {
             console.log('🔄 Auto-posting disabled or no API key');
             return { success: false, reason: 'Auto-posting disabled' };
-        }
-
-        try {
+        }        try {
             console.log(`🚀 Auto-publishing post ${postId} to Facebook...`);
             const response = await axios.post(`${this.baseUrl}/workspaces/${workspaceId}/posts/${postId}/publish`, {
                 platforms: ['facebook'],
                 facebook_page_id: this.facebookPageId,
+                facebook_app_id: this.facebookAppId,
+                facebook_app_secret: this.facebookAppSecret,
                 publish_now: true
             }, {
                 headers: {
