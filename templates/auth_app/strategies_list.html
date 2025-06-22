@@ -1,98 +1,173 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Strategii - Market Spark{% endblock %}
+{% block title %}Marketing Strategies - {{ block.super }}{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-fade-in">
+<div class="min-h-screen bg-gray-50 py-12">
     <!-- Header -->
-    <div class="mb-8">
-        <nav aria-label="breadcrumb" class="mb-4">
-            <ol class="flex items-center space-x-2 text-sm text-gray-400">
-                <li><a href="{% url 'auth_app:dashboard' %}" class="hover:text-yellow-400 transition-colors">Dashboard</a></li>
-                <li><span class="text-gray-600">/</span></li>
-                <li class="font-semibold text-yellow-400" aria-current="page">Strategii de Marketing</li>
-            </ol>
-        </nav>
-        <h1 class="text-4xl font-bold text-gradient">Strategii de Marketing</h1>
-        <p class="text-gray-400 mt-2">Gestionează strategiile bazate pe analiza site-urilor și persoanele generate</p>
+    <div class="max-w-3xl mx-auto text-center mb-16">
+        <div class="flex flex-col items-center">
+            <div class="w-20 h-20 rounded-2xl bg-blue-100 flex items-center justify-center mb-6">
+                <i class="bi bi-graph-up text-4xl text-blue-600"></i>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Marketing Strategies</h1>
+            <p class="text-lg text-gray-600 max-w-xl mx-auto">
+                AI-powered marketing strategies based on your website analysis and generated personas
+            </p>
+        </div>
     </div>
 
-    <!-- Lista Strategiilor -->
-    {% if strategies %}
-        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {% for strategy in strategies %}
-                <div class="robust-card hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-4">
-                            <h3 class="text-xl font-bold text-yellow-400 line-clamp-2">{{ strategy.title }}</h3>
-                            <div class="flex flex-col space-y-1">
-                                <span class="px-2 py-1 text-xs rounded-full font-medium
-                                    {% if strategy.priority == 'critical' %}bg-red-900/50 text-red-300 border border-red-700
-                                    {% elif strategy.priority == 'high' %}bg-orange-900/50 text-orange-300 border border-orange-700
-                                    {% elif strategy.priority == 'medium' %}bg-yellow-900/50 text-yellow-300 border border-yellow-700
-                                    {% else %}bg-green-900/50 text-green-300 border border-green-700{% endif %}">
-                                    {{ strategy.get_priority_display }}
-                                </span>
-                                <span class="px-2 py-1 text-xs rounded-full font-medium
-                                    {% if strategy.status == 'active' %}bg-green-900/50 text-green-300 border border-green-700
-                                    {% elif strategy.status == 'implemented' %}bg-blue-900/50 text-blue-300 border border-blue-700
-                                    {% elif strategy.status == 'paused' %}bg-yellow-900/50 text-yellow-300 border border-yellow-700
-                                    {% elif strategy.status == 'completed' %}bg-purple-900/50 text-purple-300 border border-purple-700
-                                    {% else %}bg-gray-900/50 text-gray-300 border border-gray-700{% endif %}">
-                                    {{ strategy.get_status_display }}
-                                </span>
-                            </div>
+    <!-- Content -->
+    <div class="max-w-7xl mx-auto px-6">
+        {% if strategies %}
+            <!-- Stats Section -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center mr-4">
+                            <i class="bi bi-graph-up text-xl text-blue-600"></i>
                         </div>
-                        
-                        <p class="text-gray-400 mb-4 line-clamp-3 text-sm">{{ strategy.description|truncatewords:25 }}</p>
-                        
-                        <div class="space-y-2 mb-4">
-                            <div class="flex items-center text-sm text-gray-500">
-                                <i class="bi bi-tag text-yellow-400 mr-2"></i>
-                                <span>{{ strategy.get_strategy_type_display }}</span>
-                            </div>
-                            <div class="flex items-center text-sm text-gray-500">
-                                <i class="bi bi-globe text-yellow-400 mr-2"></i>
-                                <span class="truncate">{{ strategy.scraped_site.domain }}</span>
-                            </div>
-                            <div class="flex items-center text-sm text-gray-500">
-                                <i class="bi bi-people text-yellow-400 mr-2"></i>
-                                <span>{{ strategy.personas.count }} persoane</span>
-                            </div>
-                            <div class="flex items-center text-sm text-gray-500">
-                                <i class="bi bi-calendar text-yellow-400 mr-2"></i>
-                                <span>{{ strategy.created_at|date:"d.m.Y" }}</span>
-                            </div>
-                        </div>
-                        
-                        <div class="flex space-x-2">
-                            <a href="{% url 'auth_app:strategy_detail' strategy.id %}" class="flex-1 robust-button text-center">
-                                <i class="bi bi-eye mr-2"></i>Vezi Detalii
-                            </a>
-                            <a href="{% url 'auth_app:edit_strategy' strategy.id %}" class="robust-button-secondary" title="Editează">
-                                <i class="bi bi-pencil-square"></i>
-                            </a>
-                            <a href="{% url 'auth_app:export_strategy' strategy.id %}" class="robust-button-secondary" title="Exportă">
-                                <i class="bi bi-download"></i>
-                            </a>
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Total Strategies</p>
+                            <p class="text-2xl font-bold text-gray-900">{{ strategies.count }}</p>
                         </div>
                     </div>
                 </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <div class="robust-card p-12 text-center">
-            <div class="text-yellow-400 mb-4">
-                <i class="bi bi-graph-up text-6xl"></i>
+                
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center mr-4">
+                            <i class="bi bi-check-circle text-xl text-green-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Active</p>
+                            <p class="text-2xl font-bold text-gray-900">{{ strategies|length }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center mr-4">
+                            <i class="bi bi-people text-xl text-purple-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Personas Used</p>
+                            <p class="text-2xl font-bold text-gray-900">{{ strategies|length }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center mr-4">
+                            <i class="bi bi-calendar text-xl text-orange-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">This Month</p>
+                            <p class="text-2xl font-bold text-gray-900">{{ strategies|length }}</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <h3 class="text-xl font-bold text-white mb-2">Nu există strategii</h3>
-            <p class="text-gray-400 mb-6">Încă nu ai creat nicio strategie. Generează o strategie bazată pe un site și persoanele sale.</p>
-            <a href="{% url 'auth_app:site_list' %}" class="robust-button">
-                <i class="bi bi-plus-circle mr-2"></i>Vezi Site-uri
-            </a>
-        </div>
-    {% endif %}
+
+            <!-- Strategies Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+                {% for strategy in strategies %}
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                        <div class="p-8">
+                            <!-- Header -->
+                            <div class="flex justify-between items-start mb-6">
+                                <h3 class="text-xl font-bold text-gray-900 line-clamp-2">{{ strategy.title }}</h3>
+                                <div class="flex flex-col space-y-2">
+                                    <span class="px-3 py-1 text-xs rounded-full font-medium
+                                        {% if strategy.priority == 'critical' %}bg-red-100 text-red-700
+                                        {% elif strategy.priority == 'high' %}bg-orange-100 text-orange-700
+                                        {% elif strategy.priority == 'medium' %}bg-yellow-100 text-yellow-700
+                                        {% else %}bg-green-100 text-green-700{% endif %}">
+                                        {{ strategy.get_priority_display }}
+                                    </span>
+                                    <span class="px-3 py-1 text-xs rounded-full font-medium
+                                        {% if strategy.status == 'active' %}bg-green-100 text-green-700
+                                        {% elif strategy.status == 'implemented' %}bg-blue-100 text-blue-700
+                                        {% elif strategy.status == 'paused' %}bg-yellow-100 text-yellow-700
+                                        {% elif strategy.status == 'completed' %}bg-purple-100 text-purple-700
+                                        {% else %}bg-gray-100 text-gray-700{% endif %}">
+                                        {{ strategy.get_status_display }}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <!-- Description -->
+                            <p class="text-gray-600 mb-6 line-clamp-3 text-sm leading-relaxed">{{ strategy.description|truncatewords:30 }}</p>
+                            
+                            <!-- Details -->
+                            <div class="space-y-3 mb-6">
+                                <div class="flex items-center text-sm text-gray-500">
+                                    <i class="bi bi-tag text-blue-500 mr-3"></i>
+                                    <span>{{ strategy.get_strategy_type_display }}</span>
+                                </div>
+                                <div class="flex items-center text-sm text-gray-500">
+                                    <i class="bi bi-globe text-blue-500 mr-3"></i>
+                                    <span class="truncate">{{ strategy.scraped_site.domain }}</span>
+                                </div>
+                                <div class="flex items-center text-sm text-gray-500">
+                                    <i class="bi bi-people text-blue-500 mr-3"></i>
+                                    <span>{{ strategy.personas.count }} personas</span>
+                                </div>
+                                <div class="flex items-center text-sm text-gray-500">
+                                    <i class="bi bi-calendar text-blue-500 mr-3"></i>
+                                    <span>{{ strategy.created_at|date:"M d, Y" }}</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Actions -->
+                            <div class="flex space-x-3">
+                                <a href="{% url 'auth_app:strategy_detail' strategy.id %}" 
+                                   class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-xl font-medium transition-colors duration-200 text-center">
+                                    <i class="bi bi-eye mr-2"></i>View Details
+                                </a>
+                                <a href="{% url 'auth_app:edit_strategy' strategy.id %}" 
+                                   class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-3 rounded-xl transition-colors duration-200" 
+                                   title="Edit">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <a href="{% url 'auth_app:export_strategy' strategy.id %}" 
+                                   class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-3 rounded-xl transition-colors duration-200" 
+                                   title="Export">
+                                    <i class="bi bi-download"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- Empty State -->
+            <div class="max-w-2xl mx-auto text-center">
+                <div class="bg-white rounded-3xl p-16 shadow-sm border border-gray-100">
+                    <div class="w-24 h-24 rounded-3xl bg-blue-100 flex items-center justify-center mx-auto mb-8">
+                        <i class="bi bi-graph-up text-4xl text-blue-600"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">No Strategies Yet</h3>
+                    <p class="text-gray-600 mb-8 text-lg leading-relaxed">
+                        Start by analyzing a website and generating personas to create your first AI-powered marketing strategy.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <a href="{% url 'auth_app:site_list' %}" 
+                           class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-medium transition-colors duration-200">
+                            <i class="bi bi-globe mr-2"></i>View Websites
+                        </a>
+                        <a href="{% url 'auth_app:scraping' %}" 
+                           class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-8 py-4 rounded-xl font-medium transition-colors duration-200">
+                            <i class="bi bi-plus-circle mr-2"></i>Add New Site
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
 </div>
 
 <style>
