@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Image, MessageSquare, Calendar, Edit, Check } from "lucide-react";
+import { Sparkles, Image, MessageSquare, Calendar, Edit, Check, Facebook, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const Campaigns = () => {
@@ -15,6 +14,7 @@ const Campaigns = () => {
   const [campaignContent, setCampaignContent] = useState("");
   const [selectedChannel, setSelectedChannel] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isPosting, setIsPosting] = useState(false);
   const [generatedContent, setGeneratedContent] = useState<any>(null);
   const { toast } = useToast();
 
@@ -37,6 +37,45 @@ const Campaigns = () => {
 
     setGeneratedContent(mockContent);
     setIsGenerating(false);
+  };
+
+  const handlePostToFacebook = async () => {
+    if (!generatedContent) return;
+
+    setIsPosting(true);
+    
+    try {
+      const response = await fetch('http://localhost:8000/test-facebook-post/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: generatedContent.postText,
+          link: "https://musicstudio.local" // You can make this dynamic
+        })
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        toast({
+          title: "Postat cu succes pe Facebook! 🎉",
+          description: "Conținutul tău a fost publicat pe pagina ta de Facebook.",
+        });
+      } else {
+        throw new Error(result.error || 'Eroare la postare');
+      }
+    } catch (error) {
+      console.error('Error posting to Facebook:', error);
+      toast({
+        title: "Eroare la postare",
+        description: "Nu s-a putut posta pe Facebook. Încearcă din nou.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsPosting(false);
+    }
   };
 
   const handleApprove = () => {
@@ -148,7 +187,20 @@ const Campaigns = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid md:grid-cols-3 gap-4">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Button 
+                onClick={handlePostToFacebook}
+                disabled={isPosting}
+                className="bg-blue-600 hover:bg-blue-700 text-white h-12"
+              >
+                {isPosting ? (
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                ) : (
+                  <Facebook className="w-5 h-5 mr-2" />
+                )}
+                {isPosting ? "Postez..." : "📘 Postează pe Facebook"}
+              </Button>
+              
               <Button 
                 onClick={handleApprove}
                 className="gradient-bg hover:opacity-90 h-12"

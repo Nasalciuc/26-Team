@@ -28,4 +28,4 @@ else:
 
 # Start Django server
 echo "Starting Django server..."
-python manage.py runserver 0.0.0.0:8000 --settings=web.settings 
+python manage.py runserver 0.0.0.0:8000 --settings=web.settings
