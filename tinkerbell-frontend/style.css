@@ -80,8 +80,8 @@
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
     line-height: 1.6;
-    color: white;
-    background-color: var(--gray-900);
+    color: var(--gray-800);
+    background-color: var(--gray-50);
     font-size: var(--text-base);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -112,8 +112,8 @@ body {
 /* Header */
 
 .app-header {
-    background: var(--gray-800);
-    border-bottom: 1px solid var(--gray-700);
+    background: white;
+    border-bottom: 1px solid var(--gray-200);
     padding: var(--space-4) 0;
     position: sticky;
     top: 0;
@@ -129,7 +129,7 @@ body {
 .brand h1 {
     font-size: var(--text-2xl);
     font-weight: 700;
-    color: white;
+    color: var(--gray-900);
     letter-spacing: -0.025em;
 }
 
@@ -202,14 +202,14 @@ body {
 .page-header h2 {
     font-size: var(--text-3xl);
     font-weight: 700;
-    color: white;
+    color: var(--gray-900);
     margin-bottom: var(--space-4);
     letter-spacing: -0.025em;
 }
 
 .page-header p {
     font-size: var(--text-lg);
-    color: var(--gray-300);
+    color: var(--gray-600);
     max-width: 600px;
     margin: 0 auto;
     line-height: 1.6;
@@ -230,11 +230,11 @@ body {
 .personas-section,
 .campaign-content,
 .success-content {
-    background: var(--gray-800);
+    background: white;
     border-radius: var(--border-radius-xl);
     padding: var(--space-8);
     box-shadow: var(--shadow-sm);
-    border: 1px solid var(--gray-700);
+    border: 1px solid var(--gray-200);
 }
 
 @media (max-width: 768px) {
@@ -268,13 +268,13 @@ body {
 
 .form-group label {
     font-weight: 600;
-    color: white;
+    color: var(--gray-700);
     font-size: var(--text-sm);
 }
 
 .optional {
     font-weight: 400;
-    color: var(--gray-400);
+    color: var(--gray-500);
 }
 
 .form-group input,
@@ -282,9 +282,9 @@ body {
     padding: var(--space-3) var(--space-4);
     border: 1px solid var(--gray-300);
     border-radius: var(--border-radius);
-    font-size: var(--text-base);    transition: all 0.2s ease;
-    background: var(--gray-700);
-    color: white;
+    font-size: var(--text-base);
+    transition: all 0.2s ease;
+    background: white;
 }
 
 .form-group input:focus,
@@ -337,13 +337,13 @@ body {
 }
 
 .btn-secondary {
-    background: var(--gray-700);
-    color: white;
-    border-color: var(--gray-600);
+    background: white;
+    color: var(--gray-700);
+    border-color: var(--gray-300);
 }
 
 .btn-secondary:hover {
-    background: var(--gray-600);
+    background: var(--gray-50);
     border-color: var(--gray-400);
 }
 
@@ -377,7 +377,7 @@ body {
 
 .loading-content h3 {
     font-size: var(--text-xl);
-    color: white;
+    color: var(--gray-700);
     margin-bottom: var(--space-8);
 }
 
@@ -411,7 +411,7 @@ body {
     align-items: center;
     gap: var(--space-3);
     padding: var(--space-3) 0;
-    color: var(--gray-300);
+    color: var(--gray-600);
 }
 
 .log-item.completed {
@@ -433,8 +433,8 @@ body {
 }
 
 .persona-card {
-    background: var(--gray-800);
-    border: 1px solid var(--gray-700);
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
     border-radius: var(--border-radius-lg);
     padding: var(--space-6);
 }
@@ -449,7 +449,7 @@ body {
 .persona-header h3 {
     font-size: var(--text-xl);
     font-weight: 600;
-    color: white;
+    color: var(--gray-900);
 }
 
 .edit-persona-btn {
@@ -476,12 +476,12 @@ body {
 .persona-detail h4 {
     font-size: var(--text-sm);
     font-weight: 600;
-    color: white;
+    color: var(--gray-700);
     margin-bottom: var(--space-1);
 }
 
 .persona-detail p {
-    color: var(--gray-300);
+    color: var(--gray-600);
     line-height: 1.5;
 }
 
@@ -491,20 +491,20 @@ body {
 .media-upload-section {
     margin: var(--space-8) 0;
     padding: var(--space-6);
-    background: var(--gray-800);
+    background: var(--gray-50);
     border-radius: var(--border-radius-lg);
-    border: 1px solid var(--gray-700);
+    border: 1px solid var(--gray-200);
 }
 
 .media-upload-section h3 {
     font-size: var(--text-lg);
     font-weight: 600;
-    color: white;
+    color: var(--gray-900);
     margin-bottom: var(--space-2);
 }
 
 .media-upload-section>p {
-    color: var(--gray-300);
+    color: var(--gray-600);
     margin-bottom: var(--space-6);
 }
 
@@ -512,9 +512,10 @@ body {
     border: 2px dashed var(--gray-300);
     border-radius: var(--border-radius-lg);
     padding: var(--space-8);
-    text-align: center;    cursor: pointer;
+    text-align: center;
+    cursor: pointer;
     transition: all 0.2s ease;
-    background: var(--gray-700);
+    background: white;
 }
 
 .upload-area:hover {
@@ -541,11 +542,11 @@ body {
 .upload-content h4 {
     font-size: var(--text-lg);
     font-weight: 600;
-    color: white;
+    color: var(--gray-700);
 }
 
 .upload-content p {
-    color: var(--gray-300);
+    color: var(--gray-600);
 }
 
 .upload-link {
@@ -636,8 +637,8 @@ body {
 /* Campaign content */
 
 .strategy-card {
-    background: var(--gray-800);
-    border: 1px solid var(--gray-700);
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
     border-radius: var(--border-radius-lg);
     padding: var(--space-6);
     margin-bottom: var(--space-8);
@@ -646,12 +647,12 @@ body {
 .strategy-card h3 {
     font-size: var(--text-xl);
     font-weight: 600;
-    color: white;
+    color: var(--gray-900);
     margin-bottom: var(--space-4);
 }
 
 .strategy-content {
-    color: var(--gray-300);
+    color: var(--gray-700);
     line-height: 1.6;
 }
 
@@ -669,11 +670,11 @@ body {
 .section-header h3 {
     font-size: var(--text-xl);
     font-weight: 600;
-    color: white;
+    color: var(--gray-900);
 }
 
 .post-count {
-    color: var(--gray-300);
+    color: var(--gray-600);
     font-size: var(--text-sm);
     font-weight: 500;
 }
@@ -684,8 +685,8 @@ body {
 }
 
 .post-card {
-    background: var(--gray-800);
-    border: 1px solid var(--gray-700);
+    background: white;
+    border: 1px solid var(--gray-200);
     border-radius: var(--border-radius-lg);
     padding: var(--space-6);
     transition: all 0.2s ease;
@@ -705,7 +706,7 @@ body {
 .post-header h4 {
     font-size: var(--text-lg);
     font-weight: 600;
-    color: white;
+    color: var(--gray-900);
 }
 
 .platform-badge {
@@ -719,7 +720,7 @@ body {
 }
 
 .post-content {
-    color: var(--gray-300);
+    color: var(--gray-700);
     line-height: 1.6;
     margin-bottom: var(--space-4);
 }
@@ -756,8 +757,8 @@ body {
 }
 
 .metric-card {
-    background: var(--gray-800);
-    border: 1px solid var(--gray-700);
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
     border-radius: var(--border-radius-lg);
     padding: var(--space-4);
     text-align: center;
@@ -765,14 +766,14 @@ body {
 
 .metric-label {
     font-size: var(--text-sm);
-    color: var(--gray-300);
+    color: var(--gray-600);
     margin-bottom: var(--space-2);
 }
 
 .metric-value {
     font-size: var(--text-2xl);
     font-weight: 700;
-    color: white;
+    color: var(--gray-900);
 }
 
 
@@ -799,8 +800,8 @@ body {
 .detail-card,
 .workspace-card,
 .next-steps {
-    background: var(--gray-800);
-    border: 1px solid var(--gray-700);
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
     border-radius: var(--border-radius-lg);
     padding: var(--space-6);
 }
@@ -810,7 +811,7 @@ body {
 .next-steps h3 {
     font-size: var(--text-lg);
     font-weight: 600;
-    color: white;
+    color: var(--gray-900);
     margin-bottom: var(--space-4);
 }
 
@@ -822,7 +823,7 @@ body {
 }
 
 .detail-card li {
-    color: var(--gray-300);
+    color: var(--gray-700);
     position: relative;
     padding-left: var(--space-5);
 }
@@ -863,7 +864,7 @@ body {
 
 .next-steps li {
     counter-increment: step-counter;
-    color: var(--gray-300);
+    color: var(--gray-700);
     position: relative;
     padding-left: var(--space-8);
 }
@@ -889,8 +890,8 @@ body {
 
 .results-section,
 .status-section {
-    background: var(--gray-800);
-    border: 1px solid var(--gray-700);
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
     border-radius: var(--border-radius-lg);
     padding: var(--space-6);
     margin: var(--space-6) 0;
@@ -900,7 +901,7 @@ body {
 .status-section h3 {
     font-size: var(--text-lg);
     font-weight: 600;
-    color: white;
+    color: var(--gray-900);
     margin-bottom: var(--space-4);
 }
 
