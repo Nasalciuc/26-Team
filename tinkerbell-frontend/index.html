@@ -85,10 +85,36 @@
                     </div>
                 </div>
             </div>
-
             <div id="personas-editor" class="personas-section">
                 <div id="personas-container">
                     <!-- Personas will be populated by JavaScript -->
+                </div>
+
+                <!-- Image Upload Section -->
+                <div class="image-upload-section">
+                    <h3>📷 Adaugă Imagini pentru Campanie (Opțional)</h3>
+                    <p>Încarcă imagini pe care vrei să le folosești în postări sau lasă AI-ul să genereze imagini noi</p>
+
+                    <div class="upload-area" id="upload-area">
+                        <div class="upload-content">
+                            <span class="upload-icon">📁</span>
+                            <p>Drag & drop imagini aici sau <span class="upload-link">click pentru a selecta</span></p>
+                            <small>JPG, PNG, GIF până la 10MB per imagine</small>
+                        </div>
+                        <input type="file" id="image-upload" multiple accept="image/*" style="display: none;">
+                    </div>
+
+                    <div id="uploaded-images-preview" class="uploaded-images">
+                        <!-- Uploaded images will be shown here -->
+                    </div>
+
+                    <div class="image-options">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="generate-missing-images" checked>
+                            <span class="checkmark-box"></span>
+                            Generează automat imagini pentru postările fără imagini
+                        </label>
+                    </div>
                 </div>
 
                 <button id="confirm-personas" class="magic-button">
@@ -110,12 +136,21 @@
                 <h3>📈 Strategia Ta de Marketing</h3>
                 <p id="marketing-strategy">Strategia se încarcă...</p>
             </div>
-
             <div id="posts-section" class="posts-grid">
                 <h3>📱 Postările Tale pe Rețelele Sociale</h3>
                 <div id="posts-container">
                     <!-- Posts will be populated by JavaScript -->
                 </div>
+            </div>
+
+            <!-- Image Processing Results Section -->
+            <div id="image-processing-results" class="results-section" style="display: none;">
+                <!-- Will be populated by JavaScript -->
+            </div>
+
+            <!-- Auto-Posting Status Section -->
+            <div id="auto-posting-status" class="status-section" style="display: none;">
+                <!-- Will be populated by JavaScript -->
             </div>
 
             <div class="campaign-stats">

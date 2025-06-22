@@ -1,9 +1,46 @@
 const express = require('express');
 const cors = require('cors');
+const multer = require('multer');
+const path = require('path');
 require('dotenv').config();
+
+// Import our enhanced services
+const ImageService = require('./imageService');
+const PlanableClient = require('./planableClient');
+const TinkerbellAI = require('./aiClient');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Initialize services
+const imageService = new ImageService();
+const planableClient = new PlanableClient();
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+    destination: function(req, file, cb) {
+        cb(null, path.join(__dirname, 'uploads'))
+    },
+    filename: function(req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname))
+    }
+});
+
+const upload = multer({
+    storage: storage,
+    limits: {
+        fileSize: 10 * 1024 * 1024 // 10MB limit
+    },
+    fileFilter: function(req, file, cb) {
+        // Accept only image files
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Only image files are allowed!'), false);
+        }
+    }
+});
 
 // Embedded Planable functionality (Nicolae's work - integrated directly)
 const Planable = {
@@ -68,8 +105,6 @@ const Planable = {
     }
 };
 
-// Import real AI client
-const TinkerbellAI = require('./aiClient');
 const aiClient = new TinkerbellAI();
 
 // Embedded AI functionality (Vladimir's work - integrated directly)
@@ -162,8 +197,12 @@ const AI = {
 
 // Middleware
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Serve uploaded and generated images
+app.use('/images', express.static(path.join(__dirname, 'uploads')));
+app.use('/generated', express.static(path.join(__dirname, 'generated-images')));
 
 // Route for creating personas (Hour 2: AI Integration)
 app.post('/api/create-personas', async(req, res) => {
@@ -238,6 +277,237 @@ app.post('/api/schedule-campaign', async(req, res) => {
     }
 });
 
+// Image upload endpoint
+app.post('/api/upload-images', upload.array('images', 10), async(req, res) => {
+    console.log('=== UPLOAD IMAGES ENDPOINT ===');
+
+    try {
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'No images uploaded'
+            });
+        }
+
+        const uploadedImages = req.files.map(file => ({
+            filename: file.filename,
+            originalName: file.originalname,
+            path: file.path,
+            size: file.size,
+            mimetype: file.mimetype,
+            url: `/images/${file.filename}`
+        }));
+
+        console.log(`📷 Uploaded ${uploadedImages.length} images`);
+
+        res.json({
+            success: true,
+            message: `Successfully uploaded ${uploadedImages.length} images`,
+            data: {
+                images: uploadedImages,
+                count: uploadedImages.length
+            }
+        });
+
+    } catch (error) {
+        console.error('❌ Error uploading images:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to upload images',
+            error: error.message
+        });
+    }
+});
+
+// Generate image endpoint
+app.post('/api/generate-image', async(req, res) => {
+    console.log('=== GENERATE IMAGE ENDPOINT ===');
+
+    try {
+        const { description, businessName } = req.body;
+
+        if (!description) {
+            return res.status(400).json({
+                success: false,
+                message: 'Image description is required'
+            });
+        }
+
+        const generatedImage = await imageService.generateImage(description, businessName || 'Business');
+
+        res.json({
+            success: true,
+            message: 'Image generated successfully',
+            data: generatedImage
+        });
+
+    } catch (error) {
+        console.error('❌ Error generating image:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to generate image',
+            error: error.message
+        });
+    }
+});
+
+// Enhanced schedule campaign endpoint with image processing
+app.post('/api/schedule-campaign-with-images', upload.array('images', 10), async(req, res) => {
+    console.log('=== ENHANCED SCHEDULE CAMPAIGN ENDPOINT ===');
+    console.log('Request body:', req.body);
+    console.log('Uploaded files:', req.files ? req.files.length : 0);
+    try {
+        const { businessData, confirmedPersonas, generateMissingImages, uploadedImageData } = req.body;
+
+        // Parse JSON strings if they exist
+        const parsedBusinessData = typeof businessData === 'string' ? JSON.parse(businessData) : businessData;
+        const parsedPersonas = typeof confirmedPersonas === 'string' ? JSON.parse(confirmedPersonas) : confirmedPersonas;
+        const shouldGenerateMissing = generateMissingImages === 'true' || generateMissingImages === true;
+
+        // Generate campaign content first
+        const campaignContent = await AI.generateCampaignContent(parsedBusinessData, parsedPersonas);
+
+        // Process uploaded images - either from current request or previously uploaded
+        let uploadedImages = [];
+
+        // Handle images from current request (if any)
+        if (req.files && req.files.length > 0) {
+            uploadedImages = req.files.map(file => ({
+                filename: file.filename,
+                originalName: file.originalname,
+                path: file.path,
+                size: file.size,
+                mimetype: file.mimetype
+            }));
+        }
+
+        // Handle previously uploaded images
+        if (uploadedImageData) {
+            const previousImages = typeof uploadedImageData === 'string' ? JSON.parse(uploadedImageData) : uploadedImageData;
+            if (Array.isArray(previousImages)) {
+                // Convert server URLs back to file paths for processing
+                const processedPreviousImages = previousImages.map(img => ({
+                    filename: img.filename,
+                    originalName: img.originalName,
+                    path: path.join(__dirname, 'uploads', img.filename), // Reconstruct full path
+                    size: img.size,
+                    mimetype: img.mimetype
+                }));
+                uploadedImages.push(...processedPreviousImages);
+            }
+        }
+
+        console.log(`📸 Processing ${uploadedImages.length} uploaded images for campaign`);
+
+        // Process images for campaign posts
+        const imageResults = await imageService.processCampaignImages(
+            campaignContent.posts,
+            uploadedImages,
+            shouldGenerateMissing
+        );
+
+        // Update posts with image information
+        const postsWithImages = imageResults.processed_posts;
+
+        // Create Planable workspace
+        const workspaceName = `${parsedBusinessData.businessName || 'Tinkerbell'} Campaign - ${new Date().toLocaleDateString()}`;
+        console.log('📋 Creating Planable workspace...');
+        const workspace = await planableClient.createWorkspace(workspaceName);
+
+        // Schedule posts with images to Planable
+        console.log('📝 Scheduling posts with images to Planable...');
+        const schedulingResults = await planableClient.scheduleMultiplePosts(workspace.id, postsWithImages);
+
+        const successfulPosts = schedulingResults.filter(r => r.success).length;
+        const workspaceUrl = planableClient.getWorkspaceUrl(workspace.id);
+
+        res.json({
+            success: true,
+            message: `Campaign with images scheduled successfully! ${successfulPosts}/${postsWithImages.length} posts created.`,
+            data: {
+                campaign: {
+                    ...campaignContent,
+                    posts: postsWithImages
+                },
+                workspace: {
+                    id: workspace.id,
+                    name: workspace.name,
+                    url: workspaceUrl
+                },
+                images: {
+                    processing_summary: imageResults.processing_summary,
+                    uploaded_images: uploadedImages.length,
+                    generated_images: imageResults.generated_images.length,
+                    matched_images: imageResults.matched_images.length
+                },
+                scheduling: {
+                    total: postsWithImages.length,
+                    successful: successfulPosts,
+                    results: schedulingResults
+                },
+                auto_posting: {
+                    enabled: planableClient.autoPost,
+                    facebook_page_id: planableClient.facebookPageId || 'Not configured'
+                }
+            },
+            planableWorkspaceUrl: workspaceUrl
+        });
+
+    } catch (error) {
+        console.error('❌ Error generating enhanced campaign:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to generate campaign with images',
+            error: error.message
+        });
+    }
+});
+
+// Analyze uploaded images endpoint
+app.post('/api/analyze-images', upload.array('images', 10), async(req, res) => {
+    console.log('=== ANALYZE IMAGES ENDPOINT ===');
+
+    try {
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'No images to analyze'
+            });
+        }
+
+        const { campaignPosts } = req.body;
+        const parsedPosts = typeof campaignPosts === 'string' ? JSON.parse(campaignPosts) : campaignPosts;
+
+        const uploadedImages = req.files.map(file => ({
+            filename: file.filename,
+            originalName: file.originalname,
+            path: file.path,
+            size: file.size,
+            mimetype: file.mimetype
+        }));
+
+        const analysisResults = await imageService.analyzeAndMatchImages(uploadedImages, parsedPosts || []);
+
+        res.json({
+            success: true,
+            message: 'Images analyzed successfully',
+            data: {
+                analysis: analysisResults,
+                uploaded_count: uploadedImages.length,
+                matches_found: analysisResults.matches.length
+            }
+        });
+
+    } catch (error) {
+        console.error('❌ Error analyzing images:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to analyze images',
+            error: error.message
+        });
+    }
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
     res.json({
@@ -253,6 +523,10 @@ app.listen(PORT, () => {
     console.log(`📍 API endpoints available:`);
     console.log(`   POST /api/create-personas`);
     console.log(`   POST /api/schedule-campaign`);
+    console.log(`   POST /api/upload-images`);
+    console.log(`   POST /api/generate-image`);
+    console.log(`   POST /api/schedule-campaign-with-images`);
+    console.log(`   POST /api/analyze-images`);
     console.log(`   GET  /health`);
 });
 

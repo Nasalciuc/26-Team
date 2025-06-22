@@ -1,66 +1,68 @@
 /**
- * Planable API Client for Tinkerbell MVP
- * Author: Nicolae Cociorva
+ * Enhanced Planable API Client for Tinkerbell MVP
+ * Author: Nicolae Cociorva + Enhanced by Aurelian
  * 
  * This module handles all interactions with the Planable API for creating
- * workspaces and scheduling social media posts.
+ * workspaces, scheduling social media posts, and auto-posting to Facebook
  */
+
+const FormData = require('form-data');
+const fs = require('fs');
+const path = require('path');
+const axios = require('axios');
 
 class PlanableClient {
     constructor() {
-        this.apiKey = process.env.PLANABLE_ACCESS_TOKEN;
-        this.baseUrl = 'https://api.planable.io/v1';
+            this.apiKey = process.env.PLANABLE_ACCESS_TOKEN;
+            this.baseUrl = 'https://app.planable.io/api/v1'; // Updated from api.planable.io to app.planable.io/api
+            this.facebookPageId = process.env.FACEBOOK_PAGE_ID; // Your Facebook page ID
+            this.autoPost = process.env.AUTO_POST_ENABLED === 'true'; // Enable auto-posting
 
-        if (!this.apiKey) {
-            console.warn('⚠️ PLANABLE_ACCESS_TOKEN not found - using mock responses');
-        }
-    }
-
-    /**
-     * Create a new workspace in Planable
-     * @param {string} workspaceName - Name for the new workspace
-     * @returns {Promise<Object>} Workspace creation response
-     */
-    async createWorkspace(workspaceName) {
-        console.log(`📋 Planable: Creating workspace "${workspaceName}"`);
-
-        if (!this.apiKey) {
-            return this._getMockWorkspace(workspaceName);
-        }
-
-        try {
-            const response = await fetch(`${this.baseUrl}/workspaces`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${this.apiKey}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    name: workspaceName,
-                    description: `Tinkerbell Marketing Campaign for ${workspaceName}`
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error(`Planable API error: ${response.status} ${response.statusText}`);
+            if (!this.apiKey) {
+                console.warn('⚠️ PLANABLE_ACCESS_TOKEN not found - using mock responses');
             }
 
-            const data = await response.json();
-            console.log(`✅ Planable: Workspace created with ID ${data.id}`);
-            return data;
-
-        } catch (error) {
-            console.error('❌ Planable workspace creation failed:', error.message);
-            return this._getMockWorkspace(workspaceName);
+            if (this.autoPost && !this.facebookPageId) {
+                console.warn('⚠️ FACEBOOK_PAGE_ID not found - auto-posting may not work correctly');
+            }
         }
-    }
+        /**
+         * Create a new workspace in Planable
+         * @param {string} workspaceName - Name for the new workspace
+         * @returns {Promise<Object>} Workspace creation response
+         */
+    async createWorkspace(workspaceName) {
+            console.log(`📋 Planable: Creating workspace "${workspaceName}"`);
 
-    /**
-     * Schedule a social media post in Planable
-     * @param {string} workspaceId - ID of the workspace
-     * @param {Object} postData - Post content and metadata
-     * @returns {Promise<Object>} Post scheduling response
-     */
+            if (!this.apiKey) {
+                return this._getMockWorkspace(workspaceName);
+            }
+
+            try {
+                const response = await axios.post(`${this.baseUrl}/workspaces`, {
+                    name: workspaceName,
+                    description: `Tinkerbell Marketing Campaign for ${workspaceName}`
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${this.apiKey}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                console.log(`✅ Planable: Workspace created with ID ${response.data.id}`);
+                return response.data;
+
+            } catch (error) {
+                console.error('❌ Planable workspace creation failed:', error.message);
+                return this._getMockWorkspace(workspaceName);
+            }
+        }
+        /**
+         * Schedule a social media post in Planable with image support and auto-posting
+         * @param {string} workspaceId - ID of the workspace
+         * @param {Object} postData - Post content and metadata
+         * @returns {Promise<Object>} Post scheduling response
+         */
     async schedulePost(workspaceId, postData) {
         console.log(`📝 Planable: Scheduling post for ${postData.platform}`);
 
@@ -72,21 +74,30 @@ class PlanableClient {
             // Transform our post data to Planable format
             const planablePost = this._transformPostData(postData);
 
-            const response = await fetch(`${this.baseUrl}/workspaces/${workspaceId}/posts`, {
-                method: 'POST',
+            // Handle image attachment if present
+            if (postData.image && postData.image.path) {
+                const imageUpload = await this._uploadImage(workspaceId, postData.image.path);
+                if (imageUpload.success) {
+                    planablePost.media = [imageUpload.mediaId];
+                }
+            }
+            const response = await axios.post(`${this.baseUrl}/workspaces/${workspaceId}/posts`, planablePost, {
                 headers: {
                     'Authorization': `Bearer ${this.apiKey}`,
                     'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(planablePost)
+                }
             });
 
-            if (!response.ok) {
-                throw new Error(`Planable API error: ${response.status} ${response.statusText}`);
+            const data = response.data;
+            console.log(`✅ Planable: Post scheduled with ID ${data.id}`);
+
+            // Auto-publish to Facebook if enabled
+            if (this.autoPost && this._shouldAutoPost(postData.platform)) {
+                setTimeout(async() => {
+                    await this._autoPublishPost(data.id, workspaceId);
+                }, 1000); // Small delay to ensure post is processed
             }
 
-            const data = await response.json();
-            console.log(`✅ Planable: Post scheduled with ID ${data.id}`);
             return data;
 
         } catch (error) {
@@ -151,7 +162,7 @@ class PlanableClient {
         return {
             content: postData.post_text,
             platforms: this._getPlatformIds(postData.platform),
-            hashtags: postData.hashtags ? .join(' ') || '',
+            hashtags: postData.hashtags ? postData.hashtags.join(' ') : '',
             call_to_action: postData.call_to_action,
             status: 'draft', // Create as draft for review
             metadata: {
@@ -197,23 +208,111 @@ class PlanableClient {
      * @private
      */
     _getMockPostResponse(postData) {
-        console.log('🔄 Using mock post response (API key not available)');
-        return {
-            id: `mock_post_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-            platform: postData.platform,
-            content: postData.post_text,
-            status: 'scheduled',
-            scheduled_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Tomorrow
-            created_at: new Date().toISOString()
-        };
+            console.log('🔄 Using mock post response (API key not available)');
+            return {
+                id: `mock_post_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                platform: postData.platform,
+                content: postData.post_text,
+                status: 'scheduled',
+                scheduled_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Tomorrow
+                created_at: new Date().toISOString()
+            };
+        }
+        /**
+         * Utility delay function
+         * @private
+         */
+    _delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     /**
-     * Utility delay function
+     * Upload image to Planable
+     * @param {string} workspaceId - Workspace ID
+     * @param {string} imagePath - Path to image file
+     * @returns {Promise<Object>} Upload response
      * @private
      */
-    _delay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
+    async _uploadImage(workspaceId, imagePath) {
+        if (!this.apiKey) {
+            return { success: false, error: 'No API key' };
+        }
+
+        try {
+            const form = new FormData();
+            form.append('file', fs.createReadStream(imagePath));
+            form.append('workspace_id', workspaceId);
+            const response = await axios.post(`${this.baseUrl}/media/upload`, form, {
+                headers: {
+                    'Authorization': `Bearer ${this.apiKey}`,
+                    ...form.getHeaders()
+                }
+            });
+
+            const data = response.data;
+            console.log(`✅ Image uploaded successfully: ${data.id}`);
+
+            return {
+                success: true,
+                mediaId: data.id,
+                url: data.url
+            };
+
+        } catch (error) {
+            console.error('❌ Image upload failed:', error.message);
+            return { success: false, error: error.message };
+        }
+    }
+
+    /**
+     * Auto-publish post to Facebook
+     * @param {string} postId - Planable post ID
+     * @param {string} workspaceId - Workspace ID
+     * @returns {Promise<Object>} Publish response
+     * @private
+     */
+    async _autoPublishPost(postId, workspaceId) {
+        if (!this.apiKey || !this.autoPost) {
+            console.log('🔄 Auto-posting disabled or no API key');
+            return { success: false, reason: 'Auto-posting disabled' };
+        }
+
+        try {
+            console.log(`🚀 Auto-publishing post ${postId} to Facebook...`);
+            const response = await axios.post(`${this.baseUrl}/workspaces/${workspaceId}/posts/${postId}/publish`, {
+                platforms: ['facebook'],
+                facebook_page_id: this.facebookPageId,
+                publish_now: true
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${this.apiKey}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const data = response.data;
+            console.log(`✅ Post auto-published to Facebook: ${data.facebook_post_id}`);
+
+            return {
+                success: true,
+                facebook_post_id: data.facebook_post_id,
+                published_at: new Date().toISOString()
+            };
+
+        } catch (error) {
+            console.error('❌ Auto-publish failed:', error.message);
+            return { success: false, error: error.message };
+        }
+    }
+
+    /**
+     * Check if post should be auto-published
+     * @param {string} platform - Post platform
+     * @returns {boolean} Should auto-post
+     * @private
+     */
+    _shouldAutoPost(platform) {
+        return this.autoPost && (platform === 'facebook' || platform === 'both');
     }
 }
 
