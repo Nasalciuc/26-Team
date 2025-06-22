@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -111,18 +110,26 @@ const BusinessProfile = () => {
       {/* CTA Section - Robust */}
       <section className="px-6 py-24 bg-gradient-to-br from-black via-gray-900 to-black">
         <div className="max-w-5xl mx-auto">
-          <Card className="robust-card p-16 text-center shadow-2xl shadow-yellow-400/20">
-            <CardContent className="space-y-8">
-              <h3 className="text-4xl font-black text-yellow-400 mb-6 uppercase tracking-wider">
-                Gata pentru Dominație?
+          <Card className="robust-card p-20 text-center shadow-2xl shadow-yellow-400/30 border-4 border-yellow-400/40">
+            <CardContent className="space-y-10">
+              <h3 className="text-5xl font-black text-yellow-400 mb-8 uppercase tracking-widest drop-shadow-lg">
+                Ești pregătit să-ți cucerești piața?
               </h3>
-              <p className="text-xl text-yellow-400/80 mb-12 max-w-3xl mx-auto font-bold leading-relaxed">
-                Alătură-te elitei antreprenorilor care transformă viziunile în imperii digitale
+              <p className="text-2xl text-yellow-300/90 mb-10 max-w-3xl mx-auto font-extrabold leading-relaxed">
+                Fă parte din elita antreprenorilor care transformă ideile în imperii digitale. Acum e momentul să acționezi!
               </p>
-              <Button size="lg" className="robust-button px-16 py-8 text-xl font-black uppercase tracking-wider animate-pulse-robust">
-                Creează Primul Tău Imperiu
-                <ArrowRight size={28} className="ml-4" />
+              <Button
+                size="lg"
+                className="robust-button px-20 py-8 text-2xl font-black uppercase tracking-wider animate-pulse-robust bg-yellow-400 text-black hover:bg-yellow-300 transition-all duration-300 shadow-lg shadow-yellow-400/30"
+              >
+                Creează-ți Imperiul Acum
+                <ArrowRight size={32} className="ml-5" />
               </Button>
+              <div className="mt-6">
+                <span className="text-yellow-400/70 text-lg font-bold">
+                  Nu rata șansa de a domina cu inteligență artificială!
+                </span>
+              </div>
             </CardContent>
           </Card>
         </div>
