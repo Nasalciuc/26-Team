@@ -6,40 +6,91 @@
     {% else %}
         Toate Personas
     {% endif %}
-    - Team 26
+    - {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<div class="max-w-5xl mx-auto p-6 space-y-8 animate-fade-in">
-    <div class="text-center mb-8">
-        <h1 class="text-4xl font-black text-purple-400 tracking-tight mb-2">
-            {% if site_filter %}
-                Personas pentru <br class="md:hidden"/> <span class="text-purple-300">{{ site_filter.domain }}</span>
-            {% else %}
-                Toate Personas Generate
-            {% endif %}
-        </h1>
-        <p class="text-lg text-purple-400/70 font-bold uppercase tracking-wider">
-            {% if site_filter %}
-                Listă de profiluri AI specifice acestui site
-            {% else %}
-                Lista completă a personas generate cu AI pentru afacerea ta
-            {% endif %}
-        </p>
+<div class="min-h-screen bg-gray-50">
+    <!-- Hero Header -->
+    <div class="bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-6 py-12">
+            <!-- Breadcrumb -->
+            <nav class="mb-8">
+                <ol class="flex items-center space-x-2 text-sm text-gray-500">
+                    <li><a href="{% url 'auth_app:dashboard' %}" class="hover:text-blue-600 transition-colors">Dashboard</a></li>
+                    <li><span class="text-gray-400">/</span></li>
+                    <li><a href="{% url 'auth_app:ai_personas' %}" class="hover:text-blue-600 transition-colors">AI Personas</a></li>
+                    <li><span class="text-gray-400">/</span></li>
+                    <li class="text-gray-900 font-medium">
+                        {% if site_filter %}
+                            {{ site_filter.domain }}
+                        {% else %}
+                            Toate Personas
+                        {% endif %}
+                    </li>
+                </ol>
+            </nav>
+
+            <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
+                <div class="flex-1">
+                    <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight">
+                        {% if site_filter %}
+                            Personas pentru <span class="text-blue-600">{{ site_filter.domain }}</span>
+                        {% else %}
+                            Toate Personas Generate
+                        {% endif %}
+                    </h1>
+                    <p class="text-xl text-gray-600 mb-6 leading-relaxed max-w-4xl">
+                        {% if site_filter %}
+                            Profiluri AI specifice generate pentru acest website
+                        {% else %}
+                            Lista completă a personas generate cu AI pentru afacerea ta
+                        {% endif %}
+                    </p>
+                    
+                    <!-- Stats -->
+                    <div class="flex flex-wrap gap-4 mb-8">
+                        <div class="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3">
+                            <div class="text-2xl font-bold text-blue-600">{{ personas.count }}</div>
+                            <div class="text-sm text-blue-600">Personas</div>
+                        </div>
+                        {% if site_filter %}
+                        <div class="bg-green-50 border border-green-200 rounded-xl px-4 py-3">
+                            <div class="text-2xl font-bold text-green-600">{{ site_filter.domain }}</div>
+                            <div class="text-sm text-green-600">Website</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-3">
+                    {% if site_filter %}
+                        <a href="{% url 'auth_app:personas_list' %}" class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 rounded-xl text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                            <i class="bi bi-grid-3x3-gap-fill mr-2"></i>
+                            Vezi toate
+                        </a>
+                    {% else %}
+                        <a href="{% url 'auth_app:ai_personas' %}" class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 rounded-xl text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                            <i class="bi bi-robot mr-2"></i>
+                            Generează noi
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
-    
+
+    <!-- Messages -->
     {% if messages %}
-        <div class="w-full max-w-4xl mx-auto">
+        <div class="max-w-7xl mx-auto px-6 py-4">
             {% for message in messages %}
-                <div class="flex items-center p-4 mb-4 text-sm rounded-lg
-                    {% if message.tags == 'success' %} bg-green-900 text-green-300 border border-green-500
-                    {% elif message.tags == 'error' %} bg-red-900 text-red-300 border border-red-500
-                    {% elif message.tags == 'warning' %} bg-yellow-900 text-yellow-300 border border-yellow-500
-                    {% else %} bg-gray-900 text-gray-300 border border-gray-700 {% endif %}" role="alert">
-                    <svg class="flex-shrink-0 inline w-4 h-4 mr-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
-                    </svg>
-                    <span class="sr-only">Info</span>
+                <div class="flex items-center p-4 mb-4 text-sm rounded-xl border
+                    {% if message.tags == 'success' %} bg-green-50 text-green-800 border-green-200
+                    {% elif message.tags == 'error' %} bg-red-50 text-red-800 border-red-200
+                    {% elif message.tags == 'warning' %} bg-yellow-50 text-yellow-800 border-yellow-200
+                    {% else %} bg-blue-50 text-blue-800 border-blue-200 {% endif %}" role="alert">
+                    <i class="bi bi-check-circle mr-3 text-lg"></i>
                     <div>
                         <span class="font-medium">{{ message.tags|title }}!</span> {{ message }}
                     </div>
@@ -48,118 +99,144 @@
         </div>
     {% endif %}
 
-    <!-- Navigation -->
-    <div class="text-center mb-6">
-        {% if site_filter %}
-            <a href="{% url 'auth_app:personas_list' %}" class="robust-button-secondary text-sm">
-                <i class="bi bi-grid-3x3-gap-fill"></i> Vezi toate profilurile
-            </a>
-        {% else %}
-             <a href="{% url 'auth_app:ai_personas' %}" class="robust-button-secondary text-sm">
-                <i class="bi bi-robot"></i> Generează Personas Noi
-            </a>
-        {% endif %}
-    </div>
-
-
-    {% if personas %}
-    <form action="{% url 'auth_app:bulk_delete_personas' %}" method="post" id="bulk-delete-form">
-        {% csrf_token %}
-        <div class="flex justify-end mb-4">
-            <button type="submit" id="bulk-delete-button" class="robust-button-destructive hidden flex items-center gap-2" disabled>
-                <i class="bi bi-trash"></i>
-                <span>Șterge Selectate</span>
-            </button>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {% for persona in personas %}
-            <div class="robust-card rounded-xl p-6 card-hover flex flex-col justify-between">
-                <div>
-                    <div class="flex items-start justify-between">
-                        <h2 class="text-2xl font-bold text-purple-400 mb-2">{{ persona.name }}</h2>
-                        <input type="checkbox" name="persona_ids" value="{{ persona.id }}" class="bulk-delete-checkbox form-checkbox h-5 w-5 bg-gray-700 border-gray-600 text-purple-600 focus:ring-purple-500 rounded">
+    <!-- Content -->
+    <div class="max-w-7xl mx-auto px-6 py-12">
+        {% if personas %}
+            <form action="{% url 'auth_app:bulk_delete_personas' %}" method="post" id="bulk-delete-form">
+                {% csrf_token %}
+                
+                <!-- Bulk Actions -->
+                <div class="flex justify-between items-center mb-8">
+                    <div class="flex items-center space-x-4">
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" id="select-all" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <span class="text-sm text-gray-600">Selectează toate</span>
+                        </label>
                     </div>
-                    <p class="text-gray-400 mb-2">{{ persona.age }} ani, {{ persona.location }}</p>
-                    <p class="text-sm text-gray-400 mb-2">{{ persona.occupation }}</p>
-                    <p class="text-sm text-gray-400 mb-2">{{ persona.get_interests_display }}</p>
-                    
-                    <!-- Site Information -->
-                    {% if persona.scraped_site and not site_filter %}
-                        <div class="mt-3 p-2 bg-gray-800/50 rounded-lg border border-gray-700">
-                            <p class="text-xs text-gray-400 mb-1">Site asociat:</p>
-                            <a href="{% url 'auth_app:personas_list' %}?site_id={{ persona.scraped_site.id }}" class="text-sm text-blue-400 font-semibold hover:underline">
+                    <button type="submit" id="bulk-delete-button" class="hidden inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-xl text-white bg-red-600 hover:bg-red-700 transition-colors" disabled>
+                        <i class="bi bi-trash mr-2"></i>
+                        Șterge selectate
+                    </button>
+                </div>
+
+                <!-- Personas Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for persona in personas %}
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden">
+                        <!-- Header -->
+                        <div class="p-6 border-b border-gray-100">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="flex-1">
+                                    <h3 class="text-xl font-bold text-gray-900 mb-1">{{ persona.name }}</h3>
+                                    <p class="text-sm text-gray-500">{{ persona.age }} ani, {{ persona.location }}</p>
+                                    <p class="text-sm text-gray-600 font-medium mt-1">{{ persona.occupation }}</p>
+                                </div>
+                                <input type="checkbox" name="persona_ids" value="{{ persona.id }}" class="bulk-delete-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            </div>
+                            
+                            <!-- Interests -->
+                            <div class="flex flex-wrap gap-2">
+                                {% for interest in persona.interests.all|slice:":3" %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                    {{ interest.name }}
+                                </span>
+                                {% endfor %}
+                                {% if persona.interests.count > 3 %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                                    +{{ persona.interests.count|add:"-3" }}
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Site Information -->
+                        {% if persona.scraped_site and not site_filter %}
+                        <div class="px-6 py-3 bg-gray-50 border-b border-gray-100">
+                            <p class="text-xs text-gray-500 mb-1">Site asociat:</p>
+                            <a href="{% url 'auth_app:personas_list' %}?site_id={{ persona.scraped_site.id }}" class="text-sm text-blue-600 font-medium hover:underline">
                                 {{ persona.scraped_site.domain }}
                             </a>
                         </div>
+                        {% endif %}
+
+                        <!-- Actions -->
+                        <div class="p-6">
+                            <div class="grid grid-cols-2 gap-3">
+                                <a href="{% url 'auth_app:persona_detail' persona.id %}" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-xl text-white bg-blue-600 hover:bg-blue-700 transition-colors">
+                                    <i class="bi bi-eye mr-2"></i>
+                                    Detalii
+                                </a>
+                                <a href="{% url 'auth_app:edit_persona' persona.id %}" class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-xl text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                                    <i class="bi bi-pencil-square mr-2"></i>
+                                    Editează
+                                </a>
+                                <a href="{% url 'auth_app:export_persona' persona.id %}?format=json" class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-xl text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                                    <i class="bi bi-download mr-2"></i>
+                                    Export
+                                </a>
+                                <form action="{% url 'auth_app:delete_persona' persona.id %}" method="post" class="contents">
+                                    {% csrf_token %}
+                                    <button type="submit" class="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-xl text-white bg-red-600 hover:bg-red-700 transition-colors" onclick="return confirm('Ești sigur că vrei să ștergi acest profil?');">
+                                        <i class="bi bi-trash mr-2"></i>
+                                        Șterge
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </form>
+        {% else %}
+            <!-- Empty State -->
+            <div class="text-center py-16">
+                <div class="w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mx-auto mb-8 shadow-lg">
+                    <i class="bi bi-robot text-white text-3xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-4">
+                    {% if site_filter %}
+                        Nu există personas generate pentru {{ site_filter.domain }}
+                    {% else %}
+                        Nu există personas generate încă
+                    {% endif %}
+                </h3>
+                <p class="text-gray-600 text-lg mb-8 max-w-md mx-auto">
+                    {% if site_filter %}
+                        Click pe butonul de mai jos pentru a genera primele profiluri pentru acest site.
+                    {% else %}
+                        Folosește meniul "AI Personas" pentru a genera primele tale personas!
+                    {% endif %}
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    {% if site_filter %}
+                        <a href="{% url 'auth_app:site_detail' site_filter.id %}" class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 rounded-xl text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                            <i class="bi bi-arrow-left mr-2"></i>
+                            Înapoi la site
+                        </a>
+                        <form action="{% url 'auth_app:generate_personas_from_site' site_filter.id %}" method="post" class="inline">
+                            {% csrf_token %}
+                            <button type="submit" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-sm font-medium rounded-xl text-white bg-blue-600 hover:bg-blue-700 transition-colors">
+                                <i class="bi bi-robot mr-2"></i>
+                                Generează Personas
+                            </button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'auth_app:ai_personas' %}" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-sm font-medium rounded-xl text-white bg-blue-600 hover:bg-blue-700 transition-colors">
+                            <i class="bi bi-robot mr-2"></i>
+                            Generează Primele Personas
+                        </a>
                     {% endif %}
                 </div>
-                <div class="grid grid-cols-2 gap-2 mt-4">
-                    <a href="{% url 'auth_app:persona_detail' persona.id %}" class="robust-button py-2 px-3 rounded text-sm font-bold text-center flex items-center justify-center">
-                        <i class="bi bi-eye mr-1"></i> Detalii
-                    </a>
-                    <a href="{% url 'auth_app:edit_persona' persona.id %}" class="bg-blue-900 border-2 border-blue-400 text-blue-400 py-2 px-3 rounded text-sm font-bold text-center hover:bg-blue-400 hover:text-black transition-all duration-300 flex items-center justify-center">
-                        <i class="bi bi-pencil-square mr-1"></i> Editează
-                    </a>
-                    <a href="{% url 'auth_app:export_persona' persona.id %}?format=json" class="bg-purple-900 border-2 border-purple-400 text-purple-400 py-2 px-3 rounded text-sm font-bold text-center hover:bg-purple-400 hover:text-black transition-all duration-300 flex items-center justify-center">
-                        <i class="bi bi-download mr-1"></i> Export
-                    </a>
-                    <form action="{% url 'auth_app:delete_persona' persona.id %}" method="post" class="contents">
-                        {% csrf_token %}
-                        <button type="submit" class="w-full bg-red-900 border-2 border-red-400 text-red-400 py-2 px-3 rounded text-sm font-bold text-center hover:bg-red-400 hover:text-black transition-all duration-300 flex items-center justify-center" onclick="return confirm('Ești sigur că vrei să ștergi acest profil?');">
-                            <i class="bi bi-trash mr-1"></i> Șterge
-                        </button>
-                    </form>
-                </div>
             </div>
-            {% endfor %}
-        </div>
-    </form>
-    {% else %}
-    <div class="text-center py-12">
-        <div class="w-24 h-24 rounded-2xl bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center mx-auto mb-6 shadow-2xl border-4 border-purple-400/50">
-            <i class="bi bi-robot text-white text-3xl"></i>
-        </div>
-        <h3 class="text-2xl font-bold text-purple-400 mb-4">
-            {% if site_filter %}
-                Nu există personas generate pentru {{ site_filter.domain }}
-            {% else %}
-                Nu există personas generate încă
-            {% endif %}
-        </h3>
-        <p class="text-gray-400 text-lg mb-6">
-            {% if site_filter %}
-                Click pe butonul de mai jos pentru a genera primele profiluri pentru acest site.
-            {% else %}
-                Folosește meniul "AI Personas" pentru a genera primele tale personas!
-            {% endif %}
-        </p>
-        
-        {% if site_filter %}
-            <div class="flex justify-center space-x-4">
-                <a href="{% url 'auth_app:site_detail' site_filter.id %}" class="robust-button-secondary flex items-center gap-2">
-                    <i class="bi bi-arrow-left"></i>
-                    <span>Înapoi la site</span>
-                </a>
-                <form action="{% url 'auth_app:generate_personas_from_site' site_filter.id %}" method="post" class="inline">
-                    {% csrf_token %}
-                    <button type="submit" class="robust-button flex items-center gap-2">
-                        <i class="bi bi-robot"></i>
-                        <span>Generează Personas</span>
-                    </button>
-                </form>
-            </div>
-        {% else %}
-            <a href="{% url 'auth_app:ai_personas' %}" class="robust-button flex items-center gap-2 mx-auto w-fit">
-                <i class="bi bi-robot"></i>
-                <span>Generează Primele Personas</span>
-            </a>
         {% endif %}
     </div>
-    {% endif %}
 </div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const checkboxes = document.querySelectorAll('.bulk-delete-checkbox');
+    const selectAllCheckbox = document.getElementById('select-all');
     const bulkDeleteButton = document.getElementById('bulk-delete-button');
 
     function toggleBulkDeleteButton() {
@@ -173,8 +250,26 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    function updateSelectAll() {
+        const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
+        const anyChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+        selectAllCheckbox.checked = allChecked;
+        selectAllCheckbox.indeterminate = anyChecked && !allChecked;
+    }
+
     checkboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', toggleBulkDeleteButton);
+        checkbox.addEventListener('change', () => {
+            toggleBulkDeleteButton();
+            updateSelectAll();
+        });
+    });
+
+    selectAllCheckbox.addEventListener('change', function() {
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+        toggleBulkDeleteButton();
+        updateSelectAll();
     });
     
     document.getElementById('bulk-delete-form').addEventListener('submit', function(e) {
@@ -184,6 +279,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     toggleBulkDeleteButton();
+    updateSelectAll();
 });
 </script>
 {% endblock %} 
