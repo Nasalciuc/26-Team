@@ -3,10 +3,15 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tinkerbell - AI marketing assistant</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    <title>Tinkerbell - AI marketing assistant</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        // Check if user came from landing page or redirect to landing page
+        if (!sessionStorage.getItem('fromLanding') && !window.location.search.includes('app')) {
+            window.location.href = 'landing.html';
+        }
+    </script>
 </head>
 
 <body>
