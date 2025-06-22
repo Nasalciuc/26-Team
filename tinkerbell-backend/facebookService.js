@@ -9,9 +9,12 @@ const fs = require('fs');
 
 class FacebookService {
     constructor() {
-        this.pageAccessToken = process.env.FACEBOOK_PAGE_ACCESS_TOKEN || process.env.META_ACCESS_TOKEN;
-        this.pageId = process.env.FACEBOOK_PAGE_ID;
-        this.baseUrl = 'https://graph.facebook.com/v18.0';
+        // Updated Facebook credentials - working as of June 22, 2025
+        this.pageAccessToken = process.env.FACEBOOK_PAGE_ACCESS_TOKEN ||
+            process.env.META_ACCESS_TOKEN ||
+            'EAAY2VBFOoHwBOwrpZCXSRjDZAXSNZC8rZBnRM49dmreEE9UsCfIMHBqx2ZAoRPwgZAoncIRzDugchj1NaQJ0cCkcx2iqHXTBHScZBLpRZCkaP01adZBIpRO0x2iq410dRDrrZAFIQspkH57pYL3Qj9XVbIw7r7QvDR16QmM9WMfSxGE03mahti9dYHLOyL56SV6kG7A0gooD4vS0Lu9vudQeK8dZCqLOmmtUiEdlle9DmIZD';
+        this.pageId = process.env.FACEBOOK_PAGE_ID || '532394313287326';
+        this.baseUrl = 'https://graph.facebook.com';
 
         if (!this.pageAccessToken) {
             console.warn('⚠️ FACEBOOK_PAGE_ACCESS_TOKEN not found - using mock responses');

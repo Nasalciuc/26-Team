@@ -1,125 +1,168 @@
 <!DOCTYPE html>
-<html lang="ro">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✨ Tinkerbell - Your Marketing Magic</title>
+    <title>Tinkerbell - AI marketing assistant</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
-    <!-- Page 1: Conversational Onboarding -->
+    <!-- Header Navigation -->
+    <header class="app-header">
+        <div class="container">
+            <div class="brand">
+                <h1>Tinkerbell</h1>
+                <span class="beta-badge">Beta</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Page 1: Business Setup -->
     <div id="page-onboarding" class="page active">
         <div class="container">
-            <header class="hero">
-                <h1>✨ Tinkerbell</h1>
-                <p class="tagline">Your magical companion for effortless small business growth</p>
-                <h2 class="headline">Transformă descrierea afacerii tale în marketing. Cu un singur click.</h2>
-            </header>
+            <div class="onboarding-wrapper">
+                <div class="onboarding-content">
+                    <div class="step-indicator">
+                        <span class="step active">1</span>
+                        <span class="step">2</span>
+                        <span class="step">3</span>
+                    </div>
 
-            <form id="onboarding-form" class="conversation-form">
-                <div class="question-group">
-                    <label for="businessName">Care este numele afacerii tale? 🏪</label>
-                    <input type="text" id="businessName" name="businessName" placeholder="ex: Florărie Marta" required>
+                    <div class="page-header">
+                        <h2>Tell us about your business</h2>
+                        <p>We'll use this information to create personalized marketing campaigns that work for your specific audience.</p>
+                    </div>
+
+                    <form id="onboarding-form" class="onboarding-form">
+                        <div class="form-section">
+                            <div class="form-group">
+                                <label for="businessName">Business name</label>
+                                <input type="text" id="businessName" name="businessName" placeholder="e.g., Martha's Flower Shop" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="businessDescription">What does your business do?</label>
+                                <textarea id="businessDescription" name="businessDescription" placeholder="e.g., Local florist in Chisinau specializing in unique wedding arrangements and special event flowers" required></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="targetCustomers">Who are your ideal customers?</label>
+                                <textarea id="targetCustomers" name="targetCustomers" placeholder="e.g., Brides-to-be, event planners, people looking for special gifts"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="businessGoals">What are your main business goals?</label>
+                                <textarea id="businessGoals" name="businessGoals" placeholder="e.g., Attract more clients for large events, increase online visibility"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="websiteUrl">Website or Facebook page <span class="optional">(optional)</span></label>
+                                <input type="url" id="websiteUrl" name="websiteUrl" placeholder="https://www.facebook.com/marthasflowers">
+                                <small>We'll analyze your content to better understand your business</small>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                Continue
+                            </button>
+                        </div>
+                    </form>
                 </div>
-
-                <div class="question-group">
-                    <label for="businessDescription">Spune-mi pe scurt despre produsele/serviciile tale 📦</label>
-                    <textarea id="businessDescription" name="businessDescription" placeholder="ex: Florărie locală în Chișinău care vinde aranjamente unice pentru nunți și evenimente speciale" required></textarea>
-                </div>
-
-                <div class="question-group">
-                    <label for="targetCustomers">Cine sunt clienții tăi ideali? Care sunt obiectivele tale? 🎯</label>
-                    <textarea id="targetCustomers" name="targetCustomers" placeholder="ex: Mirese, organizatori de evenimente, persoane care vor să facă cadouri speciale"></textarea>
-                </div>
-
-                <div class="question-group">
-                    <label for="businessGoals">Care sunt obiectivele tale de business? 🚀</label>
-                    <textarea id="businessGoals" name="businessGoals" placeholder="ex: Să atrag mai mulți clienți pentru evenimente mari, să cresc vizibilitatea online"></textarea>
-                </div>
-
-                <div class="question-group">
-                    <label for="websiteUrl">Lipește un link către Facebook-ul sau website-ul tău (opțional) 🌐</label>
-                    <input type="url" id="websiteUrl" name="websiteUrl" placeholder="ex: https://www.facebook.com/florariamaarta">
-                    <small>Vom analiza conținutul pentru a înțelege mai bine afacerea ta</small>
-                </div>
-
-                <button type="submit" class="magic-button">
-                    🪄 Generează-mi Planul de Marketing
-                </button>
-            </form>
+            </div>
         </div>
     </div>
 
-    <!-- Page 2: Persona Editor -->
+    <!-- Page 2: Customer Personas -->
     <div id="page-personas" class="page">
         <div class="container">
-            <header>
-                <h1>✨ Personele Tale de Client</h1>
-                <p>Am generat profilurile clienților tăi ideali. Poți să le editezi dacă ceva nu pare corect.</p>
-            </header>
-
-            <div id="loading-log" class="loading-section">
-                <h3>🔮 Magia se întâmplă...</h3>
-                <div class="progress-log">
-                    <div class="log-item completed">
-                        <span class="checkmark">✓</span>
-                        <span>Analizăm contextul afacerii tale...</span>
-                    </div>
-                    <div class="log-item completed">
-                        <span class="checkmark">✓</span>
-                        <span>Identificăm audiența țintă și creăm persona...</span>
-                    </div>
-                    <div class="log-item completed">
-                        <span class="checkmark">✓</span>
-                        <span>Generăm idei de campanii personalizate...</span>
-                    </div>
-                    <div class="log-item completed">
-                        <span class="checkmark">✓</span>
-                        <span>Creăm postări și ad-uri cu AI...</span>
-                    </div>
-                    <div class="log-item completed">
-                        <span class="checkmark">✓</span>
-                        <span>Evaluăm potențialul de leads...</span>
-                    </div>
-                </div>
-            </div>
-            <div id="personas-editor" class="personas-section">
-                <div id="personas-container">
-                    <!-- Personas will be populated by JavaScript -->
+            <div class="personas-wrapper">
+                <div class="step-indicator">
+                    <span class="step completed">1</span>
+                    <span class="step active">2</span>
+                    <span class="step">3</span>
                 </div>
 
-                <!-- Image Upload Section -->
-                <div class="image-upload-section">
-                    <h3>📷 Adaugă Imagini pentru Campanie (Opțional)</h3>
-                    <p>Încarcă imagini pe care vrei să le folosești în postări sau lasă AI-ul să genereze imagini noi</p>
+                <div class="page-header">
+                    <h2>Review your customer personas</h2>
+                    <p>We've created detailed profiles of your ideal customers. You can edit them if something doesn't look right.</p>
+                </div>
 
-                    <div class="upload-area" id="upload-area">
-                        <div class="upload-content">
-                            <span class="upload-icon">📁</span>
-                            <p>Drag & drop imagini aici sau <span class="upload-link">click pentru a selecta</span></p>
-                            <small>JPG, PNG, GIF până la 10MB per imagine</small>
+                <div id="loading-log" class="loading-section">
+                    <div class="loading-content">
+                        <div class="loading-spinner"></div>
+                        <h3>Creating your marketing strategy...</h3>
+                        <div class="progress-log">
+                            <div class="log-item completed">
+                                <span class="checkmark">✓</span>
+                                <span>Analyzing your business context...</span>
+                            </div>
+                            <div class="log-item completed">
+                                <span class="checkmark">✓</span>
+                                <span>Identifying target audience and creating personas...</span>
+                            </div>
+                            <div class="log-item completed">
+                                <span class="checkmark">✓</span>
+                                <span>Generating personalized campaign ideas...</span>
+                            </div>
+                            <div class="log-item completed">
+                                <span class="checkmark">✓</span>
+                                <span>Creating AI-powered posts and ads...</span>
+                            </div>
+                            <div class="log-item completed">
+                                <span class="checkmark">✓</span>
+                                <span>Evaluating lead potential...</span>
+                            </div>
                         </div>
-                        <input type="file" id="image-upload" multiple accept="image/*" style="display: none;">
-                    </div>
-
-                    <div id="uploaded-images-preview" class="uploaded-images">
-                        <!-- Uploaded images will be shown here -->
-                    </div>
-
-                    <div class="image-options">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="generate-missing-images" checked>
-                            <span class="checkmark-box"></span>
-                            Generează automat imagini pentru postările fără imagini
-                        </label>
                     </div>
                 </div>
 
-                <button id="confirm-personas" class="magic-button">
-                    🎯 Confirmă Personele & Construiește Strategia
-                </button>
+                <div id="personas-editor" class="personas-section">
+                    <div id="personas-container">
+                        <!-- Personas will be populated by JavaScript -->
+                    </div>
+
+                    <!-- Image Upload Section -->
+                    <div class="media-upload-section">
+                        <h3>Add campaign images</h3>
+                        <p>Upload images you'd like to use in your posts, or let our AI generate new ones for you.</p>
+
+                        <div class="upload-area" id="upload-area">
+                            <div class="upload-content">
+                                <div class="upload-icon">
+                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                                    </svg>
+                                </div>
+                                <h4>Drag and drop images here</h4>
+                                <p>or <span class="upload-link">click to browse</span></p>
+                                <small>JPG, PNG, GIF up to 10MB per image</small>
+                            </div>
+                            <input type="file" id="image-upload" multiple accept="image/*" style="display: none;">
+                        </div>
+
+                        <div id="uploaded-images-preview" class="uploaded-images">
+                            <!-- Uploaded images will be shown here -->
+                        </div>
+
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="generate-missing-images" checked>
+                                <span class="checkmark"></span>
+                                <span>Generate images automatically for posts without visuals</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button id="confirm-personas" class="btn btn-primary">
+                            Continue to campaigns
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -127,93 +170,130 @@
     <!-- Page 3: Campaign Dashboard -->
     <div id="page-campaign" class="page">
         <div class="container">
-            <header>
-                <h1>🚀 Dashboard-ul Campaniei Tale</h1>
-                <p>Iată strategia ta de marketing și postările generate cu AI!</p>
-            </header>
+            <div class="campaign-wrapper">
+                <div class="step-indicator">
+                    <span class="step completed">1</span>
+                    <span class="step completed">2</span>
+                    <span class="step active">3</span>
+                </div>
 
-            <div id="strategy-section" class="strategy-card">
-                <h3>📈 Strategia Ta de Marketing</h3>
-                <p id="marketing-strategy">Strategia se încarcă...</p>
-            </div>
-            <div id="posts-section" class="posts-grid">
-                <h3>📱 Postările Tale pe Rețelele Sociale</h3>
-                <div id="posts-container">
-                    <!-- Posts will be populated by JavaScript -->
+                <div class="page-header">
+                    <h2>Your marketing campaigns</h2>
+                    <p>Here's your AI-generated marketing strategy and social media posts ready to launch.</p>
+                </div>
+
+                <div class="campaign-content">
+                    <div id="strategy-section" class="strategy-card">
+                        <h3>Marketing strategy</h3>
+                        <div id="marketing-strategy" class="strategy-content">
+                            <div class="loading-placeholder">Loading strategy...</div>
+                        </div>
+                    </div>
+
+                    <div id="posts-section" class="posts-section">
+                        <div class="section-header">
+                            <h3>Social media posts</h3>
+                            <span class="post-count" id="posts-count">0 posts ready</span>
+                        </div>
+                        <div id="posts-container" class="posts-grid">
+                            <!-- Posts will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Image Processing Results Section -->
+                    <div id="image-processing-results" class="results-section" style="display: none;">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+
+                    <!-- Auto-Posting Status Section -->
+                    <div id="auto-posting-status" class="status-section" style="display: none;">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+
+                    <div class="campaign-metrics">
+                        <div class="metrics-grid">
+                            <div class="metric-card">
+                                <div class="metric-label">Suggested budget</div>
+                                <div class="metric-value">$50</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-label">Estimated qualified leads</div>
+                                <div class="metric-value">5-8</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-label">Estimated cost per lead</div>
+                                <div class="metric-value">$7-10</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button id="schedule-campaign" class="btn btn-primary btn-large">
+                            Launch campaigns
+                        </button>
+                    </div>
                 </div>
             </div>
-
-            <!-- Image Processing Results Section -->
-            <div id="image-processing-results" class="results-section" style="display: none;">
-                <!-- Will be populated by JavaScript -->
-            </div>
-
-            <!-- Auto-Posting Status Section -->
-            <div id="auto-posting-status" class="status-section" style="display: none;">
-                <!-- Will be populated by JavaScript -->
-            </div>
-
-            <div class="campaign-stats">
-                <div class="stat-card">
-                    <h4>💰 Buget Sugerat</h4>
-                    <p class="stat-value">$50</p>
-                </div>
-                <div class="stat-card">
-                    <h4>🎯 Leads Calificate Estimat</h4>
-                    <p class="stat-value">5-8</p>
-                </div>
-                <div class="stat-card">
-                    <h4>💵 Cost/Lead Estimat</h4>
-                    <p class="stat-value">$7 - $10</p>
-                </div>
-            </div>
-
-            <button id="schedule-campaign" class="magic-button large">
-                🎉 Aprobă și Lansează Campaniile
-            </button>
         </div>
     </div>
 
     <!-- Page 4: Success -->
     <div id="page-success" class="page">
         <div class="container">
-            <header class="success-header">
-                <div class="success-animation">🎉</div>
-                <h1>🌟 Magia S-a Întâmplat!</h1>
-                <p>Campania ta a fost creată și programată cu succes în Planable!</p>
-            </header>
+            <div class="success-wrapper">
+                <div class="success-content">
+                    <div class="success-icon">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+                            <polyline points="22,4 12,14.01 9,11.01"/>
+                        </svg>
+                    </div>
 
-            <div class="success-content">
-                <div class="success-card">
-                    <h3>✅ Ce s-a întâmplat:</h3>
-                    <ul id="success-details">
-                        <li>✨ Workspace creat în Planable</li>
-                        <li>📱 <span id="posts-count">3</span> postări programate</li>
-                        <li>🎯 Campania gata de lansare</li>
-                    </ul>
+                    <div class="success-header">
+                        <h2>Campaign created successfully!</h2>
+                        <p>Your marketing campaigns have been created and scheduled in Planable.</p>
+                    </div>
+
+                    <div class="success-details">
+                        <div class="detail-card">
+                            <h3>What happened:</h3>
+                            <ul id="success-details">
+                                <li>Workspace created in Planable</li>
+                                <li><span id="posts-count">3</span> posts scheduled</li>
+                                <li>Campaign ready to launch</li>
+                            </ul>
+                        </div>
+
+                        <div class="workspace-card">
+                            <h3>Access your campaigns</h3>
+                            <p>View and manage all your posts in your new Planable workspace:</p>
+                            <a id="workspace-link" href="#" target="_blank" class="workspace-button">
+                                Open Planable workspace
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
+                                    <polyline points="15,3 21,3 21,9"/>
+                                    <line x1="10" y1="14" x2="21" y2="3"/>
+                                </svg>
+                            </a>
+                        </div>
+
+                        <div class="next-steps">
+                            <h3>Next steps</h3>
+                            <ol>
+                                <li>Access your Planable workspace</li>
+                                <li>Review and customize your posts</li>
+                                <li>Approve and publish your campaigns</li>
+                                <li>Monitor your results</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button onclick="location.reload()" class="btn btn-secondary">
+                            Create new campaign
+                        </button>
+                    </div>
                 </div>
-
-                <div class="workspace-card">
-                    <h3>🔗 Accesează-ți Campania</h3>
-                    <p>Vezi și gestionează toate postările în noul tău workspace Planable:</p>
-                    <a id="workspace-link" href="#" target="_blank" class="workspace-button">
-                        🚀 Deschide Workspace-ul Planable
-                    </a>
-                </div>
-
-                <div class="next-steps">
-                    <h3>🎯 Următorii Pași</h3>
-                    <ol>
-                        <li>Accesează workspace-ul Planable</li>
-                        <li>Revizuiește și personalizează postările</li>
-                        <li>Aprobă și publică campaniile</li>
-                        <li>Monitorizează rezultatele</li>
-                    </ol>
-                </div>
-
-                <button onclick="location.reload()" class="magic-button">
-                    ✨ Creează O Nouă Campanie
-                </button>
             </div>
         </div>
     </div>

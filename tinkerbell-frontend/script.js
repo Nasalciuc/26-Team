@@ -13,17 +13,17 @@ class TinkerbellApp {
         this.init();
     }
     init() {
-            console.log('🎯 Tinkerbell App initialized');
+            console.log('Tinkerbell App initialized');
 
             // Add global error handler
             window.addEventListener('error', (e) => {
-                console.error('🔥 Global JavaScript Error:', e.error);
-                console.error('🔥 Error message:', e.message);
-                console.error('🔥 Error at:', e.filename + ':' + e.lineno);
+                console.error('Global JavaScript Error:', e.error);
+                console.error('Error message:', e.message);
+                console.error('Error at:', e.filename + ':' + e.lineno);
             });
 
             window.addEventListener('unhandledrejection', (e) => {
-                console.error('🔥 Unhandled Promise Rejection:', e.reason);
+                console.error('Unhandled Promise Rejection:', e.reason);
             });
 
             this.bindEvents();
@@ -31,18 +31,18 @@ class TinkerbellApp {
             this.showPage('page-onboarding');
         } // Event Binding
     bindEvents() {
-        console.log('🔗 Binding events...');
+        console.log('Binding events...');
 
         // Page 1: Onboarding form submission
         const onboardingForm = document.getElementById('onboarding-form');
         if (onboardingForm) {
-            console.log('✅ Found onboarding form, adding event listener');
+            console.log('Found onboarding form, adding event listener');
             onboardingForm.addEventListener('submit', (e) => {
-                console.log('🚀 Form submit event triggered!');
+                console.log('Form submit event triggered!');
                 this.handleOnboardingSubmit(e);
             });
         } else {
-            console.error('❌ Onboarding form not found!');
+            console.error('Onboarding form not found!');
         }
 
         // Page 2: Confirm personas button
@@ -95,18 +95,17 @@ class TinkerbellApp {
 
     // Handle file selection
     async handleFileSelection(files) {
-        console.log(`📷 Files selected: ${files.length}`);
-
+        console.log('Files selected:', files.length);
         const validFiles = Array.from(files).filter(file => {
             const isImage = file.type.startsWith('image/');
             const isValidSize = file.size <= 10 * 1024 * 1024; // 10MB
 
             if (!isImage) {
-                this.showError(`${file.name} nu este o imagine validă`);
+                this.showError(`${file.name} is not a valid image`);
                 return false;
             }
             if (!isValidSize) {
-                this.showError(`${file.name} este prea mare (max 10MB)`);
+                this.showError(`${file.name} is too large (max 10MB)`);
                 return false;
             }
             return true;
@@ -136,17 +135,16 @@ class TinkerbellApp {
             }
 
             const result = await response.json();
-            console.log('✅ Images uploaded:', result);
+            console.log('Images uploaded:', result);
 
             // Store uploaded image data
             this.uploadedImages.push(...result.data.images);
 
             // Update preview with server data
             this.updateImagePreviews(result.data.images);
-
         } catch (error) {
-            console.error('❌ Upload failed:', error);
-            this.showError('Eroare la încărcarea imaginilor. Te rugăm să încerci din nou.');
+            console.error('Upload failed:', error);
+            this.showError('Error uploading images. Please try again.');
         }
     }
 
@@ -209,16 +207,14 @@ class TinkerbellApp {
 
     // Format file size
     formatFileSize(bytes) {
-        if (bytes === 0) return '0 Bytes';
-        const k = 1024;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-    }
-
-    // Page Navigation
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        } // Page Navigation
     showPage(pageId) {
-            console.log(`📄 Navigating to: ${pageId}`);
+            console.log(`Navigating to: ${pageId}`);
 
             // Hide all pages
             document.querySelectorAll('.page').forEach(page => {
@@ -266,12 +262,10 @@ class TinkerbellApp {
             websiteUrl: formData.get('websiteUrl')
         };
 
-        console.log('🏪 Business data collected:', this.businessData);
-
-        // Validate required fields
+        console.log('🏪 Business data collected:', this.businessData); // Validate required fields
         if (!this.businessData.businessName || !this.businessData.businessDescription) {
-            console.error('❌ Missing required fields');
-            this.showError('Te rugăm să completezi toate câmpurile obligatorii.');
+            console.error('Missing required fields');
+            this.showError('Please fill in all required fields.');
             return;
         }
 
@@ -314,11 +308,9 @@ class TinkerbellApp {
 
         } catch (error) {
             console.error('❌ Error generating personas:', error);
-            console.error('❌ Error details:', error.stack);
-
-            // Go back to onboarding page on error
+            console.error('❌ Error details:', error.stack); // Go back to onboarding page on error
             this.showPage('page-onboarding');
-            this.showError(`A apărut o problemă la generarea personelor: ${error.message}`);
+            this.showError(`An error occurred while generating personas: ${error.message}`);
         }
     }
 
@@ -327,7 +319,7 @@ class TinkerbellApp {
         const container = document.getElementById('personas-container');
         if (!container) return;
 
-        console.log('👥 Populating personas editor...');
+        console.log('Populating personas editor...');
         container.innerHTML = '';
 
         this.personas.forEach((persona, index) => {
@@ -341,131 +333,103 @@ class TinkerbellApp {
             const card = document.createElement('div');
             card.className = 'persona-card';
             card.innerHTML = `
-            <h4>👤 Persona ${index + 1}: ${persona.name}</h4>
-            
-            <div class="persona-field">
-                <label>Nume:</label>
-                <input type="text" name="name_${index}" value="${persona.name}" />
+            <div class="persona-header">
+                <div class="persona-avatar">${index + 1}</div>
+                <div class="persona-info">
+                    <h4>${persona.name}</h4>
+                    <p>${persona.age_range}</p>
+                </div>
             </div>
             
-            <div class="persona-field">
-                <label>Vârsta:</label>
-                <input type="text" name="age_range_${index}" value="${persona.age_range}" />
+            <div class="persona-details">
+                <p><strong>Demographics:</strong> ${persona.demographics}</p>
+                <p><strong>Interests:</strong> ${Array.isArray(persona.interests) ? persona.interests.join(', ') : persona.interests}</p>
+                <p><strong>Pain points:</strong> ${Array.isArray(persona.pain_points) ? persona.pain_points.join(', ') : persona.pain_points}</p>
+                <p><strong>Communication style:</strong> ${persona.communication_style}</p>
             </div>
             
-            <div class="persona-field">
-                <label>Demografia:</label>
-                <textarea name="demographics_${index}">${persona.demographics}</textarea>
-            </div>
-            
-            <div class="persona-field">
-                <label>Interese:</label>
-                <textarea name="interests_${index}">${Array.isArray(persona.interests) ? persona.interests.join(', ') : persona.interests}</textarea>
-            </div>
-            
-            <div class="persona-field">
-                <label>Probleme (Pain Points):</label>
-                <textarea name="pain_points_${index}">${Array.isArray(persona.pain_points) ? persona.pain_points.join(', ') : persona.pain_points}</textarea>
-            </div>
-            
-            <div class="persona-field">
-                <label>Comportament de cumpărare:</label>
-                <textarea name="buying_behavior_${index}">${persona.buying_behavior}</textarea>
-            </div>
-            
-            <div class="persona-field">
-                <label>Platforme preferate:</label>
-                <input type="text" name="preferred_platforms_${index}" value="${Array.isArray(persona.preferred_platforms) ? persona.preferred_platforms.join(', ') : persona.preferred_platforms}" />
-            </div>
-            
-            <div class="persona-field">
-                <label>Stil de comunicare:</label>
-                <textarea name="communication_style_${index}">${persona.communication_style}</textarea>
+            <div class="persona-edit">
+                <h5>Edit persona:</h5>
+                <textarea name="persona_edit_${index}" placeholder="Make any changes to this persona...">${persona.demographics}</textarea>
             </div>
         `;
 
             return card;
         } // Page 2: Handle personas confirmation
     async handleConfirmPersonas() {
-        console.log('✅ Confirming personas...');
+            console.log('✅ Confirming personas...');
 
-        // Collect edited persona data
-        const editedPersonas = this.collectEditedPersonas();
-        console.log('📝 Edited personas:', editedPersonas);
+            // Collect edited persona data
+            const editedPersonas = this.collectEditedPersonas();
+            console.log('📝 Edited personas:', editedPersonas);
 
-        // Check if we should generate missing images
-        const generateMissingImagesEl = document.getElementById('generate-missing-images');
-        const generateMissingImages = generateMissingImagesEl ? generateMissingImagesEl.checked : true;
+            // Check if we should generate missing images
+            const generateMissingImagesEl = document.getElementById('generate-missing-images');
+            const generateMissingImages = generateMissingImagesEl ? generateMissingImagesEl.checked : true;
 
-        try {
-            // Show campaign page
-            this.showPage('page-campaign');
+            try {
+                // Show campaign page
+                this.showPage('page-campaign');
 
-            // Prepare form data for enhanced campaign with images
-            const formData = new FormData();
-            formData.append('businessData', JSON.stringify(this.businessData));
-            formData.append('confirmedPersonas', JSON.stringify(editedPersonas));
-            formData.append('generateMissingImages', generateMissingImages);
+                // Prepare form data for enhanced campaign with images
+                const formData = new FormData();
+                formData.append('businessData', JSON.stringify(this.businessData));
+                formData.append('confirmedPersonas', JSON.stringify(editedPersonas));
+                formData.append('generateMissingImages', generateMissingImages);
 
-            // Add uploaded images to form data
-            if (this.uploadedImages && this.uploadedImages.length > 0) {
-                console.log(`📷 Including ${this.uploadedImages.length} uploaded images`);
-                // Note: Images are already uploaded to server, we'll reference them by server data
-                formData.append('uploadedImageData', JSON.stringify(this.uploadedImages));
-            }
-
-            // Call enhanced schedule-campaign-with-images API
-            const response = await fetch(`${this.apiBaseUrl}/schedule-campaign-with-images`, {
-                method: 'POST',
-                body: formData
-            });
-
-            if (!response.ok) {
-                throw new Error(`API Error: ${response.status}`);
-            }
-
-            const result = await response.json();
-            console.log('🚀 Enhanced campaign result:', result);
-
-            if (result.success && result.data) {
-                this.campaignData = result.data;
-                this.populateCampaignDashboard();
-
-                // Show image processing results if available
-                if (result.data.images) {
-                    this.displayImageProcessingResults(result.data.images);
+                // Add uploaded images to form data
+                if (this.uploadedImages && this.uploadedImages.length > 0) {
+                    console.log(`📷 Including ${this.uploadedImages.length} uploaded images`);
+                    // Note: Images are already uploaded to server, we'll reference them by server data
+                    formData.append('uploadedImageData', JSON.stringify(this.uploadedImages));
                 }
 
-                // Show auto-posting status if enabled
-                if (result.data.auto_posting && result.data.auto_posting.enabled) {
-                    this.displayAutoPostingStatus(result.data.auto_posting);
+                // Call enhanced schedule-campaign-with-images API
+                const response = await fetch(`${this.apiBaseUrl}/schedule-campaign-with-images`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status}`);
                 }
-            } else {
-                throw new Error('Invalid campaign response');
+
+                const result = await response.json();
+                console.log('🚀 Enhanced campaign result:', result);
+
+                if (result.success && result.data) {
+                    this.campaignData = result.data;
+                    this.populateCampaignDashboard();
+
+                    // Show image processing results if available
+                    if (result.data.images) {
+                        this.displayImageProcessingResults(result.data.images);
+                    }
+
+                    // Show auto-posting status if enabled
+                    if (result.data.auto_posting && result.data.auto_posting.enabled) {
+                        this.displayAutoPostingStatus(result.data.auto_posting);
+                    }
+                } else {
+                    throw new Error('Invalid campaign response');
+                }
+            } catch (error) {
+                console.error('Error generating enhanced campaign:', error);
+                this.showError('An error occurred while generating the campaign. Please try again.');
             }
-
-        } catch (error) {
-            console.error('❌ Error generating enhanced campaign:', error);
-            this.showError('A apărut o problemă la generarea campaniei cu imagini. Te rugăm să încerci din nou.');
-        }
-    }
-
-    // Collect edited persona data from form
+        } // Collect edited persona data from form
     collectEditedPersonas() {
         const editedPersonas = [];
         const container = document.getElementById('personas-container');
         const personaCards = container.querySelectorAll('.persona-card');
 
         personaCards.forEach((card, index) => {
+            const editText = card.querySelector(`textarea[name="persona_edit_${index}"]`).value;
+            const originalPersona = this.personas[index];
+
             const persona = {
-                name: card.querySelector(`input[name="name_${index}"]`).value,
-                age_range: card.querySelector(`input[name="age_range_${index}"]`).value,
-                demographics: card.querySelector(`textarea[name="demographics_${index}"]`).value,
-                interests: card.querySelector(`textarea[name="interests_${index}"]`).value.split(',').map(s => s.trim()),
-                pain_points: card.querySelector(`textarea[name="pain_points_${index}"]`).value.split(',').map(s => s.trim()),
-                buying_behavior: card.querySelector(`textarea[name="buying_behavior_${index}"]`).value,
-                preferred_platforms: card.querySelector(`input[name="preferred_platforms_${index}"]`).value.split(',').map(s => s.trim()),
-                communication_style: card.querySelector(`textarea[name="communication_style_${index}"]`).value
+                ...originalPersona,
+                demographics: editText || originalPersona.demographics
             };
             editedPersonas.push(persona);
         });
@@ -594,8 +558,8 @@ class TinkerbellApp {
             }
         } // Error handling
     showError(message) {
-        console.error('❌ Showing error:', message);
-        alert(`❌ Eroare: ${message}`);
+        console.error('Showing error:', message);
+        alert(`Error: ${message}`);
 
         // Don't auto-reload anymore - let the user decide what to do
         // The calling function should handle navigation appropriately
@@ -718,6 +682,6 @@ window.debugTinkerbell = () => {
 window.addEventListener('beforeunload', (e) => {
     if (window.tinkerbellApp && window.tinkerbellApp.currentPage !== 'onboarding') {
         e.preventDefault();
-        e.returnValue = 'Ești sigur că vrei să părăsești pagina? Progresul va fi pierdut.';
+        e.returnValue = 'Are you sure you want to leave this page? Your progress will be lost.';
     }
 });
