@@ -8,6 +8,7 @@ require('dotenv').config();
 const ImageService = require('./imageService');
 const PlanableClient = require('./planableClient');
 const TinkerbellAI = require('./aiClient');
+const FacebookService = require('./facebookService');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -15,6 +16,7 @@ const PORT = process.env.PORT || 3000;
 // Initialize services
 const imageService = new ImageService();
 const planableClient = new PlanableClient();
+const facebookService = new FacebookService();
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -508,6 +510,184 @@ app.post('/api/analyze-images', upload.array('images', 10), async(req, res) => {
     }
 });
 
+// Direct Facebook posting endpoint (bypassing Planable)
+app.post('/api/post-to-facebook', async(req, res) => {
+    console.log('=== DIRECT FACEBOOK POSTING ENDPOINT ===');
+    console.log('Request body:', req.body);
+
+    try {
+        const { businessData, confirmedPersonas } = req.body;
+
+        // Generate campaign content
+        const campaignContent = await AI.generateCampaignContent(businessData, confirmedPersonas);
+
+        // Test Facebook connection first
+        const connectionTest = await facebookService.testConnection();
+        if (!connectionTest.success) {
+            console.warn('⚠️ Facebook connection failed, but continuing with mock responses');
+        }
+
+        // Post directly to Facebook
+        console.log('📘 Posting directly to Facebook...');
+        const facebookResults = await facebookService.postMultiplePosts(campaignContent.posts);
+
+        const successfulPosts = facebookResults.filter(r => r.success).length;
+
+        res.json({
+            success: true,
+            message: `Direct Facebook posting completed! ${successfulPosts}/${facebookResults.length} posts created.`,
+            data: {
+                campaign: campaignContent,
+                facebook_connection: connectionTest,
+                facebook_results: {
+                    total: facebookResults.length,
+                    successful: successfulPosts,
+                    posts: facebookResults
+                },
+                scheduled_posts: facebookResults.filter(r => r.success),
+                generated_images: []
+            }
+        });
+
+    } catch (error) {
+        console.error('❌ Error with direct Facebook posting:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to post to Facebook',
+            error: error.message
+        });
+    }
+});
+
+// Enhanced schedule campaign endpoint with direct Facebook posting
+app.post('/api/schedule-campaign-facebook', upload.array('images', 10), async(req, res) => {
+    console.log('=== ENHANCED FACEBOOK CAMPAIGN ENDPOINT ===');
+    console.log('Request body:', req.body);
+    console.log('Uploaded files:', req.files ? req.files.length : 0);
+
+    try {
+        const { businessData, confirmedPersonas, generateMissingImages, uploadedImageData } = req.body;
+
+        // Parse JSON strings if they exist
+        const parsedBusinessData = typeof businessData === 'string' ? JSON.parse(businessData) : businessData;
+        const parsedPersonas = typeof confirmedPersonas === 'string' ? JSON.parse(confirmedPersonas) : confirmedPersonas;
+        const shouldGenerateMissing = generateMissingImages === 'true' || generateMissingImages === true;
+
+        // Generate campaign content first
+        const campaignContent = await AI.generateCampaignContent(parsedBusinessData, parsedPersonas);
+
+        // Process uploaded images - either from current request or previously uploaded
+        let uploadedImages = [];
+
+        // Handle images from current request (if any)
+        if (req.files && req.files.length > 0) {
+            uploadedImages = req.files.map(file => ({
+                filename: file.filename,
+                originalName: file.originalname,
+                path: file.path,
+                size: file.size,
+                mimetype: file.mimetype
+            }));
+        }
+
+        // Handle previously uploaded images
+        if (uploadedImageData) {
+            const previousImages = typeof uploadedImageData === 'string' ? JSON.parse(uploadedImageData) : uploadedImageData;
+            if (Array.isArray(previousImages)) {
+                // Convert server URLs back to file paths for processing
+                const processedPreviousImages = previousImages.map(img => ({
+                    filename: img.filename,
+                    originalName: img.originalName,
+                    path: path.join(__dirname, 'uploads', img.filename), // Reconstruct full path
+                    size: img.size,
+                    mimetype: img.mimetype
+                }));
+                uploadedImages.push(...processedPreviousImages);
+            }
+        }
+
+        console.log(`📸 Processing ${uploadedImages.length} uploaded images for campaign`);
+
+        // Process images for campaign posts
+        const imageResults = await imageService.processCampaignImages(
+            campaignContent.posts,
+            uploadedImages,
+            shouldGenerateMissing
+        );
+
+        // Update posts with image information
+        const postsWithImages = imageResults.processed_posts;
+
+        // Test Facebook connection first
+        const connectionTest = await facebookService.testConnection();
+        if (!connectionTest.success) {
+            console.warn('⚠️ Facebook connection failed, but continuing with mock responses');
+        }
+
+        // Post directly to Facebook with images
+        console.log('📘 Posting to Facebook with images...');
+        const facebookResults = await facebookService.postMultiplePosts(postsWithImages);
+
+        const successfulPosts = facebookResults.filter(r => r.success).length;
+
+        res.json({
+            success: true,
+            message: `Enhanced Facebook campaign completed! ${successfulPosts}/${postsWithImages.length} posts created.`,
+            data: {
+                campaign: {
+                    ...campaignContent,
+                    posts: postsWithImages
+                },
+                facebook_connection: connectionTest,
+                images: {
+                    processing_summary: imageResults.processing_summary,
+                    uploaded_images: uploadedImages.length,
+                    generated_images: imageResults.generated_images.length,
+                    matched_images: imageResults.matched_images.length
+                },
+                facebook_results: {
+                    total: facebookResults.length,
+                    successful: successfulPosts,
+                    posts: facebookResults
+                },
+                scheduled_posts: facebookResults.filter(r => r.success),
+                generated_images: imageResults.generated_images
+            }
+        });
+
+    } catch (error) {
+        console.error('❌ Error generating enhanced Facebook campaign:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to generate Facebook campaign with images',
+            error: error.message
+        });
+    }
+});
+
+// Test Facebook connection endpoint
+app.get('/api/test-facebook', async(req, res) => {
+    console.log('=== TEST FACEBOOK CONNECTION ===');
+
+    try {
+        const connectionTest = await facebookService.testConnection();
+
+        res.json({
+            success: true,
+            message: 'Facebook connection test completed',
+            data: connectionTest
+        });
+
+    } catch (error) {
+        console.error('❌ Error testing Facebook connection:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to test Facebook connection',
+            error: error.message
+        });
+    }
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
     res.json({
@@ -527,6 +707,8 @@ app.listen(PORT, () => {
     console.log(`   POST /api/generate-image`);
     console.log(`   POST /api/schedule-campaign-with-images`);
     console.log(`   POST /api/analyze-images`);
+    console.log(`   POST /api/post-to-facebook`);
+    console.log(`   POST /api/schedule-campaign-facebook`);
     console.log(`   GET  /health`);
 });
 

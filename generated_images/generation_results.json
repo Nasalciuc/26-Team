@@ -1,0 +1,32 @@
+[
+  {
+    "success": true,
+    "image_url": "https://oaidalleapiprodscus.blob.core.windows.net/private/org-RzUNdajxdSJmBMes7wVCJ8e4/user-YAYKJpP6w9UnUCLp1jUmaLgl/img-9MIcxeIrcaJvZwJBgnllxTj1.png?st=2025-06-22T00%3A38%3A21Z&se=2025-06-22T02%3A38%3A21Z&sp=r&sv=2024-08-04&sr=b&rscd=inline&rsct=image/png&skoid=cc612491-d948-4d2e-9821-2683df3719f5&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-06-21T13%3A04%3A24Z&ske=2025-06-22T13%3A04%3A24Z&sks=b&skv=2024-08-04&sig=uX6ZeFc1Yhltj5Vo8/rwR1v24VgI4qPZDtcgG8oyXPI%3D",
+    "local_path": "generated_images\\generated_1750556303252_r0gahrux.jpg",
+    "filename": "generated_1750556303252_r0gahrux.jpg",
+    "description": "Modern coffee shop interior with customers enjoying coffee",
+    "prompt": "Create a professional, high-quality marketing image for \"Urban Coffee Co\". Modern coffee shop interior with customers enjoying coffee. \n        Style: Modern, clean, commercial photography style. High resolution, good lighting, appealing composition. \n        Suitable for social media marketing. No text or logos in the image.",
+    "business_name": "Urban Coffee Co",
+    "generated_at": "2025-06-22T04:38:26.636323"
+  },
+  {
+    "success": true,
+    "image_url": "https://oaidalleapiprodscus.blob.core.windows.net/private/org-RzUNdajxdSJmBMes7wVCJ8e4/user-YAYKJpP6w9UnUCLp1jUmaLgl/img-fSivP0t842ayKuxv3MQzP9gL.png?st=2025-06-22T00%3A38%3A41Z&se=2025-06-22T02%3A38%3A41Z&sp=r&sv=2024-08-04&sr=b&rscd=inline&rsct=image/png&skoid=cc612491-d948-4d2e-9821-2683df3719f5&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-06-22T01%3A38%3A41Z&ske=2025-06-23T01%3A38%3A41Z&sks=b&skv=2024-08-04&sig=GqCgAF6jkcqroW3Af6LFSQQRoqNbn3m/Y3DeEJGQtj4%3D",
+    "local_path": "generated_images\\generated_1750556323941_pdrzousu.jpg",
+    "filename": "generated_1750556323941_pdrzousu.jpg",
+    "description": "Professional business team meeting in modern office",
+    "prompt": "Create a professional, high-quality marketing image for \"Tech Solutions Inc\". Professional business team meeting in modern office. \n        Style: Modern, clean, commercial photography style. High resolution, good lighting, appealing composition. \n        Suitable for social media marketing. No text or logos in the image.",
+    "business_name": "Tech Solutions Inc",
+    "generated_at": "2025-06-22T04:38:47.325265"
+  },
+  {
+    "success": true,
+    "image_url": "https://oaidalleapiprodscus.blob.core.windows.net/private/org-RzUNdajxdSJmBMes7wVCJ8e4/user-YAYKJpP6w9UnUCLp1jUmaLgl/img-8rMqW31QF899pj0soanrQKr4.png?st=2025-06-22T00%3A38%3A57Z&se=2025-06-22T02%3A38%3A57Z&sp=r&sv=2024-08-04&sr=b&rscd=inline&rsct=image/png&skoid=cc612491-d948-4d2e-9821-2683df3719f5&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-06-21T17%3A52%3A14Z&ske=2025-06-22T17%3A52%3A14Z&sks=b&skv=2024-08-04&sig=YFoZ/wi4GBBuVEBls8Kxv9tOZ36CuiH/Cw1tuKWdd4Q%3D",
+    "local_path": "generated_images\\generated_1750556339220_pygnrjth.jpg",
+    "filename": "generated_1750556339220_pygnrjth.jpg",
+    "description": "Fresh ingredients for healthy cooking, vibrant colors",
+    "prompt": "Create a professional, high-quality marketing image for \"Healthy Eats Restaurant\". Fresh ingredients for healthy cooking, vibrant colors. \n        Style: Modern, clean, commercial photography style. High resolution, good lighting, appealing composition. \n        Suitable for social media marketing. No text or logos in the image.",
+    "business_name": "Healthy Eats Restaurant",
+    "generated_at": "2025-06-22T04:39:05.645214"
+  }
+]

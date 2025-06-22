@@ -88,7 +88,7 @@ class PlanableClient {
                 // Use the first available workspace
                 const workspace = response.data[0];
                 console.log(`✅ Using existing workspace: "${workspace.name}" (ID: ${workspace.id})`);
-                
+
                 return {
                     id: workspace.id,
                     name: workspace.name,
@@ -103,7 +103,7 @@ class PlanableClient {
 
         } catch (error) {
             console.error(`❌ Failed to get existing workspace: ${error.message}`);
-            
+
             // Fallback to mock on error
             return this._getMockWorkspace(workspaceName);
         }
