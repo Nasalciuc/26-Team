@@ -248,6 +248,7 @@ class Post(models.Model):
     title = models.CharField(max_length=255)
     content = models.TextField(help_text="Conținutul postării")
     image_prompt = models.TextField(help_text="Prompt pentru generarea imaginii")
+    generated_image = models.ImageField(upload_to='generated_images/', null=True, blank=True, help_text="Imaginea generată pentru postare")
     
     # Tipul postării
     post_type = models.CharField(max_length=50, choices=[

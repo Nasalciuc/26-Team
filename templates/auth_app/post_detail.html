@@ -65,7 +65,34 @@
                 </div>
             </div>
 
-            <!-- Prompt pentru imagine -->
+            <!-- Imagine generată AI -->
+            {% if post.generated_image %}
+            <div class="robust-card p-6">
+                <h2 class="text-xl font-bold text-yellow-400 mb-4 flex items-center">
+                    <i class="bi bi-image mr-2"></i>
+                    Imagine Generată AI
+                </h2>
+                <div class="flex justify-center">
+                    <img src="{{ post.generated_image.url }}" alt="Imagine generată AI" class="rounded-lg shadow-lg max-w-xs max-h-80 border border-gray-700">
+                </div>
+                <!-- Debug info -->
+                <div class="mt-4 text-sm text-gray-400">
+                    <p><strong>Debug:</strong> {{ post.generated_image.name }} | URL: {{ post.generated_image.url }}</p>
+                </div>
+            </div>
+            {% else %}
+            <div class="robust-card p-6">
+                <h2 class="text-xl font-bold text-yellow-400 mb-4 flex items-center">
+                    <i class="bi bi-image mr-2"></i>
+                    Imagine Generată AI
+                </h2>
+                <div class="text-center text-gray-400">
+                    <p>Nu există imagine generată pentru această postare.</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Prompt pentru Imagine -->
             <div class="robust-card p-6">
                 <h2 class="text-xl font-bold text-yellow-400 mb-4 flex items-center">
                     <i class="bi bi-image mr-2"></i>

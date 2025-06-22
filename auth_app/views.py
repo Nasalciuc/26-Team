@@ -15,6 +15,7 @@ import re
 import openai
 import requests
 from django.urls import reverse
+from .image_generator import ImageGenerator
 
 # Import scraper-ul
 try:
@@ -1463,6 +1464,7 @@ IMPORTANT:
 
         # Creează postările în baza de date
         created_posts = []
+        image_generator = ImageGenerator()
         for post_info in posts_data["posts"]:
             post = Post.objects.create(
                 user=request.user,
@@ -1476,6 +1478,12 @@ IMPORTANT:
             )
             # Adaugă persoanele la postare
             post.personas.set(personas)
+            # Generează imaginea dacă există prompt
+            if post.image_prompt:
+                result = image_generator.generate_image(post.image_prompt, strategy.title)
+                if result.get('success') and result.get('local_path'):
+                    post.generated_image = result['local_path']
+                    post.save(update_fields=['generated_image'])
             created_posts.append(post)
         
         messages.success(request, f'✅ Au fost generate cu succes {len(created_posts)} postări pentru strategia "{strategy.title}"!')
