@@ -1,97 +1,145 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Postări - Market Spark{% endblock %}
+{% block title %}Posts - {{ block.super }}{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-fade-in">
-    <!-- Header -->
-    <div class="mb-8">
-        <div class="flex justify-between items-start">
-            <div>
-                <h1 class="text-4xl font-bold text-gradient mb-2">Postări</h1>
-                <p class="text-gray-400">Gestionează și organizează postările tale generate cu AI</p>
-            </div>
-            <div class="flex space-x-2">
-                <a href="{% url 'auth_app:strategies_list' %}" class="robust-button-secondary">
-                    <i class="bi bi-graph-up mr-2"></i>Vezi Strategii
-                </a>
+<div class="min-h-screen bg-gray-50">
+    <!-- Hero Header -->
+    <div class="bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-6 py-12">
+            <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
+                <div class="flex-1">
+                    <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight">Posts</h1>
+                    <p class="text-xl text-gray-600 mb-6 leading-relaxed max-w-4xl">Manage and organize your AI-generated posts with realistic social media previews</p>
+                    
+                    <!-- Stats -->
+                    <div class="flex flex-wrap gap-6">
+                        <div class="bg-blue-50 rounded-xl p-4 border border-blue-200">
+                            <div class="text-2xl font-bold text-blue-600">{{ posts.count }}</div>
+                            <div class="text-sm text-blue-700">Total Posts</div>
+                        </div>
+                        <div class="bg-green-50 rounded-xl p-4 border border-green-200">
+                            <div class="text-2xl font-bold text-green-600">{{ posts|length }}</div>
+                            <div class="text-sm text-green-700">Active Posts</div>
+                        </div>
+                        <div class="bg-purple-50 rounded-xl p-4 border border-purple-200">
+                            <div class="text-2xl font-bold text-purple-600">{{ posts|length }}</div>
+                            <div class="text-sm text-purple-700">This Month</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row lg:flex-col gap-3">
+                    <a href="{% url 'auth_app:strategies_list' %}" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-medium transition-colors duration-200 text-center">
+                        <i class="bi bi-graph-up mr-2"></i>View Strategies
+                    </a>
+                    <a href="{% url 'auth_app:scraping' %}" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-xl font-medium transition-colors duration-200 text-center">
+                        <i class="bi bi-search mr-2"></i>Scrape Website
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Lista Postărilor -->
-    {% if posts %}
-        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {% for post in posts %}
-                <div class="robust-card hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-4">
-                            <h3 class="text-xl font-bold text-yellow-400 line-clamp-2">{{ post.title }}</h3>
-                            <div class="flex flex-col space-y-1">
-                                <span class="px-2 py-1 text-xs rounded-full font-medium
-                                    {% if post.status == 'published' %}bg-green-900/50 text-green-300 border border-green-700
-                                    {% elif post.status == 'ready' %}bg-blue-900/50 text-blue-300 border border-blue-700
-                                    {% elif post.status == 'scheduled' %}bg-purple-900/50 text-purple-300 border border-purple-700
-                                    {% elif post.status == 'archived' %}bg-gray-900/50 text-gray-300 border border-gray-700
-                                    {% else %}bg-yellow-900/50 text-yellow-300 border border-yellow-700{% endif %}">
-                                    {{ post.get_status_display }}
-                                </span>
-                                <span class="px-2 py-1 text-xs rounded-full font-medium bg-indigo-900/50 text-indigo-300 border border-indigo-700">
-                                    {{ post.get_platform_display }}
-                                </span>
-                                {% if post.platform == 'facebook' %}
-                                <span class="px-2 py-1 text-xs rounded-full font-medium
-                                    {% if post.facebook_posted %}bg-green-900/50 text-green-300 border border-green-700
-                                    {% else %}bg-red-900/50 text-red-300 border border-red-700{% endif %}">
-                                    {% if post.facebook_posted %}
-                                        <i class="bi bi-facebook mr-1"></i>Facebook ✓
-                                    {% else %}
-                                        <i class="bi bi-facebook mr-1"></i>Facebook ✗
+    <!-- Posts Grid -->
+    <div class="max-w-7xl mx-auto px-6 py-12">
+        {% if posts %}
+            <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+                {% for post in posts %}
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                        <!-- Post Header -->
+                        <div class="p-6 border-b border-gray-100">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-xl font-bold text-gray-900 line-clamp-2 leading-tight">{{ post.title }}</h3>
+                                <div class="flex flex-col space-y-2">
+                                    <span class="px-3 py-1 text-xs rounded-full font-medium
+                                        {% if post.status == 'published' %}bg-green-100 text-green-700
+                                        {% elif post.status == 'ready' %}bg-blue-100 text-blue-700
+                                        {% elif post.status == 'scheduled' %}bg-purple-100 text-purple-700
+                                        {% elif post.status == 'archived' %}bg-gray-100 text-gray-700
+                                        {% else %}bg-yellow-100 text-yellow-700{% endif %}">
+                                        {{ post.get_status_display }}
+                                    </span>
+                                    <span class="px-3 py-1 text-xs rounded-full font-medium bg-indigo-100 text-indigo-700">
+                                        {{ post.get_platform_display }}
+                                    </span>
+                                    {% if post.platform == 'facebook' %}
+                                    <span class="px-3 py-1 text-xs rounded-full font-medium
+                                        {% if post.facebook_posted %}bg-green-100 text-green-700
+                                        {% else %}bg-red-100 text-red-700{% endif %}">
+                                        {% if post.facebook_posted %}
+                                            <i class="bi bi-facebook mr-1"></i>Facebook ✓
+                                        {% else %}
+                                            <i class="bi bi-facebook mr-1"></i>Facebook ✗
+                                        {% endif %}
+                                    </span>
                                     {% endif %}
-                                </span>
+                                </div>
+                            </div>
+                            
+                            <!-- Post Preview -->
+                            <div class="space-y-3 mb-4">
+                                <p class="text-gray-600 text-sm line-clamp-3 leading-relaxed">{{ post.content|truncatewords:25 }}</p>
+                                
+                                <!-- Generated Image Preview -->
+                                {% if post.generated_image %}
+                                <div class="relative">
+                                    <img src="{{ post.generated_image.url }}" alt="Generated image" class="w-full h-32 object-cover rounded-lg" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                    <div style="display: none;" class="w-full h-32 bg-gray-200 rounded-lg flex items-center justify-center">
+                                        <span class="text-gray-500 text-sm">Image preview</span>
+                                    </div>
+                                </div>
                                 {% endif %}
+                                
+                                <!-- Post Info -->
+                                <div class="text-xs text-gray-500 space-y-1">
+                                    <p><strong>Type:</strong> {{ post.get_post_type_display }}</p>
+                                    {% if post.strategy %}
+                                        <p><strong>Strategy:</strong> {{ post.strategy.title|truncatechars:30 }}</p>
+                                    {% endif %}
+                                    <p><strong>Created:</strong> {{ post.created_at|date:"M d, Y" }}</p>
+                                </div>
                             </div>
                         </div>
                         
-                        <div class="space-y-3 mb-4">
-                            <p class="text-gray-300 text-sm line-clamp-3">{{ post.content|truncatewords:20 }}</p>
-                            <div class="text-xs text-gray-400">
-                                <p><strong>Tip:</strong> {{ post.get_post_type_display }}</p>
-                                {% if post.strategy %}
-                                    <p><strong>Strategie:</strong> {{ post.strategy.title|truncatechars:30 }}</p>
-                                {% endif %}
-                                <p><strong>Creată:</strong> {{ post.created_at|date:"d.m.Y H:i" }}</p>
+                        <!-- Action Buttons -->
+                        <div class="p-6">
+                            <div class="flex space-x-3">
+                                <a href="{% url 'auth_app:post_detail' post.id %}" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 text-center text-sm">
+                                    <i class="bi bi-eye mr-2"></i>View Details
+                                </a>
+                                <a href="{% url 'auth_app:edit_post' post.id %}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium transition-colors duration-200 text-center text-sm" title="Edit">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <a href="{% url 'auth_app:export_post' post.id %}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium transition-colors duration-200 text-center text-sm" title="Export">
+                                    <i class="bi bi-download"></i>
+                                </a>
                             </div>
-                        </div>
-                        
-                        <div class="flex space-x-2">
-                            <a href="{% url 'auth_app:post_detail' post.id %}" class="flex-1 robust-button text-center">
-                                <i class="bi bi-eye mr-2"></i>Vezi Detalii
-                            </a>
-                            <a href="{% url 'auth_app:edit_post' post.id %}" class="robust-button-secondary" title="Editează">
-                                <i class="bi bi-pencil-square"></i>
-                            </a>
-                            <a href="{% url 'auth_app:export_post' post.id %}" class="robust-button-secondary" title="Exportă">
-                                <i class="bi bi-download"></i>
-                            </a>
                         </div>
                     </div>
-                </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <div class="robust-card p-12 text-center">
-            <div class="text-yellow-400 mb-4">
-                <i class="bi bi-megaphone text-6xl"></i>
+                {% endfor %}
             </div>
-            <h3 class="text-xl font-bold text-white mb-2">Nu există postări</h3>
-            <p class="text-gray-400 mb-6">Încă nu ai creat nicio postare. Generează postări bazate pe strategiile tale.</p>
-            <a href="{% url 'auth_app:strategies_list' %}" class="robust-button">
-                <i class="bi bi-plus-circle mr-2"></i>Vezi Strategii
-            </a>
-        </div>
-    {% endif %}
+        {% else %}
+            <!-- Empty State -->
+            <div class="bg-white rounded-2xl p-12 text-center shadow-sm border border-gray-100">
+                <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="bi bi-megaphone text-3xl text-blue-600"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-4">No posts yet</h3>
+                <p class="text-gray-600 mb-8 max-w-md mx-auto">You haven't created any posts yet. Generate posts based on your strategies to get started.</p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="{% url 'auth_app:strategies_list' %}" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-medium transition-colors duration-200">
+                        <i class="bi bi-plus-circle mr-2"></i>View Strategies
+                    </a>
+                    <a href="{% url 'auth_app:scraping' %}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-xl font-medium transition-colors duration-200">
+                        <i class="bi bi-search mr-2"></i>Scrape Website
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
 </div>
 
 <style>
