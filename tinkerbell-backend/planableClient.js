@@ -11,7 +11,8 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 
-class PlanableClient {    constructor() {
+class PlanableClient {
+    constructor() {
             this.apiKey = process.env.PLANABLE_ACCESS_TOKEN;
             this.baseUrl = 'https://app.planable.io/api/v1'; // Updated from api.planable.io to app.planable.io/api
             this.facebookPageId = process.env.FACEBOOK_PAGE_ID; // Your Facebook page ID
@@ -280,7 +281,8 @@ class PlanableClient {    constructor() {
         if (!this.apiKey || !this.autoPost) {
             console.log('🔄 Auto-posting disabled or no API key');
             return { success: false, reason: 'Auto-posting disabled' };
-        }        try {
+        }
+        try {
             console.log(`🚀 Auto-publishing post ${postId} to Facebook...`);
             const response = await axios.post(`${this.baseUrl}/workspaces/${workspaceId}/posts/${postId}/publish`, {
                 platforms: ['facebook'],
