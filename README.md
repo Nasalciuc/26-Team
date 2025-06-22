@@ -1,67 +1,79 @@
-# Django + PostgreSQL Docker Project
+# Market Spark - AI-Powered Marketing Platform
 
-Acest proiect conține o aplicație Django configurată să ruleze cu PostgreSQL într-un mediu Docker.
+## 🇷🇴 Descrierea Proiectului (Romanian)
 
-## 📁 Structura proiectului
+**Market Spark** este o platformă avansată de marketing digital care oferă servicii complete de marketing bazate pe analiza site-ului web al utilizatorului. Aplicația oferă funcționalități complete pentru:
 
-```
-team26/
-├── docker-compose.yml
-├── Dockerfile
-├── requirements.txt
-├── env.example
-├── setup-env.sh
-├── startup.sh
-├── manage.py
-├── README.md
-└── myproject/         ← proiectul Django
-    ├── __init__.py
-    ├── settings.py
-    ├── urls.py
-    ├── wsgi.py
-    ├── asgi.py
-    └── management/
-        └── commands/
-            └── wait_for_db.py
-```
+- **Analiza site-ului**: Scraping automat al site-ului web al utilizatorului pentru a înțelege conținutul și structura
+- **Generarea de persoane**: Crearea de buyer personas personalizate folosind AI bazat pe analiza site-ului
+- **Strategii de marketing**: Dezvoltarea de strategii personalizate bazate pe conținutul site-ului
+- **Generarea de conținut**: Crearea automată de postări și imagini cu AI inspirate din site-ul utilizatorului
+- **Postare automată**: Integrare cu Facebook pentru postarea automată a conținutului generat
 
-## 🚀 Instrucțiuni de pornire
+Platforma analizează site-ul web al utilizatorului și generează automat întregul plan de marketing - de la persoanele țintă până la conținutul pentru social media. Este construită cu Django și PostgreSQL, rulează în containere Docker și integrează API-uri moderne pentru generarea de conținut și analiza datelor.
 
-### 1. Configurare automată a mediului
+---
 
+## 🇺🇸 Project Description (English)
+
+**Market Spark** is an advanced digital marketing platform that provides comprehensive marketing services based on analysis of the user's website. The application offers complete functionality for:
+
+- **Website Analysis**: Automated scraping of the user's website to understand content and structure
+- **Persona Generation**: AI-powered creation of customized buyer personas based on website analysis
+- **Marketing Strategies**: Development of personalized strategies based on website content
+- **Content Generation**: Automated creation of posts and images using AI inspired by the user's website
+- **Auto Posting**: Facebook integration for automatic posting of generated content
+
+The platform analyzes the user's website and automatically generates the entire marketing plan - from target personas to social media content. It is built with Django and PostgreSQL, runs in Docker containers, and integrates modern APIs for content generation and data analysis.
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Docker and Docker Compose installed
+- Git
+- At least 4GB RAM available
+
+### 1. Clone the Repository
 ```bash
-# Rulează scriptul de setup (recomandat)
+git clone git@github.com:Nicu106/26-Team.git
+cd team26
+```
+
+### 2. Environment Setup
+```bash
+# Automatic setup (recommended)
 ./setup-env.sh
 
-# SAU copiază manual
+# OR manual setup
 cp env.example .env
 ```
 
-### 2. Pornește totul cu o singură comandă!
-
+### 3. Start the Application
 ```bash
-# Construiește și pornește containerele
+# Build and start all containers
 docker-compose up --build
 ```
 
-**Asta e tot!** 🎉
+**That's it!** 🎉
 
-Scriptul de startup va:
-- ✅ Aștepta ca baza de date să fie gata
-- ✅ Rula migrările automat
-- ✅ Crea un superuser din variabilele de mediu
-- ✅ Porni serverul Django
+The startup script will automatically:
+- ✅ Wait for the database to be ready
+- ✅ Run all migrations
+- ✅ Create a superuser from environment variables
+- ✅ Start the Django server
 
-## 🌐 Accesare aplicație
+## 🌐 Access the Application
 
-- **Aplicație Django**: http://localhost:8000/
+- **Main Application**: http://localhost:8000/
 - **Django Admin**: http://localhost:8000/admin/
-  - **Username**: admin (configurabil în .env)
-  - **Password**: admin123 (configurabil în .env)
+  - **Username**: admin (configurable in .env)
+  - **Password**: admin123 (configurable in .env)
 
-## 🔧 Configurare variabile de mediu
+## 🔧 Environment Configuration
 
-### Variabile disponibile în `.env`:
+### Available Variables in `.env`:
 
 ```env
 # PostgreSQL Database Configuration
@@ -93,117 +105,169 @@ LANGUAGE_CODE=en-us
 # Development Settings
 DEVELOPMENT_MODE=True
 LOG_LEVEL=DEBUG
+
+# Facebook Integration (for auto-posting)
+FACEBOOK_ACCESS_TOKEN=your_facebook_access_token
+FACEBOOK_PAGE_ID=your_facebook_page_id
+
+# OpenAI Integration (for AI content generation)
+OPENAI_API_KEY=your_openai_api_key
 ```
 
-### Personalizare:
+### Customization:
 
-1. **Schimbă parola admin**:
+1. **Change admin password**:
    ```env
    ADMIN_PASSWORD=your_secure_password
    ```
 
-2. **Schimbă numele bazei de date**:
+2. **Change database name**:
    ```env
    POSTGRES_DB=your_database_name
    ```
 
-3. **Dezactivează debug mode**:
+3. **Disable debug mode**:
    ```env
    DJANGO_DEBUG=False
    ```
 
-## 🛠️ Comenzi utile
+## 🛠️ Useful Commands
 
-### Rulare în background
+### Run in background
 ```bash
 docker-compose up -d --build
 ```
 
-### Oprire servicii
+### Stop services
 ```bash
 docker-compose down
 ```
 
-### Oprire și ștergere volume-uri
+### Stop and remove volumes
 ```bash
 docker-compose down -v
 ```
 
-### Verificare log-uri
+### Check logs
 ```bash
 docker-compose logs web
 docker-compose logs db
 ```
 
-### Accesare shell Django
+### Access Django shell
 ```bash
 docker-compose run web python manage.py shell
 ```
 
-### Creare superuser manual
+### Create superuser manually
 ```bash
 docker-compose run web python manage.py createsuperuser
 ```
 
-### Regenerare fișier .env
+### Regenerate .env file
 ```bash
 ./setup-env.sh
 ```
 
-## 📊 Baza de date
+## 📊 Database
 
-- **Tip**: PostgreSQL 15
+- **Type**: PostgreSQL 15
 - **Host**: localhost:5432
-- **Database**: django_db (configurabil)
-- **User**: django_user (configurabil)
-- **Password**: django_pass (configurabil)
+- **Database**: django_db (configurable)
+- **User**: django_user (configurable)
+- **Password**: django_pass (configurable)
 
-## 📝 Note importante
+## 📁 Project Structure
 
-1. Asigură-te că Docker și Docker Compose sunt instalate și rulează
-2. Portul 8000 trebuie să fie liber pentru aplicația Django
-3. Portul 5432 trebuie să fie liber pentru PostgreSQL
-4. Prima rulare poate dura mai mult din cauza descărcării imaginilor Docker
-5. Superuser-ul se creează automat la prima rulare din variabilele de mediu
-6. Toate setările sunt configurabile prin fișierul `.env`
+```
+team26/
+├── docker-compose.yml
+├── Dockerfile
+├── requirements.txt
+├── env.example
+├── setup-env.sh
+├── startup.sh
+├── manage.py
+├── README.md
+├── auth_app/              ← Main Django app
+│   ├── models.py
+│   ├── views.py
+│   ├── urls.py
+│   ├── forms.py
+│   ├── facebook_poster.py
+│   ├── image_generator.py
+│   └── templates/
+├── web/                   ← Django project settings
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+├── media/                 ← Generated images
+├── templates/             ← HTML templates
+└── staticfiles/           ← Static files
+```
 
-## 🐛 Depanare
+## 📝 Important Notes
 
-### Dacă Docker nu pornește
+1. Ensure Docker and Docker Compose are installed and running
+2. Port 8000 must be free for the Django application
+3. Port 5432 must be free for PostgreSQL
+4. First run may take longer due to Docker image downloads
+5. Superuser is automatically created on first run from environment variables
+6. All settings are configurable through the `.env` file
+7. For Facebook auto-posting, you need a valid Facebook access token
+8. For AI content generation, you need a valid OpenAI API key
+9. The platform analyzes your own website to generate marketing content
+10. All marketing strategies are personalized based on your website content
+
+## 🐛 Troubleshooting
+
+### If Docker doesn't start
 ```bash
-# Verifică statusul Docker
+# Check Docker status
 docker --version
 docker-compose --version
 
-# Repornește Docker Desktop
+# Restart Docker Desktop
 ```
 
-### Dacă porturile sunt ocupate
+### If ports are occupied
 ```bash
-# Verifică ce rulează pe porturi
+# Check what's running on ports
 lsof -i :8000
 lsof -i :5432
 
-# Modifică porturile în docker-compose.yml dacă e necesar
+# Modify ports in docker-compose.yml if necessary
 ```
 
-### Dacă migrările eșuează
+### If migrations fail
 ```bash
-# Șterge volume-urile și începe din nou
+# Remove volumes and start fresh
 docker-compose down -v
 docker-compose up --build
 ```
 
-### Dacă vrei să resetezi totul
+### If you want to reset everything
 ```bash
-# Oprește și șterge tot
+# Stop and remove everything
 docker-compose down -v
-docker system prune -a
-docker-compose up --build
 ```
 
-### Dacă ai probleme cu .env
+### If Facebook posting doesn't work
 ```bash
-# Regenerază fișierul .env
-./setup-env.sh
-``` 
+# Check if ngrok is running for public URL access
+ngrok http 8000
+
+# Update ALLOWED_HOSTS in web/settings.py with ngrok URL
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details. 
