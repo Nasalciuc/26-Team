@@ -1,0 +1,13 @@
+{
+    "name": "image-upload-test",
+    "version": "1.0.0",
+    "description": "Simple image upload and analysis test",
+    "main": "test-image-upload.js",
+    "scripts": {
+        "test": "node test-image-upload.js"
+    },
+    "dependencies": {
+        "openai": "^4.20.0",
+        "dotenv": "^16.0.0"
+    }
+}

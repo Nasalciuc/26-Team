@@ -240,7 +240,7 @@ app.post('/api/schedule-campaign', async(req, res) => {
         // Nicolae's Planable integration (Hour 3)
         const workspaceName = `${businessData.businessName || 'Tinkerbell'} Campaign - ${new Date().toLocaleDateString()}`;
         console.log('📋 Creating Planable workspace...');
-        const workspace = await Planable.createWorkspace(workspaceName);
+        const workspace = await Planable.getOrCreateWorkspace(workspaceName);
 
         console.log('📝 Scheduling posts to Planable...');
         const schedulingResults = await Planable.scheduleMultiplePosts(workspace.id, campaignContent.posts);
@@ -412,7 +412,7 @@ app.post('/api/schedule-campaign-with-images', upload.array('images', 10), async
         // Create Planable workspace
         const workspaceName = `${parsedBusinessData.businessName || 'Tinkerbell'} Campaign - ${new Date().toLocaleDateString()}`;
         console.log('📋 Creating Planable workspace...');
-        const workspace = await planableClient.createWorkspace(workspaceName);
+        const workspace = await planableClient.getOrCreateWorkspace(workspaceName);
 
         // Schedule posts with images to Planable
         console.log('📝 Scheduling posts with images to Planable...');
