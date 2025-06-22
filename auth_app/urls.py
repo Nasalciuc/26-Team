@@ -49,4 +49,8 @@ urlpatterns = [
     path('posts/<int:post_id>/export/', views.export_post, name='export_post'),
     path('posts/bulk-delete/', views.bulk_delete_posts, name='bulk_delete_posts'),
     path('strategies/<int:strategy_id>/generate-posts/', views.generate_posts_from_strategy, name='generate_posts_from_strategy'),
+    
+    # Debugging URLs
+    path('test-facebook-post/', views.test_facebook_post_view, name='test_facebook_post'),
+    path('debug-env/', views.debug_env_view, name='debug_env'),
 ] 

@@ -14,6 +14,8 @@ from datetime import datetime
 import re
 import openai
 import requests
+import hmac
+import hashlib
 from django.urls import reverse
 
 # Import scraper-ul
@@ -845,6 +847,57 @@ def generate_personas_view(request):
     except Exception as e:
         return JsonResponse({'error': f'An unexpected error occurred: {str(e)}'}, status=500)
 
+def _post_to_facebook(message, image_url=None):
+    """
+    Helper function to post a message or photo to a Facebook Page.
+    This function is designed to ALWAYS return a dictionary.
+    """
+    page_id = os.environ.get('FACEBOOK_PAGE_ID')
+    access_token = os.environ.get('META_ACCESS_TOKEN')
+    app_secret = os.environ.get('META_APP_SECRET')
+
+    if not all([page_id, access_token, app_secret]):
+        return {'success': False, 'error': {'message': 'Server environment not configured. Missing FACEBOOK_PAGE_ID, META_ACCESS_TOKEN, or META_APP_SECRET from .env file.', 'code': 500}}
+
+    try:
+        # Generate appsecret_proof
+        appsecret_proof = hmac.new(
+            app_secret.encode('utf-8'),
+            msg=access_token.encode('utf-8'),
+            digestmod=hashlib.sha256
+        ).hexdigest()
+
+        if image_url:
+            url = f"https://graph.facebook.com/{page_id}/photos"
+            payload = {
+                'caption': message,
+                'url': image_url,
+                'access_token': access_token,
+                'appsecret_proof': appsecret_proof
+            }
+        else:
+            url = f"https://graph.facebook.com/{page_id}/feed"
+            payload = {
+                'message': message,
+                'access_token': access_token,
+                'appsecret_proof': appsecret_proof
+            }
+
+        response = requests.post(url, data=payload)
+        response_data = response.json()
+
+        if response.ok:
+            return {'success': True, 'data': response_data}
+        else:
+            return {'success': False, 'error': response_data.get('error', response_data)}
+            
+    except requests.exceptions.RequestException as e:
+        return {'success': False, 'error': {'message': f'A network error occurred: {str(e)}', 'code': 503}}
+    except json.JSONDecodeError:
+        return {'success': False, 'error': {'message': 'Failed to decode JSON response from Facebook.', 'code': 500}}
+    except Exception as e:
+        return {'success': False, 'error': {'message': f'An unexpected error occurred: {str(e)}', 'code': 500}}
+
 @csrf_exempt
 @login_required
 def post_to_facebook_view(request):
@@ -854,17 +907,14 @@ def post_to_facebook_view(request):
     
     try:
         data = json.loads(request.body)
-        message = data.get('message', '')
-        
-        # Aici ar trebui să fie logica pentru postarea pe Facebook
-        # Pentru moment, doar simulăm o postare reușită
-        
-        return JsonResponse({
-            'success': True,
-            'message': 'Postare pe Facebook reușită',
-            'post_id': 'fb_123456789'
-        })
-        
+        message = data.get('message')
+        image_url = data.get('image_url')
+
+        if not message:
+            return JsonResponse({'error': 'Message is required'}, status=400)
+
+        result = _post_to_facebook(message, image_url)
+        return JsonResponse(result)
     except json.JSONDecodeError:
         return JsonResponse({'error': 'JSON invalid'}, status=400)
     except Exception as e:
@@ -1594,3 +1644,48 @@ def export_post(request, post_id):
     )
     response['Content-Disposition'] = f'attachment; filename="post_{post.id}_{post.title.replace(" ", "_")}.json"'
     return response
+
+def test_facebook_post_view(request):
+    """A simple view to test Facebook posting."""
+    message = f"This is a test post from the app at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+    result = _post_to_facebook(message)
+
+    try:
+        if result.get('success'):
+            return JsonResponse({'status': 'SUCCESS', 'message': 'Test post sent successfully.', 'details': result})
+        else:
+            error_details = result.get('error', {})
+            status_code = error_details.get('code')
+
+            if not isinstance(status_code, int) or not 100 <= status_code <= 599:
+                status_code = 400
+            
+            return JsonResponse({'status': 'FAILED', 'message': 'Failed to send test post.', 'details': result}, status=status_code)
+    except Exception as e:
+        return JsonResponse({
+            'status': 'FATAL',
+            'message': 'A server error occurred while trying to format the response.',
+            'details': str(e)
+        }, status=500)
+
+def debug_env_view(request):
+    """A view to debug environment variables inside the container."""
+    relevant_vars = [
+        'META_ACCESS_TOKEN',
+        'META_APP_SECRET',
+        'FACEBOOK_PAGE_ID',
+        'DB_ENGINE',
+        'DB_HOST',
+        'POSTGRES_USER',
+        'DJANGO_SETTINGS_MODULE'
+    ]
+    
+    debug_data = {}
+    for var in relevant_vars:
+        value = os.environ.get(var)
+        debug_data[var] = {
+            'value': value if var not in ['META_ACCESS_TOKEN', 'META_APP_SECRET'] else ('****' if value else None),
+            'is_set': value is not None and value != ''
+        }
+        
+    return JsonResponse(debug_data)
