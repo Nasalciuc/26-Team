@@ -131,6 +131,58 @@ OPENAI_API_KEY=your_openai_api_key
    DJANGO_DEBUG=False
    ```
 
+## 🌍 Ngrok Configuration for Facebook Posting
+
+For Facebook auto-posting functionality, you need to expose your local Django server to the internet using ngrok. Facebook requires publicly accessible URLs for images.
+
+### 1. Install ngrok
+```bash
+# Download and install ngrok
+# Visit: https://ngrok.com/download
+
+# Or install via Homebrew (macOS)
+brew install ngrok
+```
+
+### 2. Authenticate ngrok
+```bash
+# Get your auth token from https://dashboard.ngrok.com/get-started/your-authtoken
+ngrok config add-authtoken YOUR_AUTH_TOKEN
+```
+
+### 3. Start ngrok tunnel
+```bash
+# Start tunnel on port 8000 (Django server port)
+ngrok http 8000
+```
+
+### 4. Update Django ALLOWED_HOSTS
+After starting ngrok, you'll get a public URL like `https://abc123.ngrok-free.app`. Add this to your Django settings:
+
+```python
+# In web/settings.py
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '0.0.0.0',
+    'abc123.ngrok-free.app',  # Add your ngrok URL here
+]
+```
+
+### 5. Restart Django server
+```bash
+# Restart the web container to apply settings changes
+docker-compose restart web
+```
+
+### 6. Test Facebook posting
+Now you can run the Facebook posting script:
+```bash
+docker-compose run web python post_to_facebook.py
+```
+
+**Note**: Keep ngrok running while using Facebook posting functionality. The ngrok URL changes each time you restart ngrok unless you have a paid plan.
+
 ## 🛠️ Useful Commands
 
 ### Run in background
@@ -167,6 +219,11 @@ docker-compose run web python manage.py createsuperuser
 ### Regenerate .env file
 ```bash
 ./setup-env.sh
+```
+
+### Run Facebook posting script
+```bash
+docker-compose run web python post_to_facebook.py
 ```
 
 ## 📊 Database
@@ -218,6 +275,8 @@ team26/
 8. For AI content generation, you need a valid OpenAI API key
 9. The platform analyzes your own website to generate marketing content
 10. All marketing strategies are personalized based on your website content
+11. **Facebook posting requires ngrok for public URL access**
+12. **Keep ngrok running while using Facebook posting functionality**
 
 ## 🐛 Troubleshooting
 
@@ -254,10 +313,32 @@ docker-compose down -v
 
 ### If Facebook posting doesn't work
 ```bash
-# Check if ngrok is running for public URL access
+# 1. Check if ngrok is running
 ngrok http 8000
 
-# Update ALLOWED_HOSTS in web/settings.py with ngrok URL
+# 2. Update ALLOWED_HOSTS in web/settings.py with ngrok URL
+# Add your ngrok URL to ALLOWED_HOSTS list
+
+# 3. Restart Django server
+docker-compose restart web
+
+# 4. Test image accessibility
+curl -I https://your-ngrok-url.ngrok-free.app/media/generated_images/your-image.jpg
+
+# 5. Run Facebook posting script
+docker-compose run web python post_to_facebook.py
+```
+
+### If ngrok connection fails
+```bash
+# Check ngrok status
+ngrok status
+
+# Restart ngrok tunnel
+ngrok http 8000
+
+# Verify tunnel is active
+curl https://your-ngrok-url.ngrok-free.app/
 ```
 
 ## 🤝 Contributing
