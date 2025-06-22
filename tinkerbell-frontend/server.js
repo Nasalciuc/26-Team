@@ -5,7 +5,7 @@ const path = require('path');
 const port = 8081;
 
 const server = http.createServer((req, res) => {
-    let filePath = path.join(__dirname, req.url === '/' ? 'index.html' : req.url);
+    let filePath = path.join(__dirname, req.url === '/' ? 'landing.html' : req.url);
 
     const extname = path.extname(filePath);
     let contentType = 'text/html';

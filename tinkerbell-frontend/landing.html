@@ -205,12 +205,13 @@
             font-weight: 700;
             color: var(--primary-500);
         }
-          .stat-label {
+        
+        .stat-label {
             font-size: 0.875rem;
             color: var(--gray-600);
         }
-        
         /* Dashboard Preview */
+        
         .dashboard-preview {
             background: white;
             border-radius: 1rem;
@@ -220,8 +221,13 @@
         }
         
         @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
         }
         
         .preview-header {
@@ -245,9 +251,17 @@
             background: var(--gray-300);
         }
         
-        .control:nth-child(1) { background: #ff5f57; }
-        .control:nth-child(2) { background: #ffbd2e; }
-        .control:nth-child(3) { background: #28ca42; }
+        .control:nth-child(1) {
+            background: #ff5f57;
+        }
+        
+        .control:nth-child(2) {
+            background: #ffbd2e;
+        }
+        
+        .control:nth-child(3) {
+            background: #28ca42;
+        }
         
         .preview-title {
             font-weight: 600;
@@ -291,8 +305,13 @@
         }
         
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
         }
         
         .campaign-metrics {
@@ -344,8 +363,13 @@
         }
         
         @keyframes shimmer {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.8;
+            }
         }
         
         .post-content {
@@ -361,8 +385,13 @@
         }
         
         @keyframes loading {
-            0%, 100% { background: var(--gray-100); }
-            50% { background: var(--gray-200); }
+            0%,
+            100% {
+                background: var(--gray-100);
+            }
+            50% {
+                background: var(--gray-200);
+            }
         }
         
         .post-platform {
@@ -371,9 +400,13 @@
             border-radius: 0.25rem;
         }
         
-        .post-platform.facebook { background: #1877f2; }
-        .post-platform.instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+        .post-platform.facebook {
+            background: #1877f2;
+        }
         
+        .post-platform.instagram {
+            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+        }
         /* Features */
         
         .features {
@@ -754,25 +787,22 @@
                 flex-direction: column;
                 gap: 1rem;
                 text-align: center;
-            }            .cta-features {
+            }
+            .cta-features {
                 flex-direction: column;
                 gap: 0.5rem;
             }
-            
             .dashboard-preview {
                 max-height: 300px;
                 overflow-y: auto;
             }
-            
             .campaign-metrics {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 0.75rem;
             }
-            
             .posts-grid {
                 grid-template-columns: 1fr;
             }
-            
             .preview-content {
                 padding: 1rem;
             }
@@ -846,7 +876,8 @@
                             <span class="stat-label">AI optimization</span>
                         </div>
                     </div>
-                </div>                <div class="hero-visual">
+                </div>
+                <div class="hero-visual">
                     <div class="dashboard-preview">
                         <div class="preview-header">
                             <div class="preview-controls">
@@ -1180,15 +1211,18 @@
                 </div>
             </div>
         </div>
-    </footer>    <script>
-        // Handle app navigation links
-        document.querySelectorAll('a[href="index.html"]').forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                // Set session storage to indicate user came from landing page
-                sessionStorage.setItem('fromLanding', 'true');
-                // Navigate to main app
-                window.location.href = 'index.html?app=true';
+    </footer>
+    <script>        // Handle app navigation links
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('a[href="index.html"]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // Set session storage to indicate user came from landing page
+                    sessionStorage.setItem('fromLanding', 'true');
+                    console.log('Session storage set, navigating to app...');
+                    // Update the href to include the app parameter
+                    this.href = 'index.html?app=true';
+                    // Let the default navigation happen
+                });
             });
         });
 
