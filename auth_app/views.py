@@ -20,6 +20,9 @@ from django.conf import settings
 from .facebook_poster import FacebookPoster
 import logging
 
+# Setup logger
+logger = logging.getLogger(__name__)
+
 # Import scraper-ul
 try:
     # This complex path logic is necessary to handle both local dev and Docker environments
@@ -1492,9 +1495,9 @@ IMPORTANT:
                     image_result = image_generator.generate_image(post.image_prompt, strategy.scraped_site.domain)
                     if image_result and image_result.get('success'):
                         # Salvează imaginea în câmpul generated_image
-                        image_path = image_result.get('path')
-                        if image_path:
-                            post.generated_image = image_path
+                        image_filename = image_result.get('filename')
+                        if image_filename:
+                            post.generated_image = image_filename
                             post.save()
                 except Exception as e:
                     logger.error(f"Failed to generate image for post {post.id}: {str(e)}")
