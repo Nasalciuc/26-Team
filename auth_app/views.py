@@ -747,12 +747,15 @@ def site_detail(request, site_id):
         messages.warning(request, "Nu s-au găsit date detaliate pentru acest site.")
     # Get personas for this specific site
     personas = AIPersona.objects.filter(user=request.user, scraped_site=site).order_by('-created_at')
+    # Get strategies for this specific site
+    strategies = Strategy.objects.filter(user=request.user, scraped_site=site).order_by('-created_at')
     context = {
         'site': site,
         'data': scraped_data,  # Pass as 'data' to match template expectations
         'summary': summary,
         'openai_available': OPENAI_AVAILABLE,
         'personas': personas,
+        'strategies': strategies,
     }
     return render(request, 'auth_app/site_detail.html', context)
 

@@ -1,159 +1,161 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Editează {{ strategy.title }} - Market Spark{% endblock %}
+{% block title %}Editează {{ strategy.title }} - Tinkerbell{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-fade-in">
-    <!-- Header -->
-    <div class="mb-8">
-        <nav aria-label="breadcrumb" class="mb-4">
-            <ol class="flex items-center space-x-2 text-sm text-gray-400">
-                <li><a href="{% url 'auth_app:dashboard' %}" class="hover:text-yellow-400 transition-colors">Dashboard</a></li>
-                <li><span class="text-gray-600">/</span></li>
-                <li><a href="{% url 'auth_app:strategies_list' %}" class="hover:text-yellow-400 transition-colors">Strategii</a></li>
-                <li><span class="text-gray-600">/</span></li>
-                <li><a href="{% url 'auth_app:strategy_detail' strategy.id %}" class="hover:text-yellow-400 transition-colors">{{ strategy.title|truncatechars:20 }}</a></li>
-                <li><span class="text-gray-600">/</span></li>
-                <li class="font-semibold text-yellow-400" aria-current="page">Editează</li>
+<div class="min-h-screen bg-gray-50">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <!-- Breadcrumb -->
+        <nav class="flex mb-8" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a href="{% url 'auth_app:dashboard' %}" class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+                        <a href="{% url 'auth_app:strategies_list' %}" class="ml-1 text-sm font-medium text-gray-500 hover:text-gray-700 md:ml-2 transition-colors">Strategii</a>
+                    </div>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+                        <a href="{% url 'auth_app:strategy_detail' strategy.id %}" class="ml-1 text-sm font-medium text-gray-500 hover:text-gray-700 md:ml-2 transition-colors">{{ strategy.title|truncatechars:20 }}</a>
+                    </div>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+                        <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">Editează</span>
+                    </div>
+                </li>
             </ol>
         </nav>
-        <div class="flex justify-between items-center">
+
+        <!-- Header -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
-                <h1 class="text-4xl font-bold text-gradient mb-2">Editează Strategia</h1>
-                <p class="text-gray-400">{{ strategy.title }}</p>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Editează Strategia</h1>
+                <p class="text-gray-500">{{ strategy.title }}</p>
             </div>
-            <a href="{% url 'auth_app:strategy_detail' strategy.id %}" class="robust-button-secondary">
-                <i class="bi bi-arrow-left mr-2"></i>Înapoi la Detalii
+            <a href="{% url 'auth_app:strategy_detail' strategy.id %}" class="inline-flex items-center px-5 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                Înapoi la Detalii
             </a>
         </div>
-    </div>
 
-    <form method="POST" class="space-y-6">
-        {% csrf_token %}
-        
-        <!-- Informații de bază -->
-        <div class="robust-card p-6">
-            <h2 class="text-xl font-bold text-yellow-400 mb-4 flex items-center">
-                <i class="bi bi-info-circle mr-2"></i>Informații de bază
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label for="title" class="block text-sm font-medium text-gray-300 mb-2">Titlu strategie</label>
-                    <input type="text" name="title" id="title" value="{{ strategy.title }}" 
-                           class="w-full robust-input input-yellow-focus" required>
+        <form method="POST" class="space-y-8">
+            {% csrf_token %}
+            <!-- Informații de bază -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+                <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z"></path></svg>
+                    Informații de bază
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="title" class="block text-sm font-medium text-gray-700 mb-2">Titlu strategie</label>
+                        <input type="text" name="title" id="title" value="{{ strategy.title }}" class="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-gray-50" required>
+                    </div>
+                    <div>
+                        <label for="strategy_type" class="block text-sm font-medium text-gray-700 mb-2">Tip strategie</label>
+                        <select name="strategy_type" id="strategy_type" class="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-gray-50">
+                            {% for value, label in strategy_types %}
+                                <option value="{{ value }}" {% if strategy.strategy_type == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                        <select name="status" id="status" class="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-gray-50">
+                            {% for value, label in status_choices %}
+                                <option value="{{ value }}" {% if strategy.status == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label for="priority" class="block text-sm font-medium text-gray-700 mb-2">Prioritate</label>
+                        <select name="priority" id="priority" class="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-gray-50">
+                            {% for value, label in priority_choices %}
+                                <option value="{{ value }}" {% if strategy.priority == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
-                <div>
-                    <label for="strategy_type" class="block text-sm font-medium text-gray-300 mb-2">Tip strategie</label>
-                    <select name="strategy_type" id="strategy_type" class="w-full robust-input input-yellow-focus">
-                        {% for value, label in strategy_types %}
-                            <option value="{{ value }}" {% if strategy.strategy_type == value %}selected{% endif %}>{{ label }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div>
-                    <label for="status" class="block text-sm font-medium text-gray-300 mb-2">Status</label>
-                    <select name="status" id="status" class="w-full robust-input input-yellow-focus">
-                        {% for value, label in status_choices %}
-                            <option value="{{ value }}" {% if strategy.status == value %}selected{% endif %}>{{ label }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div>
-                    <label for="priority" class="block text-sm font-medium text-gray-300 mb-2">Prioritate</label>
-                    <select name="priority" id="priority" class="w-full robust-input input-yellow-focus">
-                        {% for value, label in priority_choices %}
-                            <option value="{{ value }}" {% if strategy.priority == value %}selected{% endif %}>{{ label }}</option>
-                        {% endfor %}
-                    </select>
+                <div class="mt-6">
+                    <label for="description" class="block text-sm font-medium text-gray-700 mb-2">Descriere</label>
+                    <textarea name="description" id="description" rows="4" class="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-gray-50">{{ strategy.description }}</textarea>
                 </div>
             </div>
-            <div class="mt-6">
-                <label for="description" class="block text-sm font-medium text-gray-300 mb-2">Descriere</label>
-                <textarea name="description" id="description" rows="4" 
-                          class="w-full robust-input input-yellow-focus">{{ strategy.description }}</textarea>
-            </div>
-        </div>
 
-        <!-- Mesaje cheie -->
-        <div class="robust-card p-6">
-            <h2 class="text-xl font-bold text-yellow-400 mb-4 flex items-center">
-                <i class="bi bi-chat-quote mr-2"></i>Mesaje cheie
-            </h2>
-            <div class="space-y-3">
-                <div id="key-messages-container">
+            <!-- Mesaje cheie -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+                <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2v-8a2 2 0 012-2h2"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 3h-6a2 2 0 00-2 2v0a2 2 0 002 2h6a2 2 0 002-2v0a2 2 0 00-2-2z"></path></svg>
+                    Mesaje cheie
+                </h2>
+                <div class="space-y-3" id="key-messages-container">
                     {% for message in strategy.key_messages %}
-                        <div class="flex items-center space-x-2">
-                            <input type="text" name="key_messages[]" value="{{ message }}" 
-                                   class="flex-1 robust-input input-yellow-focus">
-                            <button type="button" onclick="removeMessage(this)" class="text-red-400 hover:text-red-300 transition-colors">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </div>
+                    <div class="flex items-center space-x-2">
+                        <input type="text" name="key_messages[]" value="{{ message }}" class="flex-1 border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 bg-gray-50">
+                        <button type="button" onclick="removeMessage(this)" class="text-red-400 hover:text-red-600 transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                    </div>
                     {% endfor %}
                 </div>
-                <button type="button" onclick="addMessage()" class="robust-button-secondary">
-                    <i class="bi bi-plus-circle mr-2"></i>Adaugă mesaj
-                </button>
+                <button type="button" onclick="addMessage()" class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors mt-2"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>Adaugă mesaj</button>
             </div>
-        </div>
 
-        <!-- Canale de comunicare -->
-        <div class="robust-card p-6">
-            <h2 class="text-xl font-bold text-yellow-400 mb-4 flex items-center">
-                <i class="bi bi-broadcast-tower mr-2"></i>Canale de comunicare
-            </h2>
-            <div class="space-y-3">
-                <div id="channels-container">
+            <!-- Canale de comunicare -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+                <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V4a2 2 0 10-4 0v1.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                    Canale de comunicare
+                </h2>
+                <div class="space-y-3" id="channels-container">
                     {% for channel in strategy.channels %}
-                        <div class="flex items-center space-x-2">
-                            <input type="text" name="channels[]" value="{{ channel }}" 
-                                   class="flex-1 robust-input input-yellow-focus">
-                            <button type="button" onclick="removeChannel(this)" class="text-red-400 hover:text-red-300 transition-colors">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </div>
+                    <div class="flex items-center space-x-2">
+                        <input type="text" name="channels[]" value="{{ channel }}" class="flex-1 border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-gray-50">
+                        <button type="button" onclick="removeChannel(this)" class="text-red-400 hover:text-red-600 transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                    </div>
                     {% endfor %}
                 </div>
-                <button type="button" onclick="addChannel()" class="robust-button-secondary">
-                    <i class="bi bi-plus-circle mr-2"></i>Adaugă canal
-                </button>
+                <button type="button" onclick="addChannel()" class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors mt-2"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>Adaugă canal</button>
             </div>
-        </div>
 
-        <!-- KPI-uri -->
-        <div class="robust-card p-6">
-            <h2 class="text-xl font-bold text-yellow-400 mb-4 flex items-center">
-                <i class="bi bi-graph-up mr-2"></i>KPI-uri (Indicatori de performanță)
-            </h2>
-            <div class="space-y-3">
-                <div id="kpis-container">
+            <!-- KPI-uri -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+                <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17a2.5 2.5 0 002.5-2.5V11a2.5 2.5 0 00-5 0v3.5A2.5 2.5 0 0011 17z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a5 5 0 00-10 0v2"></path></svg>
+                    KPI-uri (Indicatori de performanță)
+                </h2>
+                <div class="space-y-3" id="kpis-container">
                     {% for kpi in strategy.kpis %}
-                        <div class="flex items-center space-x-2">
-                            <input type="text" name="kpis[]" value="{{ kpi }}" 
-                                   class="flex-1 robust-input input-yellow-focus">
-                            <button type="button" onclick="removeKPI(this)" class="text-red-400 hover:text-red-300 transition-colors">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </div>
+                    <div class="flex items-center space-x-2">
+                        <input type="text" name="kpis[]" value="{{ kpi }}" class="flex-1 border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 bg-gray-50">
+                        <button type="button" onclick="removeKPI(this)" class="text-red-400 hover:text-red-600 transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                    </div>
                     {% endfor %}
                 </div>
-                <button type="button" onclick="addKPI()" class="robust-button-secondary">
-                    <i class="bi bi-plus-circle mr-2"></i>Adaugă KPI
+                <button type="button" onclick="addKPI()" class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors mt-2"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>Adaugă KPI</button>
+            </div>
+
+            <!-- Butoane acțiune -->
+            <div class="flex justify-end space-x-4">
+                <a href="{% url 'auth_app:strategy_detail' strategy.id %}" class="inline-flex items-center px-5 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    Anulează
+                </a>
+                <button type="submit" class="inline-flex items-center px-5 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    Salvează modificările
                 </button>
             </div>
-        </div>
-
-        <!-- Butoane acțiune -->
-        <div class="flex justify-end space-x-4">
-            <a href="{% url 'auth_app:strategy_detail' strategy.id %}" class="robust-button-secondary">
-                <i class="bi bi-x-circle mr-2"></i>Anulează
-            </a>
-            <button type="submit" class="robust-button">
-                <i class="bi bi-check-circle mr-2"></i>Salvează modificările
-            </button>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
 
 <script>
@@ -162,53 +164,33 @@ function addMessage() {
     const div = document.createElement('div');
     div.className = 'flex items-center space-x-2';
     div.innerHTML = `
-        <input type="text" name="key_messages[]" 
-               class="flex-1 robust-input input-yellow-focus">
-        <button type="button" onclick="removeMessage(this)" class="text-red-400 hover:text-red-300 transition-colors">
-            <i class="bi bi-trash"></i>
-        </button>
+        <input type="text" name="key_messages[]" class="flex-1 border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 bg-gray-50">
+        <button type="button" onclick="removeMessage(this)" class="text-red-400 hover:text-red-600 transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
     `;
     container.appendChild(div);
 }
-
-function removeMessage(button) {
-    button.parentElement.remove();
-}
-
+function removeMessage(button) { button.parentElement.remove(); }
 function addChannel() {
     const container = document.getElementById('channels-container');
     const div = document.createElement('div');
     div.className = 'flex items-center space-x-2';
     div.innerHTML = `
-        <input type="text" name="channels[]" 
-               class="flex-1 robust-input input-yellow-focus">
-        <button type="button" onclick="removeChannel(this)" class="text-red-400 hover:text-red-300 transition-colors">
-            <i class="bi bi-trash"></i>
-        </button>
+        <input type="text" name="channels[]" class="flex-1 border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-gray-50">
+        <button type="button" onclick="removeChannel(this)" class="text-red-400 hover:text-red-600 transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
     `;
     container.appendChild(div);
 }
-
-function removeChannel(button) {
-    button.parentElement.remove();
-}
-
+function removeChannel(button) { button.parentElement.remove(); }
 function addKPI() {
     const container = document.getElementById('kpis-container');
     const div = document.createElement('div');
     div.className = 'flex items-center space-x-2';
     div.innerHTML = `
-        <input type="text" name="kpis[]" 
-               class="flex-1 robust-input input-yellow-focus">
-        <button type="button" onclick="removeKPI(this)" class="text-red-400 hover:text-red-300 transition-colors">
-            <i class="bi bi-trash"></i>
-        </button>
+        <input type="text" name="kpis[]" class="flex-1 border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 bg-gray-50">
+        <button type="button" onclick="removeKPI(this)" class="text-red-400 hover:text-red-600 transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
     `;
     container.appendChild(div);
 }
-
-function removeKPI(button) {
-    button.parentElement.remove();
-}
+function removeKPI(button) { button.parentElement.remove(); }
 </script>
 {% endblock %}

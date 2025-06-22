@@ -130,6 +130,25 @@
                             </button>
                         </form>
                         {% endif %}
+                        
+                        {% if strategies %}
+                        <div class="mt-8">
+                            <h4 class="text-md font-semibold text-gray-900 mb-4">Strategii generate pentru acest site</h4>
+                            <div class="grid grid-cols-1 gap-4">
+                                {% for strategy in strategies %}
+                                <div class="p-4 bg-gradient-to-br from-green-50 to-blue-50 rounded-xl border border-green-100 flex flex-col md:flex-row md:items-center md:justify-between">
+                                    <div>
+                                        <a href="{% url 'auth_app:strategy_detail' strategy.id %}" class="font-semibold text-gray-900 hover:text-green-700 transition-colors text-lg">{{ strategy.title|default:'Strategie fără titlu' }}</a>
+                                        <p class="text-sm text-gray-600 mt-1">{{ strategy.short_description|truncatechars:100 }}</p>
+                                    </div>
+                                    <div class="mt-2 md:mt-0 flex items-center gap-2">
+                                        <a href="{% url 'auth_app:strategy_detail' strategy.id %}" class="inline-flex items-center px-3 py-1.5 bg-green-600 text-white text-xs font-medium rounded-lg hover:bg-green-700 transition-colors">Vezi detalii</a>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
 
                         <form action="{% url 'auth_app:delete_site' site.id %}" method="post" onsubmit="return confirm('Ești sigur că vrei să ștergi acest site și toate datele asociate?');">
                             {% csrf_token %}
