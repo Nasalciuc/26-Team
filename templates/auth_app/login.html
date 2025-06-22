@@ -1,8 +1,24 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Login - Team 26{% endblock %}
 
 {% block content %}
+<style>
+    .input-yellow-focus:focus {
+        border-color: #fbbf24 !important;
+        color: #000000 !important; /* Black text on focus */
+        background-color: #fbbf24 !important; /* Yellow background on focus */
+    }
+    
+    .input-yellow-focus::placeholder {
+        color: #4b5563; /* Gray placeholder text */
+    }
+    
+    .input-yellow-focus:focus::placeholder {
+        color: #000000; /* Black placeholder text on focus */
+    }
+</style>
 <div class="min-h-screen flex items-center justify-center bg-black py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8 animate-fade-in">
         <!-- Logo Section -->
@@ -44,7 +60,7 @@
                             type="text" 
                             name="{{ form.username.name }}"
                             id="{{ form.username.id_for_label }}"
-                            class="w-full px-4 py-4 bg-black border-2 border-gray-700 rounded-lg text-yellow-400 placeholder-gray-500 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 transition-all duration-300 font-medium"
+                            class="w-full px-4 py-4 bg-black border-2 border-gray-700 rounded-lg text-yellow-400 placeholder-gray-500 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 transition-all duration-300 font-medium input-yellow-focus"
                             placeholder="Introdu username-ul"
                             required
                         >
@@ -60,7 +76,7 @@
                         </div>
                     {% endif %}
                 </div>
-
+                
                 <!-- Password Field -->
                 <div>
                     <label for="{{ form.password.id_for_label }}" class="block text-sm font-bold text-yellow-400 mb-2">
@@ -72,7 +88,7 @@
                             type="password" 
                             name="{{ form.password.name }}"
                             id="{{ form.password.id_for_label }}"
-                            class="w-full px-4 py-4 bg-black border-2 border-gray-700 rounded-lg text-yellow-400 placeholder-gray-500 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 transition-all duration-300 font-medium"
+                            class="w-full px-4 py-4 bg-black border-2 border-gray-700 rounded-lg text-yellow-400 placeholder-gray-500 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 transition-all duration-300 font-medium input-yellow-focus"
                             placeholder="Introdu parola"
                             required
                         >
@@ -88,7 +104,7 @@
                         </div>
                     {% endif %}
                 </div>
-
+                
                 <!-- Form Errors -->
                 {% if form.non_field_errors %}
                     <div class="bg-red-900/50 border-2 border-red-400 rounded-lg p-4">
@@ -114,7 +130,9 @@
                     </button>
                 </div>
             </form>
-
+        </div>
+        
+        <div class="max-w-md w-full mt-8">
             <!-- Demo Credentials -->
             <div class="mt-8 p-4 bg-gray-900/50 rounded-lg border-2 border-gray-700">
                 <h4 class="text-sm font-bold text-yellow-400 mb-3 flex items-center">
@@ -132,26 +150,43 @@
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Features Preview -->
-        <div class="text-center space-y-4">
-            <h4 class="text-lg font-bold text-yellow-400">Funcționalități Principale</h4>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div class="robust-card rounded-lg p-4 text-center">
-                    <i class="bi bi-search text-2xl text-yellow-400 mb-2"></i>
-                    <p class="text-xs text-gray-400 font-medium">Scraping Universal</p>
-                </div>
-                <div class="robust-card rounded-lg p-4 text-center">
-                    <i class="bi bi-database text-2xl text-yellow-400 mb-2"></i>
-                    <p class="text-xs text-gray-400 font-medium">Salvare Date</p>
-                </div>
-                <div class="robust-card rounded-lg p-4 text-center">
-                    <i class="bi bi-download text-2xl text-yellow-400 mb-2"></i>
-                    <p class="text-xs text-gray-400 font-medium">Export JSON/CSV</p>
+            <!-- Features Preview -->
+            <div class="text-center space-y-4">
+                <h4 class="text-lg font-bold text-yellow-400">Funcționalități Principale</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="robust-card rounded-lg p-4 text-center">
+                        <i class="bi bi-search text-2xl text-yellow-400 mb-2"></i>
+                        <p class="text-xs text-gray-400 font-medium">Scraping Universal</p>
+                    </div>
+                    <div class="robust-card rounded-lg p-4 text-center">
+                        <i class="bi bi-database text-2xl text-yellow-400 mb-2"></i>
+                        <p class="text-xs text-gray-400 font-medium">Salvare Date</p>
+                    </div>
+                    <div class="robust-card rounded-lg p-4 text-center">
+                        <i class="bi bi-download text-2xl text-yellow-400 mb-2"></i>
+                        <p class="text-xs text-gray-400 font-medium">Export JSON/CSV</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add custom focus classes to form inputs
+    const usernameInput = document.getElementById('{{ form.username.id_for_label }}');
+    if (usernameInput) {
+        usernameInput.classList.add('input-yellow-focus');
+    }
+
+    const passwordInput = document.getElementById('{{ form.password.id_for_label }}');
+    if (passwordInput) {
+        passwordInput.classList.add('input-yellow-focus');
+    }
+});
+</script>
 {% endblock %} 

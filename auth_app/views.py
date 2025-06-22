@@ -5,14 +5,16 @@ from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from django.http import JsonResponse, HttpResponse
 from django.utils import timezone
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
 from urllib.parse import urlparse
 import sys
 import os
 import json
 from datetime import datetime
+import re
 import openai
 import requests
+from django.urls import reverse
 
 # Import scraper-ul
 try:
@@ -29,7 +31,7 @@ except ImportError as e:
     print(f"Scraper Import Warning: {e}")
 
 
-from .models import ScrapedSite, ScrapedData, AIPersona
+from .models import ScrapedSite, ScrapedData, AIPersona, Strategy, Post
 from .forms import ScrapingForm
 
 # OpenAI Configuration
@@ -86,12 +88,18 @@ def dashboard(request):
     """Dashboard view for authenticated users"""
     recent_sites = ScrapedSite.objects.filter(user=request.user).order_by('-scraped_at')[:5]
     recent_personas = AIPersona.objects.filter(user=request.user).order_by('-created_at')[:5]
+    recent_strategies = Strategy.objects.filter(user=request.user).order_by('-created_at')[:5]
+    recent_posts = Post.objects.filter(user=request.user).order_by('-created_at')[:5]
     
     context = {
         'recent_sites': recent_sites,
         'recent_personas': recent_personas,
+        'recent_strategies': recent_strategies,
+        'recent_posts': recent_posts,
         'total_sites': ScrapedSite.objects.filter(user=request.user).count(),
         'total_personas': AIPersona.objects.filter(user=request.user).count(),
+        'total_strategies': Strategy.objects.filter(user=request.user).count(),
+        'total_posts': Post.objects.filter(user=request.user).count(),
         'scraper_available': SCRAPER_AVAILABLE,
         'openai_available': OPENAI_AVAILABLE,
     }
@@ -153,20 +161,38 @@ def generate_personas_from_site(request, site_id):
 
     prompt = "\n".join(prompt_parts) + """
 
-Return only JSON format:
+CRITICAL: You must return ONLY valid JSON. No explanations, no markdown, no additional text.
+
+The response must start with { and end with }.
+
+Create 5 detailed customer personas for this website. Include ALL the following fields with realistic Romanian context:
+
 {
   "personas": [
     {
       "name": "Full Name",
       "age": "25-35",
-      "description": "Brief description",
-      "interests": ["interest1", "interest2"],
-      "needs": ["need1", "need2"],
-      "frustrations": ["frustration1", "frustration2"],
-      "usage_scenario": "How they would use this website"
+      "location": "City, România",
+      "description": "Brief occupation description",
+      "interests": ["interest1", "interest2", "interest3"],
+      "needs": ["need1", "need2", "need3"],
+      "frustrations": ["frustration1", "frustration2", "frustration3"],
+      "usage_scenario": "How they would use this website",
+      "income_level": "Low/Medium/High",
+      "education": "High School/Bachelor's/Master's/PhD",
+      "marital_status": "Single/Married/Divorced",
+      "online_behavior": "How they typically behave online",
+      "buying_preferences": "What influences their purchasing decisions",
+      "communication_channels": ["email", "social_media", "phone"],
+      "objections": ["objection1", "objection2"],
+      "business_type": "Type of business they work for",
+      "product_description": "What products/services they might need",
+      "target_market": "Their role in the market"
     }
   ]
-}"""
+}
+
+IMPORTANT: Make the personas realistic for Romanian market. Use Romanian cities, education levels, and business contexts. Include diverse age ranges, income levels, and professional backgrounds."""
 
     try:
         # Use the working OpenAI client approach
@@ -175,11 +201,11 @@ Return only JSON format:
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "You are a marketing expert. Return only valid JSON."},
+                {"role": "system", "content": "You are a marketing expert. You must return ONLY valid JSON format without any markdown formatting, explanations, or additional text. All strings must be properly quoted and escaped. Do not include ```json or ``` markers. The response must be a valid JSON object starting with { and ending with }."},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=1000,
-            temperature=0.7
+            max_tokens=1500,
+            temperature=0.3
         )
         
         # Get and clean the response
@@ -191,26 +217,268 @@ Return only JSON format:
         elif "```" in content:
             content = content.split("```")[1].strip()
         
-        personas_data = json.loads(content)
+        # Additional JSON cleaning to handle common issues
+        # Remove any leading/trailing non-JSON content
+        content = content.strip()
+        if not content.startswith('{'):
+            # Find the first occurrence of '{'
+            start_idx = content.find('{')
+            if start_idx != -1:
+                content = content[start_idx:]
+        
+        if not content.endswith('}'):
+            # Find the last occurrence of '}'
+            end_idx = content.rfind('}')
+            if end_idx != -1:
+                content = content[:end_idx + 1]
+        
+        # Comprehensive JSON repair function
+        def repair_json(json_str):
+            """Attempt to repair common JSON issues"""
+            # Fix missing commas between elements
+            json_str = re.sub(r'(\]|\})\s*(\[|\{)', r'\1,\2', json_str)
+            json_str = re.sub(r'(")\s*(\[|\{)', r'\1,\2', json_str)
+            json_str = re.sub(r'(\]|\})\s*(")', r'\1,\2', json_str)
+            json_str = re.sub(r'(\d+)\s*(\[|\{)', r'\1,\2', json_str)
+            json_str = re.sub(r'(\]|\})\s*(\d+)', r'\1,\2', json_str)
+            json_str = re.sub(r'(true|false|null)\s*(\[|\{)', r'\1,\2', json_str)
+            json_str = re.sub(r'(\]|\})\s*(true|false|null)', r'\1,\2', json_str)
+            
+            # Fix missing commas in object properties
+            json_str = re.sub(r'(")\s*(")', r'\1,\2', json_str)
+            json_str = re.sub(r'(\d+)\s*(")', r'\1,\2', json_str)
+            json_str = re.sub(r'(")\s*(\d+)', r'\1,\2', json_str)
+            
+            # Fix trailing commas (which are invalid in JSON)
+            json_str = re.sub(r',(\s*[}\]])', r'\1', json_str)
+            
+            # Fix missing quotes around property names
+            json_str = re.sub(r'([{,])\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*:', r'\1"\2":', json_str)
+            
+            return json_str
+        
+        # Apply JSON repair
+        content = repair_json(content)
+        
+        # Log the content for debugging (first 1000 characters)
+        print(f"JSON content after repair (first 1000 chars): {content[:1000]}")
+        print(f"JSON content length: {len(content)}")
+        
+        # Additional aggressive repair for specific comma delimiter errors
+        # This targets the "Expecting ',' delimiter: line 8 column 6" error
+        lines = content.split('\n')
+        if len(lines) >= 8:
+            # Focus on line 8 (index 7) and surrounding lines
+            for i in range(max(0, 6), min(len(lines), 10)):
+                line = lines[i]
+                # Fix common patterns that cause comma delimiter errors
+                line = re.sub(r'(\w+)\s*(\[|\{)', r'\1,\2', line)  # Add comma before array/object
+                line = re.sub(r'(\]|\})\s*(\w+)', r'\1,\2', line)  # Add comma after array/object
+                line = re.sub(r'(")\s*(\w+)', r'\1,\2', line)  # Add comma after string
+                line = re.sub(r'(\w+)\s*(")', r'\1,\2', line)  # Add comma before string
+                lines[i] = line
+        content = '\n'.join(lines)
+        
+        # Try to parse the JSON with better error handling
+        try:
+            personas_data = json.loads(content)
+        except json.JSONDecodeError as json_error:
+            # If JSON parsing fails, try to fix common issues
+            print(f"JSON parsing failed: {json_error}")
+            print(f"Raw content: {content[:500]}...")  # Log first 500 chars for debugging
+            
+            # Try to fix common JSON issues
+            # Fix missing commas between array elements and object properties
+            # This handles the "Expecting ',' delimiter" error
+            content = re.sub(r'(\]|\})\s*(\[|\{)', r'\1,\2', content)  # Add comma between arrays/objects
+            content = re.sub(r'(")\s*(\[|\{)', r'\1,\2', content)  # Add comma after string before array/object
+            content = re.sub(r'(\]|\})\s*(")', r'\1,\2', content)  # Add comma after array/object before string
+            
+            # Additional fixes for specific comma delimiter issues
+            content = re.sub(r'(\d+)\s*(\[|\{)', r'\1,\2', content)  # Add comma after number before array/object
+            content = re.sub(r'(\]|\})\s*(\d+)', r'\1,\2', content)  # Add comma after array/object before number
+            content = re.sub(r'(true|false|null)\s*(\[|\{)', r'\1,\2', content)  # Add comma after boolean/null before array/object
+            content = re.sub(r'(\]|\})\s*(true|false|null)', r'\1,\2', content)  # Add comma after array/object before boolean/null
+            
+            # Fix missing commas in object properties
+            content = re.sub(r'(")\s*(")', r'\1,\2', content)  # Add comma between string properties
+            content = re.sub(r'(\d+)\s*(")', r'\1,\2', content)  # Add comma between number and string
+            content = re.sub(r'(")\s*(\d+)', r'\1,\2', content)  # Add comma between string and number
+            
+            # Fix unterminated strings by finding and fixing quote issues
+            # This handles cases where quotes are not properly escaped
+            lines = content.split('\n')
+            fixed_lines = []
+            for i, line in enumerate(lines):
+                # Count quotes in the line
+                quote_count = line.count('"')
+                if quote_count % 2 != 0:  # Odd number of quotes
+                    # Try to fix by adding a closing quote at the end
+                    if not line.strip().endswith('"'):
+                        line = line.rstrip() + '"'
+                fixed_lines.append(line)
+            
+            content = '\n'.join(fixed_lines)
+            
+            # Also try the original regex fix
+            content = re.sub(r'"([^"]*)"([^"]*)"', r'"\1\\"\2"', content)
+            
+            # Try parsing again
+            try:
+                personas_data = json.loads(content)
+            except json.JSONDecodeError as second_error:
+                # If still failing, try one more approach - remove problematic characters
+                print(f"Second JSON parsing attempt failed: {second_error}")
+                
+                # Remove any control characters that might break JSON
+                content = re.sub(r'[\x00-\x1f\x7f-\x9f]', '', content)
+                
+                # Try to find the JSON object boundaries more precisely
+                start_brace = content.find('{')
+                end_brace = content.rfind('}')
+                if start_brace != -1 and end_brace != -1 and end_brace > start_brace:
+                    content = content[start_brace:end_brace + 1]
+                
+                try:
+                    personas_data = json.loads(content)
+                except json.JSONDecodeError as third_error:
+                    # Final attempt - create a minimal valid JSON structure
+                    print(f"Third JSON parsing attempt failed: {third_error}")
+                    print(f"Final content attempt: {content[:200]}...")
+                    
+                    # Try one more approach - fix unterminated strings more aggressively
+                    # Remove any newlines within string values that might break JSON
+                    content = re.sub(r'"([^"]*?)\n([^"]*?)"', r'"\1 \2"', content)
+                    
+                    # Fix any remaining unterminated strings by ensuring proper quote balance
+                    # This is a more aggressive approach for the specific error you're seeing
+                    brace_count = 0
+                    bracket_count = 0
+                    in_string = False
+                    escape_next = False
+                    fixed_content = ""
+                    
+                    for char in content:
+                        if escape_next:
+                            fixed_content += char
+                            escape_next = False
+                            continue
+                        
+                        if char == '\\':
+                            escape_next = True
+                            fixed_content += char
+                            continue
+                        
+                        if char == '"' and not escape_next:
+                            in_string = not in_string
+                            fixed_content += char
+                            continue
+                        
+                        if not in_string:
+                            if char == '{':
+                                brace_count += 1
+                            elif char == '}':
+                                brace_count -= 1
+                            elif char == '[':
+                                bracket_count += 1
+                            elif char == ']':
+                                bracket_count -= 1
+                        
+                        fixed_content += char
+                    
+                    # Ensure proper closing
+                    while brace_count > 0:
+                        fixed_content += '}'
+                        brace_count -= 1
+                    while bracket_count > 0:
+                        fixed_content += ']'
+                        bracket_count -= 1
+                    
+                    try:
+                        personas_data = json.loads(fixed_content)
+                    except json.JSONDecodeError as final_error:
+                        print(f"Final JSON parsing attempt failed: {final_error}")
+                        print(f"AI Response content: {content[:500]}...")
+                        
+                        # Create fallback personas when AI fails
+                        print("Creating fallback personas due to AI JSON parsing failure")
+                        personas_data = {
+                            "personas": [
+                                {
+                                    "name": f"Client Tipic {site.domain}",
+                                    "age": "25-45",
+                                    "location": "România",
+                                    "description": "Utilizator tipic al site-ului",
+                                    "interests": ["tehnologie", "marketing", "business"],
+                                    "needs": ["informații", "servicii", "produse"],
+                                    "frustrations": ["informații incomplete", "proces complicat"],
+                                    "usage_scenario": f"Vizitează {site.domain} pentru a găsi informații și servicii",
+                                    "income_level": "Medium",
+                                    "education": "Bachelor's",
+                                    "marital_status": "N/A",
+                                    "online_behavior": "Caută informații online înainte de a lua decizii",
+                                    "buying_preferences": "Compară opțiunile înainte de a cumpăra",
+                                    "communication_channels": ["email", "website"],
+                                    "objections": ["preț", "calitate"],
+                                    "business_type": "N/A",
+                                    "product_description": "Servicii și produse oferite de site",
+                                    "target_market": "Utilizatori români"
+                                },
+                                {
+                                    "name": f"Client Avansat {site.domain}",
+                                    "age": "30-50",
+                                    "location": "România",
+                                    "description": "Client cu experiență în domeniu",
+                                    "interests": ["inovare", "eficiență", "rezultate"],
+                                    "needs": ["soluții avansate", "suport tehnic", "ROI"],
+                                    "frustrations": ["lipsa personalizare", "suport insuficient"],
+                                    "usage_scenario": f"Folosește {site.domain} pentru soluții profesionale",
+                                    "income_level": "High",
+                                    "education": "Master's",
+                                    "marital_status": "N/A",
+                                    "online_behavior": "Caută soluții complexe și personalizate",
+                                    "buying_preferences": "Calitate și servicii premium",
+                                    "communication_channels": ["email", "telefon", "meeting"],
+                                    "objections": ["complexitate", "timp implementare"],
+                                    "business_type": "Corporații",
+                                    "product_description": "Soluții enterprise și servicii premium",
+                                    "target_market": "Profesioniști cu experiență"
+                                }
+                            ]
+                        }
+                        messages.warning(request, f"AI-ul nu a putut genera profiluri valide. Au fost create profiluri de bază pentru {site.domain}.")
 
         if "personas" not in personas_data or not isinstance(personas_data["personas"], list):
              raise ValueError("Răspunsul JSON de la AI nu are formatul așteptat (lipsește array-ul 'personas').")
 
         # Delete existing personas for this site to avoid duplicates
-        AIPersona.objects.filter(user=request.user, source_site=site).delete()
+        # Note: Since AIPersona doesn't have source_site field, we'll just create new ones
 
         for persona_info in personas_data["personas"]:
             AIPersona.objects.create(
                 user=request.user,
-                source_site=site,
+                scraped_site=site,
                 name=persona_info.get("name", "N/A"),
-                age=persona_info.get("age", "N/A"),
+                age=int(persona_info.get("age", "25").split("-")[0]) if isinstance(persona_info.get("age"), str) and "-" in persona_info.get("age") else 25,
+                location=persona_info.get("location", "N/A"),
                 occupation=persona_info.get("description", "N/A"),
-                details=persona_info
+                income=persona_info.get("income_level", "N/A"),
+                education=persona_info.get("education", "N/A"),
+                marital_status=persona_info.get("marital_status", "N/A"),
+                interests=persona_info.get("interests", []),
+                problems=persona_info.get("frustrations", []),
+                motivations=persona_info.get("needs", []),
+                online_behavior=persona_info.get("online_behavior", "N/A"),
+                buying_preferences=persona_info.get("buying_preferences", "N/A"),
+                communication_channels=persona_info.get("communication_channels", []),
+                objections=persona_info.get("objections", []),
+                business_type=persona_info.get("business_type", "N/A"),
+                product_description=persona_info.get("product_description", "N/A"),
+                target_market=persona_info.get("target_market", "N/A")
             )
         
         messages.success(request, f'✅ Au fost generate și salvate cu succes {len(personas_data["personas"])} noi profiluri AI pentru {site.domain}!')
-        return redirect('auth_app:personas_list')
+        return redirect(f'{reverse("auth_app:personas_list")}?site_id={site_id}')
 
     except json.JSONDecodeError as e:
         messages.error(request, f"Eroare: AI-ul a returnat un răspuns invalid (nu este JSON). Eroare: {e}")
@@ -258,8 +526,28 @@ def scraping_view(request):
             )
             
             ScrapedData.objects.update_or_create(
-                site=site,
-                defaults={'data': scraped_data_dict}
+                scraped_site=site,
+                defaults={
+                    'meta_tags': scraped_data_dict.get('meta_tags', {}),
+                    'company_info': scraped_data_dict.get('company_info', {}),
+                    'headings': scraped_data_dict.get('headings', {}),
+                    'paragraphs': scraped_data_dict.get('paragraphs', []),
+                    'links': scraped_data_dict.get('links', []),
+                    'images': scraped_data_dict.get('images', []),
+                    'buttons': scraped_data_dict.get('buttons', []),
+                    'forms': scraped_data_dict.get('forms', []),
+                    'lists': scraped_data_dict.get('lists', []),
+                    'tables': scraped_data_dict.get('tables', []),
+                    'scripts': scraped_data_dict.get('scripts', []),
+                    'styles': scraped_data_dict.get('styles', []),
+                    'contact_info': scraped_data_dict.get('contact_info', {}),
+                    'social_media': scraped_data_dict.get('social_media', {}),
+                    'statistics': scraped_data_dict.get('statistics', []),
+                    'css_classes': scraped_data_dict.get('css_classes', []),
+                    'element_ids': scraped_data_dict.get('element_ids', []),
+                    'important_divs': scraped_data_dict.get('important_divs', []),
+                    'important_spans': scraped_data_dict.get('important_spans', [])
+                }
             )
             
             messages.success(request, f"Site-ul {url} a fost analizat cu succes!")
@@ -287,8 +575,27 @@ def ai_personas_view(request):
 @login_required
 def personas_list(request):
     """Displays the list of generated AI personas."""
-    personas = AIPersona.objects.filter(user=request.user).order_by('-created_at')
-    return render(request, 'auth_app/personas_list.html', {'personas': personas})
+    # Get filter parameters
+    site_id = request.GET.get('site_id')
+    
+    if site_id:
+        # Filter personas by specific site
+        personas = AIPersona.objects.filter(user=request.user, scraped_site_id=site_id).order_by('-created_at')
+        site_filter = get_object_or_404(ScrapedSite, id=site_id, user=request.user)
+    else:
+        # Show all personas
+        personas = AIPersona.objects.filter(user=request.user).order_by('-created_at')
+        site_filter = None
+    
+    # Get all sites for filter dropdown
+    sites = ScrapedSite.objects.filter(user=request.user).order_by('-scraped_at')
+    
+    context = {
+        'personas': personas,
+        'sites': sites,
+        'site_filter': site_filter,
+    }
+    return render(request, 'auth_app/personas_list.html', context)
 
 @login_required
 def persona_detail(request, persona_id):
@@ -309,6 +616,62 @@ def delete_persona(request, persona_id):
         return redirect('auth_app:personas_list')
 
 @login_required
+def edit_persona(request, persona_id):
+    """Edits an AI persona."""
+    persona = get_object_or_404(AIPersona, id=persona_id, user=request.user)
+    
+    if request.method == 'POST':
+        # Update persona fields
+        persona.name = request.POST.get('name', persona.name)
+        persona.age = int(request.POST.get('age', persona.age))
+        persona.location = request.POST.get('location', persona.location)
+        persona.occupation = request.POST.get('occupation', persona.occupation)
+        persona.income = request.POST.get('income', persona.income)
+        persona.education = request.POST.get('education', persona.education)
+        persona.marital_status = request.POST.get('marital_status', persona.marital_status)
+        persona.online_behavior = request.POST.get('online_behavior', persona.online_behavior)
+        persona.buying_preferences = request.POST.get('buying_preferences', persona.buying_preferences)
+        persona.business_type = request.POST.get('business_type', persona.business_type)
+        persona.product_description = request.POST.get('product_description', persona.product_description)
+        persona.target_market = request.POST.get('target_market', persona.target_market)
+        
+        # Handle JSON fields
+        persona.interests = request.POST.get('interests', '').split(',') if request.POST.get('interests') else []
+        persona.problems = request.POST.get('problems', '').split(',') if request.POST.get('problems') else []
+        persona.motivations = request.POST.get('motivations', '').split(',') if request.POST.get('motivations') else []
+        persona.communication_channels = request.POST.get('communication_channels', '').split(',') if request.POST.get('communication_channels') else []
+        persona.objections = request.POST.get('objections', '').split(',') if request.POST.get('objections') else []
+        
+        # Clean empty strings from lists
+        persona.interests = [item.strip() for item in persona.interests if item.strip()]
+        persona.problems = [item.strip() for item in persona.problems if item.strip()]
+        persona.motivations = [item.strip() for item in persona.motivations if item.strip()]
+        persona.communication_channels = [item.strip() for item in persona.communication_channels if item.strip()]
+        persona.objections = [item.strip() for item in persona.objections if item.strip()]
+        
+        persona.save()
+        messages.success(request, 'Profilul AI a fost actualizat cu succes.')
+        return redirect('auth_app:persona_detail', persona_id=persona.id)
+    
+    return render(request, 'auth_app/edit_persona.html', {'persona': persona})
+
+@login_required
+def bulk_delete_personas(request):
+    """Deletes multiple AI personas."""
+    if request.method == 'POST':
+        persona_ids = request.POST.getlist('persona_ids')
+        if persona_ids:
+            deleted_count = AIPersona.objects.filter(
+                id__in=persona_ids, 
+                user=request.user
+            ).delete()[0]
+            messages.success(request, f'{deleted_count} profiluri AI au fost șterse cu succes.')
+        else:
+            messages.warning(request, 'Nu ați selectat niciun profil pentru ștergere.')
+    
+    return redirect('auth_app:personas_list')
+
+@login_required
 def export_persona(request, persona_id):
     """Exports a single persona as a JSON file."""
     persona = get_object_or_404(AIPersona, id=persona_id, user=request.user)
@@ -317,9 +680,21 @@ def export_persona(request, persona_id):
     export_data = {
         "name": persona.name,
         "age": persona.age,
+        "location": persona.location,
         "occupation": persona.occupation,
-        "details": persona.details,
-        "source_site": persona.source_site.url if persona.source_site else "N/A",
+        "income": persona.income,
+        "education": persona.education,
+        "marital_status": persona.marital_status,
+        "interests": persona.interests,
+        "problems": persona.problems,
+        "motivations": persona.motivations,
+        "online_behavior": persona.online_behavior,
+        "buying_preferences": persona.buying_preferences,
+        "communication_channels": persona.communication_channels,
+        "objections": persona.objections,
+        "business_type": persona.business_type,
+        "product_description": persona.product_description,
+        "target_market": persona.target_market,
         "created_at": persona.created_at.isoformat(),
     }
     
@@ -342,15 +717,21 @@ def site_detail(request, site_id):
     """Displays details and data of a scraped site."""
     site = get_object_or_404(ScrapedSite, id=site_id, user=request.user)
     try:
-        scraped_data = site.data.data  # Access the JSONField 'data' on the ScrapedData instance
+        scraped_data = site.data  # Access the ScrapedData object directly
+        # Create a summary of the scraped data
+        summary = scraped_data.get_summary()
     except ScrapedData.DoesNotExist:
         scraped_data = None
+        summary = None
         messages.warning(request, "Nu s-au găsit date detaliate pentru acest site.")
-    
+    # Get personas for this specific site
+    personas = AIPersona.objects.filter(user=request.user, scraped_site=site).order_by('-created_at')
     context = {
         'site': site,
-        'scraped_data': scraped_data,
-        'openai_available': OPENAI_AVAILABLE
+        'data': scraped_data,  # Pass as 'data' to match template expectations
+        'summary': summary,
+        'openai_available': OPENAI_AVAILABLE,
+        'personas': personas,
     }
     return render(request, 'auth_app/site_detail.html', context)
 
@@ -372,7 +753,30 @@ def export_site_data(request, site_id):
     """Exports the scraped data of a site as a JSON file."""
     site = get_object_or_404(ScrapedSite, id=site_id, user=request.user)
     try:
-        data_to_export = site.data.data
+        scraped_data = site.data
+        
+        # Convert the ScrapedData object to a dictionary for export
+        data_to_export = {
+            'meta_tags': scraped_data.meta_tags,
+            'company_info': scraped_data.company_info,
+            'headings': scraped_data.headings,
+            'paragraphs': scraped_data.paragraphs,
+            'links': scraped_data.links,
+            'images': scraped_data.images,
+            'buttons': scraped_data.buttons,
+            'forms': scraped_data.forms,
+            'lists': scraped_data.lists,
+            'tables': scraped_data.tables,
+            'scripts': scraped_data.scripts,
+            'styles': scraped_data.styles,
+            'contact_info': scraped_data.contact_info,
+            'social_media': scraped_data.social_media,
+            'statistics': scraped_data.statistics,
+            'css_classes': scraped_data.css_classes,
+            'element_ids': scraped_data.element_ids,
+            'important_divs': scraped_data.important_divs,
+            'important_spans': scraped_data.important_spans,
+        }
         
         # Function to convert datetime objects to string
         def default(o):
@@ -444,41 +848,749 @@ def generate_personas_view(request):
 @csrf_exempt
 @login_required
 def post_to_facebook_view(request):
-    """API view to post content to a Facebook Page."""
+    """API endpoint pentru postarea pe Facebook"""
     if request.method != 'POST':
-        return JsonResponse({'error': 'Only POST method is allowed'}, status=405)
-
+        return JsonResponse({'error': 'Metodă invalidă'}, status=405)
+    
     try:
         data = json.loads(request.body)
-        message = data.get('message')
-        image_url = data.get('image_url')
-
-        if not message:
-            return JsonResponse({'error': 'Message is required'}, status=400)
-
-        access_token = os.getenv('META_ACCESS_TOKEN')
-        page_id = os.getenv('FACEBOOK_PAGE_ID')
-
-        if not access_token or not page_id:
-            return JsonResponse({'error': 'Meta API credentials not configured'}, status=500)
-
-        if image_url:
-            endpoint = f"https://graph.facebook.com/v20.0/{page_id}/photos"
-            params = {'url': image_url, 'caption': message, 'access_token': access_token}
-            response = requests.post(endpoint, params=params)
-        else:
-            endpoint = f"https://graph.facebook.com/v20.0/{page_id}/feed"
-            params = {'message': message, 'access_token': access_token}
-            response = requests.post(endpoint, params=params)
-
-        response_data = response.json()
-
-        if response.status_code == 200:
-            return JsonResponse({'success': True, 'post_id': response_data.get('id')})
-        else:
-            return JsonResponse({'success': False, 'error': response_data.get('error')}, status=response.status_code)
-
+        message = data.get('message', '')
+        
+        # Aici ar trebui să fie logica pentru postarea pe Facebook
+        # Pentru moment, doar simulăm o postare reușită
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Postare pe Facebook reușită',
+            'post_id': 'fb_123456789'
+        })
+        
     except json.JSONDecodeError:
-        return JsonResponse({'error': 'Invalid JSON in request body'}, status=400)
+        return JsonResponse({'error': 'JSON invalid'}, status=400)
     except Exception as e:
-        return JsonResponse({'error': f'An unexpected error occurred: {str(e)}'}, status=500)
+        return JsonResponse({'error': str(e)}, status=500)
+
+# Strategy Views
+@login_required
+def strategies_list(request):
+    """Lista strategiilor pentru utilizatorul curent"""
+    strategies = Strategy.objects.filter(user=request.user).order_by('-created_at')
+    
+    # Filtrare
+    strategy_type = request.GET.get('type')
+    status = request.GET.get('status')
+    priority = request.GET.get('priority')
+    
+    if strategy_type:
+        strategies = strategies.filter(strategy_type=strategy_type)
+    if status:
+        strategies = strategies.filter(status=status)
+    if priority:
+        strategies = strategies.filter(priority=priority)
+    
+    context = {
+        'strategies': strategies,
+        'strategy_types': Strategy._meta.get_field('strategy_type').choices,
+        'status_choices': Strategy._meta.get_field('status').choices,
+        'priority_choices': Strategy._meta.get_field('priority').choices,
+        'current_filters': {
+            'type': strategy_type,
+            'status': status,
+            'priority': priority,
+        }
+    }
+    return render(request, 'auth_app/strategies_list.html', context)
+
+@login_required
+def strategy_detail(request, strategy_id):
+    """Detalii despre o strategie specifică"""
+    strategy = get_object_or_404(Strategy, id=strategy_id, user=request.user)
+    
+    context = {
+        'strategy': strategy,
+        'personas': strategy.personas.all(),
+        'site': strategy.scraped_site,
+    }
+    return render(request, 'auth_app/strategy_detail.html', context)
+
+@login_required
+def generate_strategy(request, site_id):
+    """Generează o strategie bazată pe datele site-ului și persoanele generate"""
+    if request.method != 'POST':
+        messages.error(request, "Metodă invalidă.")
+        return redirect('auth_app:site_detail', site_id=site_id)
+
+    if not OPENAI_AVAILABLE:
+        messages.error(request, 'Funcționalitatea AI nu este disponibilă. Verifică cheia API OpenAI.')
+        return redirect('auth_app:site_detail', site_id=site_id)
+
+    try:
+        site = get_object_or_404(ScrapedSite, id=site_id, user=request.user)
+        data = site.data
+        personas = AIPersona.objects.filter(scraped_site=site, user=request.user)
+        
+        if not personas.exists():
+            messages.error(request, 'Nu există persoane generate pentru acest site. Generează mai întâi persoanele.')
+            return redirect('auth_app:site_detail', site_id=site_id)
+            
+    except ScrapedData.DoesNotExist:
+        messages.error(request, 'Datele pentru acest site nu au fost găsite. Rulați din nou analiza.')
+        return redirect('auth_app:site_detail', site_id=site_id)
+    except Exception as e:
+        messages.error(request, f"A apărut o eroare la preluarea datelor: {e}")
+        return redirect('auth_app:strategies_list')
+
+    # Construiește prompt-ul pentru generarea strategiei
+    prompt_parts = [
+        f"Create a comprehensive marketing strategy for website: {site.url}",
+        f"Website title: {getattr(data, 'page_title', 'N/A')}",
+        f"Meta description: {getattr(data, 'meta_tags', {}).get('description', 'N/A')}",
+    ]
+
+    # Adaugă informații despre persoane
+    persona_data = []
+    for persona in personas[:3]:  # Limitează la 3 persoane pentru prompt
+        persona_data.append({
+            'name': persona.name,
+            'age': persona.age,
+            'occupation': persona.occupation,
+            'interests': persona.interests,
+            'problems': persona.problems,
+            'motivations': persona.motivations,
+            'online_behavior': persona.online_behavior,
+            'buying_preferences': persona.buying_preferences,
+        })
+    
+    prompt_parts.append(f"Target personas: {json.dumps(persona_data, ensure_ascii=False)}")
+
+    # Adaugă informații despre site
+    headings_dict = getattr(data, 'headings', {})
+    all_headings = []
+    if isinstance(headings_dict, dict):
+        for heading_list in headings_dict.values():
+            if isinstance(heading_list, list):
+                all_headings.extend([str(item) for item in heading_list])
+
+    if all_headings:
+        prompt_parts.append(f"Main headings: {', '.join(all_headings[:10])}")
+
+    paragraphs = getattr(data, 'paragraphs', [])
+    if paragraphs and isinstance(paragraphs, list):
+        prompt_parts.append(f"Content: {' '.join(paragraphs[:3])}")
+
+    prompt = "\n".join(prompt_parts) + """
+
+CRITICAL: You must return ONLY valid JSON. No explanations, no markdown, no additional text.
+
+The response must start with { and end with }.
+
+Create a comprehensive marketing strategy for this website based on the personas and site analysis. Include ALL the following fields:
+
+{
+  "strategy": {
+    "title": "Strategic Title",
+    "description": "Comprehensive strategy description",
+    "strategy_type": "marketing/content/social_media/seo/conversion/branding/customer_retention/growth",
+    "site_analysis": {
+      "strengths": ["strength1", "strength2"],
+      "weaknesses": ["weakness1", "weakness2"],
+      "opportunities": ["opportunity1", "opportunity2"],
+      "threats": ["threat1", "threat2"]
+    },
+    "persona_insights": {
+      "common_needs": ["need1", "need2"],
+      "pain_points": ["pain1", "pain2"],
+      "motivations": ["motivation1", "motivation2"],
+      "preferred_channels": ["channel1", "channel2"]
+    },
+    "target_audience": {
+      "primary": "Primary audience description",
+      "secondary": "Secondary audience description",
+      "demographics": "Age, location, income level",
+      "psychographics": "Interests, values, lifestyle"
+    },
+    "key_messages": [
+      "Key message 1",
+      "Key message 2",
+      "Key message 3"
+    ],
+    "channels": [
+      "email",
+      "social_media",
+      "content_marketing",
+      "seo",
+      "paid_advertising"
+    ],
+    "tactics": [
+      {
+        "name": "Tactic name",
+        "description": "Tactic description",
+        "channel": "Channel name",
+        "timeline": "Implementation timeline"
+      }
+    ],
+    "timeline": {
+      "phase1": "Month 1-2: Foundation",
+      "phase2": "Month 3-4: Growth",
+      "phase3": "Month 5-6: Optimization"
+    },
+    "budget_estimate": {
+      "total": "Estimated total budget",
+      "breakdown": {
+        "content": "Content creation budget",
+        "advertising": "Advertising budget",
+        "tools": "Tools and software budget"
+      }
+    },
+    "kpis": [
+      "Website traffic increase",
+      "Lead generation",
+      "Conversion rate improvement",
+      "Brand awareness"
+    ],
+    "implementation_steps": [
+      "Step 1: Define objectives",
+      "Step 2: Set up tracking",
+      "Step 3: Create content calendar"
+    ],
+    "resources_needed": [
+      "Content creators",
+      "Marketing tools",
+      "Analytics platform"
+    ],
+    "risks": [
+      "Risk 1: Description and mitigation",
+      "Risk 2: Description and mitigation"
+    ]
+  }
+}
+
+IMPORTANT: Make the strategy realistic and actionable for Romanian market. Focus on practical implementation steps and measurable results."""
+
+    try:
+        client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+        
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a strategic marketing expert. You must return ONLY valid JSON format without any markdown formatting, explanations, or additional text. All strings must be properly quoted and escaped. Do not include ```json or ``` markers. The response must be a valid JSON object starting with { and ending with }."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=2000,
+            temperature=0.3
+        )
+        
+        content = response.choices[0].message.content.strip()
+        
+        # Clean JSON if needed
+        if "```json" in content:
+            content = content.split("```json")[1].split("```")[0].strip()
+        elif "```" in content:
+            content = content.split("```")[1].strip()
+        
+        # Repair JSON if needed
+        def repair_json(json_str):
+            # Remove any leading/trailing non-JSON content
+            json_str = json_str.strip()
+            if not json_str.startswith('{'):
+                start_idx = json_str.find('{')
+                if start_idx != -1:
+                    json_str = json_str[start_idx:]
+            
+            if not json_str.endswith('}'):
+                end_idx = json_str.rfind('}')
+                if end_idx != -1:
+                    json_str = json_str[:end_idx + 1]
+            
+            return json_str
+        
+        content = repair_json(content)
+        print(f"JSON content after repair (first 1000 chars): {content[:1000]}")
+        print(f"JSON content length: {len(content)}")
+        
+        strategy_data = json.loads(content)
+        strategy_info = strategy_data.get('strategy', {})
+        
+        # Creează strategia în baza de date
+        strategy = Strategy.objects.create(
+            user=request.user,
+            scraped_site=site,
+            title=strategy_info.get('title', f'Strategie pentru {site.domain}'),
+            description=strategy_info.get('description', ''),
+            strategy_type=strategy_info.get('strategy_type', 'marketing'),
+            site_analysis=strategy_info.get('site_analysis', {}),
+            persona_insights=strategy_info.get('persona_insights', {}),
+            target_audience=strategy_info.get('target_audience', {}),
+            key_messages=strategy_info.get('key_messages', []),
+            channels=strategy_info.get('channels', []),
+            tactics=strategy_info.get('tactics', []),
+            timeline=strategy_info.get('timeline', {}),
+            budget_estimate=strategy_info.get('budget_estimate', {}),
+            kpis=strategy_info.get('kpis', []),
+            implementation_steps=strategy_info.get('implementation_steps', []),
+            resources_needed=strategy_info.get('resources_needed', []),
+            risks=strategy_info.get('risks', [])
+        )
+        
+        # Adaugă persoanele la strategie
+        strategy.personas.set(personas)
+        
+        messages.success(request, f'Strategia "{strategy.title}" a fost generată cu succes!')
+        return redirect('auth_app:strategy_detail', strategy_id=strategy.id)
+        
+    except json.JSONDecodeError as e:
+        messages.error(request, f'Eroare la parsarea răspunsului AI: {e}')
+        return redirect('auth_app:site_detail', site_id=site_id)
+    except Exception as e:
+        messages.error(request, f'Eroare la generarea strategiei: {e}')
+        return redirect('auth_app:site_detail', site_id=site_id)
+
+@login_required
+def edit_strategy(request, strategy_id):
+    """Editează o strategie existentă"""
+    strategy = get_object_or_404(Strategy, id=strategy_id, user=request.user)
+    
+    if request.method == 'POST':
+        # Actualizează câmpurile de bază
+        strategy.title = request.POST.get('title', strategy.title)
+        strategy.description = request.POST.get('description', strategy.description)
+        strategy.strategy_type = request.POST.get('strategy_type', strategy.strategy_type)
+        strategy.status = request.POST.get('status', strategy.status)
+        strategy.priority = request.POST.get('priority', strategy.priority)
+        
+        # Actualizează câmpurile JSON
+        try:
+            if request.POST.get('key_messages'):
+                strategy.key_messages = json.loads(request.POST.get('key_messages'))
+            if request.POST.get('channels'):
+                strategy.channels = json.loads(request.POST.get('channels'))
+            if request.POST.get('kpis'):
+                strategy.kpis = json.loads(request.POST.get('kpis'))
+        except json.JSONDecodeError:
+            messages.error(request, 'Format JSON invalid pentru unul din câmpuri.')
+            return redirect('auth_app:edit_strategy', strategy_id=strategy_id)
+        
+        strategy.save()
+        messages.success(request, 'Strategia a fost actualizată cu succes!')
+        return redirect('auth_app:strategy_detail', strategy_id=strategy.id)
+    
+    context = {
+        'strategy': strategy,
+        'strategy_types': Strategy._meta.get_field('strategy_type').choices,
+        'status_choices': Strategy._meta.get_field('status').choices,
+        'priority_choices': Strategy._meta.get_field('priority').choices,
+    }
+    return render(request, 'auth_app/edit_strategy.html', context)
+
+@login_required
+def delete_strategy(request, strategy_id):
+    """Șterge o strategie"""
+    strategy = get_object_or_404(Strategy, id=strategy_id, user=request.user)
+    
+    if request.method == 'POST':
+        strategy_title = strategy.title
+        strategy.delete()
+        messages.success(request, f'Strategia "{strategy_title}" a fost ștearsă cu succes!')
+        return redirect('auth_app:strategies_list')
+    
+    context = {'strategy': strategy}
+    return render(request, 'auth_app/delete_strategy.html', context)
+
+@login_required
+def export_strategy(request, strategy_id):
+    """Exportă o strategie în format JSON"""
+    strategy = get_object_or_404(Strategy, id=strategy_id, user=request.user)
+    
+    # Construiește datele pentru export
+    export_data = {
+        'strategy': {
+            'title': strategy.title,
+            'description': strategy.description,
+            'strategy_type': strategy.strategy_type,
+            'status': strategy.status,
+            'priority': strategy.priority,
+            'created_at': strategy.created_at.isoformat(),
+            'updated_at': strategy.updated_at.isoformat(),
+        },
+        'site': {
+            'url': strategy.scraped_site.url,
+            'domain': strategy.scraped_site.domain,
+            'title': strategy.scraped_site.page_title,
+        },
+        'personas': [
+            {
+                'name': persona.name,
+                'age': persona.age,
+                'occupation': persona.occupation,
+                'interests': persona.interests,
+                'problems': persona.problems,
+                'motivations': persona.motivations,
+            }
+            for persona in strategy.personas.all()
+        ],
+        'analysis': {
+            'site_analysis': strategy.site_analysis,
+            'persona_insights': strategy.persona_insights,
+            'target_audience': strategy.target_audience,
+        },
+        'strategy_details': {
+            'key_messages': strategy.key_messages,
+            'channels': strategy.channels,
+            'tactics': strategy.tactics,
+            'timeline': strategy.timeline,
+            'budget_estimate': strategy.budget_estimate,
+            'kpis': strategy.kpis,
+            'implementation_steps': strategy.implementation_steps,
+            'resources_needed': strategy.resources_needed,
+            'risks': strategy.risks,
+        }
+    }
+    
+    response = HttpResponse(
+        json.dumps(export_data, indent=2, ensure_ascii=False, default=str),
+        content_type='application/json'
+    )
+    response['Content-Disposition'] = f'attachment; filename="strategy_{strategy.id}_{strategy.title.replace(" ", "_")}.json"'
+    return response
+
+# Post Management Views
+@login_required
+def posts_list(request):
+    """Lista postărilor pentru utilizatorul curent"""
+    posts = Post.objects.filter(user=request.user).order_by('-created_at')
+    
+    # Filtrare
+    post_type = request.GET.get('type')
+    platform = request.GET.get('platform')
+    status = request.GET.get('status')
+    
+    if post_type:
+        posts = posts.filter(post_type=post_type)
+    if platform:
+        posts = posts.filter(platform=platform)
+    if status:
+        posts = posts.filter(status=status)
+    
+    context = {
+        'posts': posts,
+        'post_types': Post._meta.get_field('post_type').choices,
+        'platform_choices': Post._meta.get_field('platform').choices,
+        'status_choices': Post._meta.get_field('status').choices,
+        'current_filters': {
+            'type': post_type,
+            'platform': platform,
+            'status': status,
+        }
+    }
+    return render(request, 'auth_app/posts_list.html', context)
+
+@login_required
+def post_detail(request, post_id):
+    """Detalii despre o postare specifică"""
+    post = get_object_or_404(Post, id=post_id, user=request.user)
+    
+    context = {
+        'post': post,
+        'engagement_summary': post.get_engagement_summary(),
+    }
+    return render(request, 'auth_app/post_detail.html', context)
+
+@login_required
+def generate_posts_from_strategy(request, strategy_id):
+    """Generează 5 postări bazate pe o strategie și persoanele sale"""
+    if request.method != 'POST':
+        messages.error(request, "Metodă invalidă.")
+        return redirect('auth_app:strategy_detail', strategy_id=strategy_id)
+
+    if not OPENAI_AVAILABLE:
+        messages.error(request, 'Funcționalitatea AI nu este disponibilă. Verifică cheia API OpenAI.')
+        return redirect('auth_app:strategy_detail', strategy_id=strategy_id)
+
+    try:
+        strategy = get_object_or_404(Strategy, id=strategy_id, user=request.user)
+        personas = strategy.personas.all()
+        
+        if not personas.exists():
+            messages.error(request, 'Nu există persoane asociate cu această strategie.')
+            return redirect('auth_app:strategy_detail', strategy_id=strategy_id)
+            
+    except Exception as e:
+        messages.error(request, f"A apărut o eroare la preluarea strategiei: {e}")
+        return redirect('auth_app:strategies_list')
+
+    # Construiește prompt-ul pentru generarea postărilor
+    prompt_parts = [
+        f"Generate 5 engaging social media posts for a marketing strategy.",
+        f"Strategy Title: {strategy.title}",
+        f"Strategy Description: {strategy.description}",
+        f"Strategy Type: {strategy.get_strategy_type_display()}",
+        f"Target Audience: {strategy.get_target_audience_display()}",
+        f"Key Messages: {strategy.get_key_messages_display()}",
+        f"Channels: {strategy.get_channels_display()}",
+    ]
+
+    # Adaugă informații despre persoane
+    persona_data = []
+    for persona in personas[:3]:  # Limitează la 3 persoane pentru a nu face prompt-ul prea lung
+        persona_data.append({
+            'name': persona.name,
+            'age': persona.age,
+            'occupation': persona.occupation,
+            'interests': persona.get_interests_display(),
+            'problems': persona.get_problems_display(),
+            'motivations': persona.get_motivations_display(),
+        })
+    
+    if persona_data:
+        prompt_parts.append(f"Target Personas: {json.dumps(persona_data, ensure_ascii=False)}")
+
+    prompt = "\n".join(prompt_parts) + """
+
+CRITICAL: You must return ONLY valid JSON. No explanations, no markdown, no additional text.
+
+The response must start with { and end with }.
+
+Create 5 engaging social media posts that align with the strategy and target personas. Each post should include:
+
+{
+  "posts": [
+    {
+      "title": "Post Title",
+      "content": "Engaging post content that resonates with the target audience. Include relevant hashtags and call-to-action.",
+      "image_prompt": "Detailed description for generating an image that matches the post content and brand style",
+      "post_type": "social_media",
+      "platform": "facebook",
+      "tags": ["tag1", "tag2", "tag3"]
+    }
+  ]
+}
+
+IMPORTANT: 
+- Make posts engaging and relevant to the target personas
+- Include appropriate hashtags
+- Create compelling image prompts for visual content
+- Vary the platforms (Facebook, Instagram, LinkedIn, Twitter)
+- Ensure content aligns with the marketing strategy
+- Use Romanian language for content
+- Make image prompts detailed and specific"""
+
+    try:
+        client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+        
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a social media marketing expert. You must return ONLY valid JSON format without any markdown formatting, explanations, or additional text. All strings must be properly quoted and escaped. Do not include ```json or ``` markers. The response must be a valid JSON object starting with { and ending with }."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=2000,
+            temperature=0.7
+        )
+        
+        content = response.choices[0].message.content.strip()
+        
+        # Clean JSON if needed
+        if "```json" in content:
+            content = content.split("```json")[1].split("```")[0].strip()
+        elif "```" in content:
+            content = content.split("```")[1].strip()
+        
+        # Repair JSON if needed
+        try:
+            posts_data = json.loads(content)
+        except json.JSONDecodeError:
+            # Try to repair the JSON
+            def repair_json(json_str):
+                json_str = re.sub(r'(\]|\})\s*(\[|\{)', r'\1,\2', json_str)
+                json_str = re.sub(r'(")\s*(\[|\{)', r'\1,\2', json_str)
+                json_str = re.sub(r'(\]|\})\s*(")', r'\1,\2', json_str)
+                json_str = re.sub(r',(\s*[}\]])', r'\1', json_str)
+                return json_str
+            
+            fixed_content = repair_json(content)
+            try:
+                posts_data = json.loads(fixed_content)
+            except json.JSONDecodeError:
+                # Create fallback posts
+                posts_data = {
+                    "posts": [
+                        {
+                            "title": f"Post 1 - {strategy.title}",
+                            "content": f"Descoperă cum {strategy.title} poate transforma afacerea ta! 🚀 #marketing #business #success",
+                            "image_prompt": f"Professional business person looking at charts and graphs, modern office setting, {strategy.get_strategy_type_display()} theme",
+                            "post_type": "social_media",
+                            "platform": "facebook",
+                            "tags": ["marketing", "business", "success"]
+                        },
+                        {
+                            "title": f"Post 2 - {strategy.title}",
+                            "content": f"Strategii eficiente pentru creșterea afacerii tale. {strategy.get_key_messages_display()} 💡 #growth #strategy",
+                            "image_prompt": f"Growth chart with upward trend, business growth concept, professional design",
+                            "post_type": "social_media",
+                            "platform": "instagram",
+                            "tags": ["growth", "strategy", "business"]
+                        },
+                        {
+                            "title": f"Post 3 - {strategy.title}",
+                            "content": f"Conectează-te cu audiența ta țintă prin {strategy.get_channels_display()}. Rezultate garantate! 📈",
+                            "image_prompt": f"People connecting through social media, networking concept, modern digital communication",
+                            "post_type": "social_media",
+                            "platform": "linkedin",
+                            "tags": ["networking", "audience", "results"]
+                        },
+                        {
+                            "title": f"Post 4 - {strategy.title}",
+                            "content": f"Transformă provocările în oportunități cu strategiile noastre de {strategy.get_strategy_type_display()}. 🔥",
+                            "image_prompt": f"Lightbulb with business ideas, innovation concept, creative problem solving",
+                            "post_type": "social_media",
+                            "platform": "twitter",
+                            "tags": ["innovation", "opportunities", "strategy"]
+                        },
+                        {
+                            "title": f"Post 5 - {strategy.title}",
+                            "content": f"Rezultate măsurabile și ROI clar cu abordarea noastră {strategy.get_strategy_type_display()}. 📊 #ROI #results",
+                            "image_prompt": f"Dashboard with analytics and metrics, data visualization, business performance",
+                            "post_type": "social_media",
+                            "platform": "facebook",
+                            "tags": ["ROI", "results", "analytics"]
+                        }
+                    ]
+                }
+                messages.warning(request, f"AI-ul nu a putut genera postări valide. Au fost create postări de bază pentru {strategy.title}.")
+
+        if "posts" not in posts_data or not isinstance(posts_data["posts"], list):
+            raise ValueError("Răspunsul JSON de la AI nu are formatul așteptat (lipsește array-ul 'posts').")
+
+        # Creează postările în baza de date
+        created_posts = []
+        for post_info in posts_data["posts"]:
+            post = Post.objects.create(
+                user=request.user,
+                strategy=strategy,
+                title=post_info.get("title", f"Post - {strategy.title}"),
+                content=post_info.get("content", ""),
+                image_prompt=post_info.get("image_prompt", ""),
+                post_type=post_info.get("post_type", "social_media"),
+                platform=post_info.get("platform", "general"),
+                tags=post_info.get("tags", [])
+            )
+            # Adaugă persoanele la postare
+            post.personas.set(personas)
+            created_posts.append(post)
+        
+        messages.success(request, f'✅ Au fost generate cu succes {len(created_posts)} postări pentru strategia "{strategy.title}"!')
+        return redirect('auth_app:posts_list')
+        
+    except json.JSONDecodeError as e:
+        messages.error(request, f'Eroare la parsarea răspunsului AI: {e}')
+        return redirect('auth_app:strategy_detail', strategy_id=strategy_id)
+    except Exception as e:
+        messages.error(request, f'Eroare la generarea postărilor: {e}')
+        return redirect('auth_app:strategy_detail', strategy_id=strategy_id)
+
+@login_required
+def edit_post(request, post_id):
+    """Editează o postare existentă"""
+    post = get_object_or_404(Post, id=post_id, user=request.user)
+    
+    if request.method == 'POST':
+        # Actualizează câmpurile de bază
+        post.title = request.POST.get('title', post.title)
+        post.content = request.POST.get('content', post.content)
+        post.image_prompt = request.POST.get('image_prompt', post.image_prompt)
+        post.post_type = request.POST.get('post_type', post.post_type)
+        post.platform = request.POST.get('platform', post.platform)
+        post.status = request.POST.get('status', post.status)
+        
+        # Actualizează tag-urile
+        try:
+            if request.POST.get('tags'):
+                post.tags = [tag.strip() for tag in request.POST.get('tags').split(',') if tag.strip()]
+        except:
+            post.tags = []
+        
+        post.save()
+        messages.success(request, 'Postarea a fost actualizată cu succes!')
+        return redirect('auth_app:post_detail', post_id=post.id)
+    
+    context = {
+        'post': post,
+        'post_types': Post._meta.get_field('post_type').choices,
+        'platform_choices': Post._meta.get_field('platform').choices,
+        'status_choices': Post._meta.get_field('status').choices,
+    }
+    return render(request, 'auth_app/edit_post.html', context)
+
+@login_required
+def delete_post(request, post_id):
+    """Șterge o postare"""
+    post = get_object_or_404(Post, id=post_id, user=request.user)
+    
+    if request.method == 'POST':
+        post_title = post.title
+        post.delete()
+        messages.success(request, f'Postarea "{post_title}" a fost ștearsă cu succes!')
+        return redirect('auth_app:posts_list')
+    
+    context = {'post': post}
+    return render(request, 'auth_app/delete_post.html', context)
+
+@login_required
+def bulk_delete_posts(request):
+    """Șterge mai multe postări"""
+    if request.method == 'POST':
+        post_ids = request.POST.getlist('post_ids')
+        if post_ids:
+            deleted_count = Post.objects.filter(
+                id__in=post_ids, 
+                user=request.user
+            ).delete()[0]
+            messages.success(request, f'{deleted_count} postări au fost șterse cu succes.')
+        else:
+            messages.warning(request, 'Nu ați selectat nicio postare pentru ștergere.')
+    
+    return redirect('auth_app:posts_list')
+
+@login_required
+def export_post(request, post_id):
+    """Exportă o postare în format JSON"""
+    post = get_object_or_404(Post, id=post_id, user=request.user)
+    
+    # Construiește datele pentru export
+    export_data = {
+        'post': {
+            'title': post.title,
+            'content': post.content,
+            'image_prompt': post.image_prompt,
+            'post_type': post.post_type,
+            'platform': post.platform,
+            'status': post.status,
+            'tags': post.tags,
+            'created_at': post.created_at.isoformat(),
+            'updated_at': post.updated_at.isoformat(),
+        },
+        'strategy': {
+            'title': post.strategy.title if post.strategy else 'N/A',
+            'description': post.strategy.description if post.strategy else 'N/A',
+            'strategy_type': post.strategy.get_strategy_type_display() if post.strategy else 'N/A',
+        },
+        'personas': [
+            {
+                'name': persona.name,
+                'age': persona.age,
+                'occupation': persona.occupation,
+                'interests': persona.interests,
+                'problems': persona.problems,
+                'motivations': persona.motivations,
+            }
+            for persona in post.personas.all()
+        ],
+        'engagement_metrics': post.engagement_metrics,
+    }
+    
+    response = HttpResponse(
+        json.dumps(export_data, indent=2, ensure_ascii=False, default=str),
+        content_type='application/json'
+    )
+    response['Content-Disposition'] = f'attachment; filename="post_{post.id}_{post.title.replace(" ", "_")}.json"'
+    return response

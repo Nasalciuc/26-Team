@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Editează {{ strategy.title }} - Market Spark{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-fade-in">
+    <!-- Header -->
+    <div class="mb-8">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="flex items-center space-x-2 text-sm text-gray-400">
+                <li><a href="{% url 'auth_app:dashboard' %}" class="hover:text-yellow-400 transition-colors">Dashboard</a></li>
+                <li><span class="text-gray-600">/</span></li>
+                <li><a href="{% url 'auth_app:strategies_list' %}" class="hover:text-yellow-400 transition-colors">Strategii</a></li>
+                <li><span class="text-gray-600">/</span></li>
+                <li><a href="{% url 'auth_app:strategy_detail' strategy.id %}" class="hover:text-yellow-400 transition-colors">{{ strategy.title|truncatechars:20 }}</a></li>
+                <li><span class="text-gray-600">/</span></li>
+                <li class="font-semibold text-yellow-400" aria-current="page">Editează</li>
+            </ol>
+        </nav>
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-4xl font-bold text-gradient mb-2">Editează Strategia</h1>
+                <p class="text-gray-400">{{ strategy.title }}</p>
+            </div>
+            <a href="{% url 'auth_app:strategy_detail' strategy.id %}" class="robust-button-secondary">
+                <i class="bi bi-arrow-left mr-2"></i>Înapoi la Detalii
+            </a>
+        </div>
+    </div>
+
+    <form method="POST" class="space-y-6">
+        {% csrf_token %}
+        
+        <!-- Informații de bază -->
+        <div class="robust-card p-6">
+            <h2 class="text-xl font-bold text-yellow-400 mb-4 flex items-center">
+                <i class="bi bi-info-circle mr-2"></i>Informații de bază
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="title" class="block text-sm font-medium text-gray-300 mb-2">Titlu strategie</label>
+                    <input type="text" name="title" id="title" value="{{ strategy.title }}" 
+                           class="w-full robust-input input-yellow-focus" required>
+                </div>
+                <div>
+                    <label for="strategy_type" class="block text-sm font-medium text-gray-300 mb-2">Tip strategie</label>
+                    <select name="strategy_type" id="strategy_type" class="w-full robust-input input-yellow-focus">
+                        {% for value, label in strategy_types %}
+                            <option value="{{ value }}" {% if strategy.strategy_type == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="status" class="block text-sm font-medium text-gray-300 mb-2">Status</label>
+                    <select name="status" id="status" class="w-full robust-input input-yellow-focus">
+                        {% for value, label in status_choices %}
+                            <option value="{{ value }}" {% if strategy.status == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="priority" class="block text-sm font-medium text-gray-300 mb-2">Prioritate</label>
+                    <select name="priority" id="priority" class="w-full robust-input input-yellow-focus">
+                        {% for value, label in priority_choices %}
+                            <option value="{{ value }}" {% if strategy.priority == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="mt-6">
+                <label for="description" class="block text-sm font-medium text-gray-300 mb-2">Descriere</label>
+                <textarea name="description" id="description" rows="4" 
+                          class="w-full robust-input input-yellow-focus">{{ strategy.description }}</textarea>
+            </div>
+        </div>
+
+        <!-- Mesaje cheie -->
+        <div class="robust-card p-6">
+            <h2 class="text-xl font-bold text-yellow-400 mb-4 flex items-center">
+                <i class="bi bi-chat-quote mr-2"></i>Mesaje cheie
+            </h2>
+            <div class="space-y-3">
+                <div id="key-messages-container">
+                    {% for message in strategy.key_messages %}
+                        <div class="flex items-center space-x-2">
+                            <input type="text" name="key_messages[]" value="{{ message }}" 
+                                   class="flex-1 robust-input input-yellow-focus">
+                            <button type="button" onclick="removeMessage(this)" class="text-red-400 hover:text-red-300 transition-colors">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    {% endfor %}
+                </div>
+                <button type="button" onclick="addMessage()" class="robust-button-secondary">
+                    <i class="bi bi-plus-circle mr-2"></i>Adaugă mesaj
+                </button>
+            </div>
+        </div>
+
+        <!-- Canale de comunicare -->
+        <div class="robust-card p-6">
+            <h2 class="text-xl font-bold text-yellow-400 mb-4 flex items-center">
+                <i class="bi bi-broadcast-tower mr-2"></i>Canale de comunicare
+            </h2>
+            <div class="space-y-3">
+                <div id="channels-container">
+                    {% for channel in strategy.channels %}
+                        <div class="flex items-center space-x-2">
+                            <input type="text" name="channels[]" value="{{ channel }}" 
+                                   class="flex-1 robust-input input-yellow-focus">
+                            <button type="button" onclick="removeChannel(this)" class="text-red-400 hover:text-red-300 transition-colors">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    {% endfor %}
+                </div>
+                <button type="button" onclick="addChannel()" class="robust-button-secondary">
+                    <i class="bi bi-plus-circle mr-2"></i>Adaugă canal
+                </button>
+            </div>
+        </div>
+
+        <!-- KPI-uri -->
+        <div class="robust-card p-6">
+            <h2 class="text-xl font-bold text-yellow-400 mb-4 flex items-center">
+                <i class="bi bi-graph-up mr-2"></i>KPI-uri (Indicatori de performanță)
+            </h2>
+            <div class="space-y-3">
+                <div id="kpis-container">
+                    {% for kpi in strategy.kpis %}
+                        <div class="flex items-center space-x-2">
+                            <input type="text" name="kpis[]" value="{{ kpi }}" 
+                                   class="flex-1 robust-input input-yellow-focus">
+                            <button type="button" onclick="removeKPI(this)" class="text-red-400 hover:text-red-300 transition-colors">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    {% endfor %}
+                </div>
+                <button type="button" onclick="addKPI()" class="robust-button-secondary">
+                    <i class="bi bi-plus-circle mr-2"></i>Adaugă KPI
+                </button>
+            </div>
+        </div>
+
+        <!-- Butoane acțiune -->
+        <div class="flex justify-end space-x-4">
+            <a href="{% url 'auth_app:strategy_detail' strategy.id %}" class="robust-button-secondary">
+                <i class="bi bi-x-circle mr-2"></i>Anulează
+            </a>
+            <button type="submit" class="robust-button">
+                <i class="bi bi-check-circle mr-2"></i>Salvează modificările
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+function addMessage() {
+    const container = document.getElementById('key-messages-container');
+    const div = document.createElement('div');
+    div.className = 'flex items-center space-x-2';
+    div.innerHTML = `
+        <input type="text" name="key_messages[]" 
+               class="flex-1 robust-input input-yellow-focus">
+        <button type="button" onclick="removeMessage(this)" class="text-red-400 hover:text-red-300 transition-colors">
+            <i class="bi bi-trash"></i>
+        </button>
+    `;
+    container.appendChild(div);
+}
+
+function removeMessage(button) {
+    button.parentElement.remove();
+}
+
+function addChannel() {
+    const container = document.getElementById('channels-container');
+    const div = document.createElement('div');
+    div.className = 'flex items-center space-x-2';
+    div.innerHTML = `
+        <input type="text" name="channels[]" 
+               class="flex-1 robust-input input-yellow-focus">
+        <button type="button" onclick="removeChannel(this)" class="text-red-400 hover:text-red-300 transition-colors">
+            <i class="bi bi-trash"></i>
+        </button>
+    `;
+    container.appendChild(div);
+}
+
+function removeChannel(button) {
+    button.parentElement.remove();
+}
+
+function addKPI() {
+    const container = document.getElementById('kpis-container');
+    const div = document.createElement('div');
+    div.className = 'flex items-center space-x-2';
+    div.innerHTML = `
+        <input type="text" name="kpis[]" 
+               class="flex-1 robust-input input-yellow-focus">
+        <button type="button" onclick="removeKPI(this)" class="text-red-400 hover:text-red-300 transition-colors">
+            <i class="bi bi-trash"></i>
+        </button>
+    `;
+    container.appendChild(div);
+}
+
+function removeKPI(button) {
+    button.parentElement.remove();
+}
+</script>
+{% endblock %}

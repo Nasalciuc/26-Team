@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ post.title }} - Market Spark{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-fade-in">
+    <!-- Header -->
+    <div class="mb-8">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="flex items-center space-x-2 text-sm text-gray-400">
+                <li><a href="{% url 'auth_app:dashboard' %}" class="hover:text-yellow-400 transition-colors">Dashboard</a></li>
+                <li><span class="text-gray-600">/</span></li>
+                <li><a href="{% url 'auth_app:posts_list' %}" class="hover:text-yellow-400 transition-colors">Postări</a></li>
+                <li><span class="text-gray-600">/</span></li>
+                <li class="font-semibold text-yellow-400" aria-current="page">{{ post.title|truncatechars:30 }}</li>
+            </ol>
+        </nav>
+        <div class="flex justify-between items-start">
+            <div class="flex-1">
+                <h1 class="text-4xl font-bold text-gradient mb-2">{{ post.title }}</h1>
+                <p class="text-gray-400 mb-4">{{ post.get_post_type_display }} pentru {{ post.get_platform_display }}</p>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-3 py-1 text-sm rounded-full font-medium
+                        {% if post.status == 'published' %}bg-green-900/50 text-green-300 border border-green-700
+                        {% elif post.status == 'ready' %}bg-blue-900/50 text-blue-300 border border-blue-700
+                        {% elif post.status == 'scheduled' %}bg-purple-900/50 text-purple-300 border border-purple-700
+                        {% elif post.status == 'archived' %}bg-gray-900/50 text-gray-300 border border-gray-700
+                        {% else %}bg-yellow-900/50 text-yellow-300 border border-yellow-700{% endif %}">
+                        {{ post.get_status_display }}
+                    </span>
+                    <span class="px-3 py-1 text-sm rounded-full font-medium bg-indigo-900/50 text-indigo-300 border border-indigo-700">
+                        {{ post.get_platform_display }}
+                    </span>
+                    <span class="px-3 py-1 text-sm rounded-full font-medium bg-blue-900/50 text-blue-300 border border-blue-700">
+                        {{ post.get_post_type_display }}
+                    </span>
+                </div>
+            </div>
+            <div class="flex space-x-2">
+                <a href="{% url 'auth_app:edit_post' post.id %}" class="robust-button-secondary">
+                    <i class="bi bi-pencil-square mr-2"></i>Editează
+                </a>
+                <a href="{% url 'auth_app:export_post' post.id %}" class="robust-button-secondary">
+                    <i class="bi bi-download mr-2"></i>Exportă
+                </a>
+                <a href="{% url 'auth_app:delete_post' post.id %}" class="robust-button-destructive">
+                    <i class="bi bi-trash mr-2"></i>Șterge
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Coloana principală -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Conținutul postării -->
+            <div class="robust-card p-6">
+                <h2 class="text-xl font-bold text-yellow-400 mb-4 flex items-center">
+                    <i class="bi bi-chat-quote mr-2"></i>
+                    Conținutul Postării
+                </h2>
+                <div class="bg-gray-900/50 border border-gray-700 rounded-lg p-4">
+                    <p class="text-gray-300 whitespace-pre-wrap">{{ post.content }}</p>
+                </div>
+            </div>
+
+            <!-- Prompt pentru imagine -->
+            <div class="robust-card p-6">
+                <h2 class="text-xl font-bold text-yellow-400 mb-4 flex items-center">
+                    <i class="bi bi-image mr-2"></i>
+                    Prompt pentru Imagine
+                </h2>
+                <div class="bg-gray-900/50 border border-gray-700 rounded-lg p-4">
+                    <p class="text-gray-300 whitespace-pre-wrap">{{ post.image_prompt }}</p>
+                </div>
+                <div class="mt-4 text-sm text-gray-400">
+                    <p><strong>Tip:</strong> Acest prompt poate fi folosit pentru generarea unei imagini cu AI (DALL-E, Midjourney, etc.)</p>
+                </div>
+            </div>
+
+            <!-- Strategie asociată -->
+            {% if post.strategy %}
+            <div class="robust-card p-6">
+                <h2 class="text-xl font-bold text-yellow-400 mb-4 flex items-center">
+                    <i class="bi bi-graph-up mr-2"></i>
+                    Strategie Asociată
+                </h2>
+                <div class="bg-gray-900/50 border border-gray-700 rounded-lg p-4">
+                    <h3 class="text-lg font-semibold text-white mb-2">{{ post.strategy.title }}</h3>
+                    <p class="text-gray-300 mb-3">{{ post.strategy.description }}</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-2 py-1 text-xs rounded-full font-medium bg-blue-900/50 text-blue-300 border border-blue-700">
+                            {{ post.strategy.get_strategy_type_display }}
+                        </span>
+                        <span class="px-2 py-1 text-xs rounded-full font-medium bg-green-900/50 text-green-300 border border-green-700">
+                            {{ post.strategy.get_status_display }}
+                        </span>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <a href="{% url 'auth_app:strategy_detail' post.strategy.id %}" class="robust-button-secondary">
+                        <i class="bi bi-eye mr-2"></i>Vezi Detalii Strategie
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Persoane asociate -->
+            {% if post.personas.exists %}
+            <div class="robust-card p-6">
+                <h2 class="text-xl font-bold text-yellow-400 mb-4 flex items-center">
+                    <i class="bi bi-people mr-2"></i>
+                    Persoane Țintă
+                </h2>
+                <div class="space-y-3">
+                    {% for persona in post.personas.all %}
+                    <div class="bg-gray-900/50 border border-gray-700 rounded-lg p-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="text-lg font-semibold text-white">{{ persona.name }}</h3>
+                                <p class="text-gray-400 text-sm">{{ persona.age }} ani, {{ persona.location }}</p>
+                                <p class="text-gray-300 text-sm">{{ persona.occupation }}</p>
+                            </div>
+                            <a href="{% url 'auth_app:persona_detail' persona.id %}" class="robust-button-secondary text-sm">
+                                <i class="bi bi-eye mr-1"></i>Vezi
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-6">
+            <!-- Informații generale -->
+            <div class="robust-card p-6">
+                <h3 class="text-lg font-bold text-yellow-400 mb-4 flex items-center">
+                    <i class="bi bi-info-circle mr-2"></i>
+                    Informații Generale
+                </h3>
+                <div class="space-y-3">
+                    <div>
+                        <p class="text-sm text-gray-400">Status</p>
+                        <p class="text-white font-semibold">{{ post.get_status_display }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-400">Platformă</p>
+                        <p class="text-white font-semibold">{{ post.get_platform_display }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-400">Tip postare</p>
+                        <p class="text-white font-semibold">{{ post.get_post_type_display }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-400">Creată la</p>
+                        <p class="text-white font-semibold">{{ post.created_at|date:"d.m.Y H:i" }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-400">Actualizată la</p>
+                        <p class="text-white font-semibold">{{ post.updated_at|date:"d.m.Y H:i" }}</p>
+                    </div>
+                    {% if post.scheduled_date %}
+                    <div>
+                        <p class="text-sm text-gray-400">Programată pentru</p>
+                        <p class="text-white font-semibold">{{ post.scheduled_date|date:"d.m.Y H:i" }}</p>
+                    </div>
+                    {% endif %}
+                    {% if post.published_date %}
+                    <div>
+                        <p class="text-sm text-gray-400">Publicată la</p>
+                        <p class="text-white font-semibold">{{ post.published_date|date:"d.m.Y H:i" }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Tag-uri -->
+            {% if post.tags %}
+            <div class="robust-card p-6">
+                <h3 class="text-lg font-bold text-yellow-400 mb-4 flex items-center">
+                    <i class="bi bi-tags mr-2"></i>
+                    Tag-uri
+                </h3>
+                <div class="flex flex-wrap gap-2">
+                    {% for tag in post.tags %}
+                    <span class="px-3 py-1 text-sm rounded-full font-medium bg-purple-900/50 text-purple-300 border border-purple-700">
+                        #{{ tag }}
+                    </span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Metrici de engagement -->
+            <div class="robust-card p-6">
+                <h3 class="text-lg font-bold text-yellow-400 mb-4 flex items-center">
+                    <i class="bi bi-graph-up mr-2"></i>
+                    Metrici de Engagement
+                </h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-400">Like-uri</span>
+                        <span class="text-white font-semibold">{{ engagement_summary.likes }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-400">Share-uri</span>
+                        <span class="text-white font-semibold">{{ engagement_summary.shares }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-400">Comentarii</span>
+                        <span class="text-white font-semibold">{{ engagement_summary.comments }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-400">Vizualizări</span>
+                        <span class="text-white font-semibold">{{ engagement_summary.views }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

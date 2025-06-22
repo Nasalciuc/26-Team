@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Șterge {{ post.title }} - Market Spark{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-fade-in">
+    <!-- Header -->
+    <div class="mb-8">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="flex items-center space-x-2 text-sm text-gray-400">
+                <li><a href="{% url 'auth_app:dashboard' %}" class="hover:text-yellow-400 transition-colors">Dashboard</a></li>
+                <li><span class="text-gray-600">/</span></li>
+                <li><a href="{% url 'auth_app:posts_list' %}" class="hover:text-yellow-400 transition-colors">Postări</a></li>
+                <li><span class="text-gray-600">/</span></li>
+                <li><a href="{% url 'auth_app:post_detail' post.id %}" class="hover:text-yellow-400 transition-colors">{{ post.title|truncatechars:20 }}</a></li>
+                <li><span class="text-gray-600">/</span></li>
+                <li class="font-semibold text-yellow-400" aria-current="page">Șterge</li>
+            </ol>
+        </nav>
+    </div>
+
+    <div class="robust-card p-8">
+        <div class="text-center mb-6">
+            <div class="text-red-400 mb-4">
+                <i class="bi bi-exclamation-triangle text-6xl"></i>
+            </div>
+            <h1 class="text-3xl font-bold text-white mb-2">Confirmă ștergerea</h1>
+            <p class="text-gray-400">Această acțiune nu poate fi anulată.</p>
+        </div>
+
+        <div class="bg-red-900/20 border border-red-700/50 rounded-lg p-4 mb-6">
+            <h2 class="text-lg font-bold text-red-400 mb-2">Postarea care va fi ștearsă:</h2>
+            <div class="space-y-2">
+                <p><strong class="text-white">Titlu:</strong> <span class="text-gray-300">{{ post.title }}</span></p>
+                <p><strong class="text-white">Tip:</strong> <span class="text-gray-300">{{ post.get_post_type_display }}</span></p>
+                <p><strong class="text-white">Platformă:</strong> <span class="text-gray-300">{{ post.get_platform_display }}</span></p>
+                <p><strong class="text-white">Status:</strong> <span class="text-gray-300">{{ post.get_status_display }}</span></p>
+                {% if post.strategy %}
+                    <p><strong class="text-white">Strategie asociată:</strong> <span class="text-gray-300">{{ post.strategy.title }}</span></p>
+                {% endif %}
+                <p><strong class="text-white">Persoane asociate:</strong> <span class="text-gray-300">{{ post.personas.count }}</span></p>
+                <p><strong class="text-white">Creată la:</strong> <span class="text-gray-300">{{ post.created_at|date:"d.m.Y H:i" }}</span></p>
+            </div>
+        </div>
+
+        <form method="POST" class="space-y-4">
+            {% csrf_token %}
+            <div class="flex justify-between items-center">
+                <a href="{% url 'auth_app:post_detail' post.id %}" class="robust-button-secondary">
+                    <i class="bi bi-arrow-left mr-2"></i>Anulează
+                </a>
+                <button type="submit" class="robust-button-destructive">
+                    <i class="bi bi-trash mr-2"></i>Șterge Postarea
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

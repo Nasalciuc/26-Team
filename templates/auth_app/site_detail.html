@@ -62,6 +62,15 @@
                             <span>Generează Personas AI</span>
                         </button>
                     </form>
+                    {% if personas %}
+                    <form action="{% url 'auth_app:generate_strategy' site.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="w-full robust-button flex items-center justify-center gap-2" title="Generează o strategie de marketing bazată pe datele site-ului și persoanele generate.">
+                            <i class="bi bi-graph-up"></i>
+                            <span>Generează Strategie</span>
+                        </button>
+                    </form>
+                    {% endif %}
                     <a href="{% url 'auth_app:export_site_data' site.id %}" class="w-full robust-button flex items-center justify-center gap-2">
                         <i class="bi bi-download"></i>
                         <span>Exportă Date</span>
@@ -143,6 +152,37 @@
                             <p class="text-gray-500">Nu au fost găsite linkuri.</p>
                         {% endfor %}
                     </div>
+                </div>
+
+                <!-- Personas AI generate pentru acest site -->
+                <div class="robust-card p-6">
+                    <h3 class="text-xl font-bold text-yellow-400 mb-4">Personas AI generate</h3>
+                    {% if personas %}
+                        <ul class="divide-y divide-gray-800">
+                            {% for persona in personas %}
+                                <li class="py-3 flex items-center justify-between">
+                                    <div>
+                                        <a href="{% url 'auth_app:persona_detail' persona.id %}" class="font-semibold text-yellow-300 hover:underline">{{ persona.name }}</a>
+                                        <span class="text-gray-400 text-xs ml-2">{{ persona.age }} ani, {{ persona.location }}</span>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <a href="{% url 'auth_app:edit_persona' persona.id %}" class="text-blue-400 hover:text-blue-600" title="Editează"><i class="bi bi-pencil-square"></i></a>
+                                        <form action="{% url 'auth_app:delete_persona' persona.id %}" method="post" style="display:inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="text-red-400 hover:text-red-600" title="Șterge" onclick="return confirm('Ești sigur că vrei să ștergi acest profil?');"><i class="bi bi-trash"></i></button>
+                                        </form>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-gray-500">Nu există încă profiluri AI generate pentru acest site.</p>
+                    {% endif %}
+                    {% if personas %}
+                    <div class="mt-4 text-center">
+                        <a href="{% url 'auth_app:personas_list' %}?site_id={{ site.id }}" class="robust-button-secondary text-sm">Vezi Toate Profilurile pentru acest site</a>
+                    </div>
+                    {% endif %}
                 </div>
             {% else %}
                 <div class="robust-card p-12 text-center">

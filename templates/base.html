@@ -140,6 +140,20 @@
             box-shadow: 0 0 20px rgba(250, 204, 21, 0.5);
         }
         
+        .input-yellow-focus:focus {
+            border-color: #fbbf24 !important;
+            color: #000000 !important; /* Black text on focus */
+            background-color: #fbbf24 !important; /* Yellow background on focus */
+        }
+        
+        .input-yellow-focus::placeholder {
+            color: #4b5563; /* Gray placeholder text */
+        }
+        
+        .input-yellow-focus:focus::placeholder {
+            color: #000000; /* Black placeholder text on focus */
+        }
+        
         /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 12px;
@@ -266,6 +280,16 @@
                             <i class="bi bi-robot text-xl"></i>
                             <span class="font-bold text-sm uppercase tracking-wide">AI Personas</span>
                         </a>
+                        <a href="{% url 'auth_app:strategies_list' %}" 
+                           class="flex items-center space-x-3 px-6 py-4 rounded-lg transition-all duration-300 border-2 font-bold text-yellow-400 border-gray-800 hover:bg-gray-900 hover:border-yellow-400/50 hover:shadow-lg hover:shadow-yellow-400/20">
+                            <i class="bi bi-graph-up text-xl"></i>
+                            <span class="font-bold text-sm uppercase tracking-wide">Strategii</span>
+                        </a>
+                        <a href="{% url 'auth_app:posts_list' %}" 
+                           class="flex items-center space-x-3 px-6 py-4 rounded-lg transition-all duration-300 border-2 font-bold text-yellow-400 border-gray-800 hover:bg-gray-900 hover:border-yellow-400/50 hover:shadow-lg hover:shadow-yellow-400/20">
+                            <i class="bi bi-megaphone text-xl"></i>
+                            <span class="font-bold text-sm uppercase tracking-wide">Postări</span>
+                        </a>
                         <a href="{% url 'auth_app:logout' %}" 
                            class="flex items-center space-x-3 px-6 py-4 rounded-lg transition-all duration-300 border-2 font-bold text-red-400 border-red-800 hover:bg-red-900 hover:border-red-400/50 hover:shadow-lg hover:shadow-red-400/20">
                             <i class="bi bi-box-arrow-right text-xl"></i>
@@ -305,6 +329,16 @@
                            class="flex items-center space-x-4 px-6 py-4 rounded-lg transition-all duration-300 border-2 font-bold text-yellow-400 border-gray-700 hover:bg-gray-800 hover:border-yellow-400/50">
                             <i class="bi bi-robot text-xl"></i>
                             <span class="font-bold uppercase tracking-wide">AI Personas</span>
+                        </a>
+                        <a href="{% url 'auth_app:strategies_list' %}" 
+                           class="flex items-center space-x-4 px-6 py-4 rounded-lg transition-all duration-300 border-2 font-bold text-yellow-400 border-gray-700 hover:bg-gray-800 hover:border-yellow-400/50">
+                            <i class="bi bi-graph-up text-xl"></i>
+                            <span class="font-bold uppercase tracking-wide">Strategii</span>
+                        </a>
+                        <a href="{% url 'auth_app:posts_list' %}" 
+                           class="flex items-center space-x-4 px-6 py-4 rounded-lg transition-all duration-300 border-2 font-bold text-yellow-400 border-gray-700 hover:bg-gray-800 hover:border-yellow-400/50">
+                            <i class="bi bi-megaphone text-xl"></i>
+                            <span class="font-bold uppercase tracking-wide">Postări</span>
                         </a>
                         <a href="{% url 'auth_app:logout' %}" 
                            class="flex items-center space-x-4 px-6 py-4 rounded-lg transition-all duration-300 border-2 font-bold text-red-400 border-red-700 hover:bg-red-800 hover:border-red-400/50">

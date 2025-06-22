@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Editează {{ post.title }} - Market Spark{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-fade-in">
+    <!-- Header -->
+    <div class="mb-8">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="flex items-center space-x-2 text-sm text-gray-400">
+                <li><a href="{% url 'auth_app:dashboard' %}" class="hover:text-yellow-400 transition-colors">Dashboard</a></li>
+                <li><span class="text-gray-600">/</span></li>
+                <li><a href="{% url 'auth_app:posts_list' %}" class="hover:text-yellow-400 transition-colors">Postări</a></li>
+                <li><span class="text-gray-600">/</span></li>
+                <li><a href="{% url 'auth_app:post_detail' post.id %}" class="hover:text-yellow-400 transition-colors">{{ post.title|truncatechars:20 }}</a></li>
+                <li><span class="text-gray-600">/</span></li>
+                <li class="font-semibold text-yellow-400" aria-current="page">Editează</li>
+            </ol>
+        </nav>
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-4xl font-bold text-gradient mb-2">Editează Postarea</h1>
+                <p class="text-gray-400">{{ post.title }}</p>
+            </div>
+            <a href="{% url 'auth_app:post_detail' post.id %}" class="robust-button-secondary">
+                <i class="bi bi-arrow-left mr-2"></i>Înapoi la Detalii
+            </a>
+        </div>
+    </div>
+
+    <form method="POST" class="space-y-6">
+        {% csrf_token %}
+        
+        <!-- Informații de bază -->
+        <div class="robust-card p-6">
+            <h2 class="text-xl font-bold text-yellow-400 mb-4 flex items-center">
+                <i class="bi bi-info-circle mr-2"></i>Informații de bază
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="title" class="block text-sm font-medium text-gray-300 mb-2">Titlu postare</label>
+                    <input type="text" name="title" id="title" value="{{ post.title }}" 
+                           class="w-full robust-input input-yellow-focus" required>
+                </div>
+                <div>
+                    <label for="post_type" class="block text-sm font-medium text-gray-300 mb-2">Tip postare</label>
+                    <select name="post_type" id="post_type" class="w-full robust-input input-yellow-focus">
+                        {% for value, label in post_types %}
+                            <option value="{{ value }}" {% if post.post_type == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="platform" class="block text-sm font-medium text-gray-300 mb-2">Platformă</label>
+                    <select name="platform" id="platform" class="w-full robust-input input-yellow-focus">
+                        {% for value, label in platform_choices %}
+                            <option value="{{ value }}" {% if post.platform == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="status" class="block text-sm font-medium text-gray-300 mb-2">Status</label>
+                    <select name="status" id="status" class="w-full robust-input input-yellow-focus">
+                        {% for value, label in status_choices %}
+                            <option value="{{ value }}" {% if post.status == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conținutul postării -->
+        <div class="robust-card p-6">
+            <h2 class="text-xl font-bold text-yellow-400 mb-4 flex items-center">
+                <i class="bi bi-chat-quote mr-2"></i>Conținutul Postării
+            </h2>
+            <div>
+                <label for="content" class="block text-sm font-medium text-gray-300 mb-2">Conținut</label>
+                <textarea name="content" id="content" rows="8" 
+                          class="w-full robust-input input-yellow-focus" placeholder="Scrie conținutul postării aici...">{{ post.content }}</textarea>
+                <p class="text-sm text-gray-400 mt-2">Include hashtag-uri și call-to-action pentru mai multă engagement.</p>
+            </div>
+        </div>
+
+        <!-- Prompt pentru imagine -->
+        <div class="robust-card p-6">
+            <h2 class="text-xl font-bold text-yellow-400 mb-4 flex items-center">
+                <i class="bi bi-image mr-2"></i>Prompt pentru Imagine
+            </h2>
+            <div>
+                <label for="image_prompt" class="block text-sm font-medium text-gray-300 mb-2">Descriere pentru generarea imaginii</label>
+                <textarea name="image_prompt" id="image_prompt" rows="6" 
+                          class="w-full robust-input input-yellow-focus" placeholder="Descrie imaginea pe care vrei să o generezi...">{{ post.image_prompt }}</textarea>
+                <p class="text-sm text-gray-400 mt-2">Acest prompt poate fi folosit cu DALL-E, Midjourney sau alte tool-uri de generare imagini AI.</p>
+            </div>
+        </div>
+
+        <!-- Tag-uri -->
+        <div class="robust-card p-6">
+            <h2 class="text-xl font-bold text-yellow-400 mb-4 flex items-center">
+                <i class="bi bi-tags mr-2"></i>Tag-uri
+            </h2>
+            <div>
+                <label for="tags" class="block text-sm font-medium text-gray-300 mb-2">Tag-uri (separate prin virgulă)</label>
+                <input type="text" name="tags" id="tags" value="{{ post.get_tags_display }}" 
+                       class="w-full robust-input input-yellow-focus" placeholder="marketing, business, success">
+                <p class="text-sm text-gray-400 mt-2">Tag-urile ajută la organizarea și căutarea postărilor.</p>
+            </div>
+        </div>
+
+        <!-- Butoane de acțiune -->
+        <div class="flex justify-between items-center">
+            <a href="{% url 'auth_app:post_detail' post.id %}" class="robust-button-secondary">
+                <i class="bi bi-x-circle mr-2"></i>Anulează
+            </a>
+            <button type="submit" class="robust-button">
+                <i class="bi bi-check-circle mr-2"></i>Salvează Modificările
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %} 

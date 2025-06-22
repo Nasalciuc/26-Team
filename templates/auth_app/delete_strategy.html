@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Șterge {{ strategy.title }} - Market Spark{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-fade-in">
+    <!-- Header -->
+    <div class="mb-8">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="flex items-center space-x-2 text-sm text-gray-400">
+                <li><a href="{% url 'auth_app:dashboard' %}" class="hover:text-yellow-400 transition-colors">Dashboard</a></li>
+                <li><span class="text-gray-600">/</span></li>
+                <li><a href="{% url 'auth_app:strategies_list' %}" class="hover:text-yellow-400 transition-colors">Strategii</a></li>
+                <li><span class="text-gray-600">/</span></li>
+                <li><a href="{% url 'auth_app:strategy_detail' strategy.id %}" class="hover:text-yellow-400 transition-colors">{{ strategy.title|truncatechars:20 }}</a></li>
+                <li><span class="text-gray-600">/</span></li>
+                <li class="font-semibold text-yellow-400" aria-current="page">Șterge</li>
+            </ol>
+        </nav>
+        <div class="flex items-center">
+            <a href="{% url 'auth_app:strategy_detail' strategy.id %}" class="text-yellow-400 hover:text-yellow-300 mr-4">
+                <i class="bi bi-arrow-left mr-2"></i>Înapoi la Detalii
+            </a>
+        </div>
+    </div>
+
+    <div class="robust-card p-8">
+        <div class="text-center mb-6">
+            <div class="text-red-400 mb-4">
+                <i class="bi bi-exclamation-triangle text-6xl"></i>
+            </div>
+            <h1 class="text-3xl font-bold text-white mb-2">Confirmă ștergerea</h1>
+            <p class="text-gray-400">Această acțiune nu poate fi anulată.</p>
+        </div>
+
+        <div class="bg-red-900/20 border border-red-700/50 rounded-lg p-4 mb-6">
+            <h2 class="text-lg font-bold text-red-400 mb-2">Strategia care va fi ștearsă:</h2>
+            <div class="space-y-2">
+                <p><strong class="text-white">Titlu:</strong> <span class="text-gray-300">{{ strategy.title }}</span></p>
+                <p><strong class="text-white">Tip:</strong> <span class="text-gray-300">{{ strategy.get_strategy_type_display }}</span></p>
+                <p><strong class="text-white">Site:</strong> <span class="text-gray-300">{{ strategy.scraped_site.domain }}</span></p>
+                <p><strong class="text-white">Persoane asociate:</strong> <span class="text-gray-300">{{ strategy.personas.count }}</span></p>
+                <p><strong class="text-white">Creată la:</strong> <span class="text-gray-300">{{ strategy.created_at|date:"d.m.Y H:i" }}</span></p>
+            </div>
+        </div>
+
+        <div class="bg-yellow-900/20 border border-yellow-700/50 rounded-lg p-4 mb-6">
+            <h3 class="text-md font-bold text-yellow-400 mb-2 flex items-center">
+                <i class="bi bi-info-circle mr-2"></i>Informații importante:
+            </h3>
+            <ul class="text-yellow-300 space-y-1">
+                <li class="flex items-start">
+                    <i class="bi bi-dot mr-2 mt-1"></i>
+                    <span>Toate datele strategiei vor fi șterse definitiv</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="bi bi-dot mr-2 mt-1"></i>
+                    <span>Asocierea cu persoanele va fi eliminată</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="bi bi-dot mr-2 mt-1"></i>
+                    <span>Site-ul și persoanele vor rămâne intacte</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="bi bi-dot mr-2 mt-1"></i>
+                    <span>Această acțiune nu poate fi anulată</span>
+                </li>
+            </ul>
+        </div>
+
+        <form method="POST" class="space-y-4">
+            {% csrf_token %}
+            <div class="flex justify-center space-x-4">
+                <a href="{% url 'auth_app:strategy_detail' strategy.id %}" class="robust-button-secondary">
+                    <i class="bi bi-x-circle mr-2"></i>Anulează
+                </a>
+                <button type="submit" class="robust-button-destructive">
+                    <i class="bi bi-trash mr-2"></i>Șterge definitiv
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

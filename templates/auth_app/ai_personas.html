@@ -39,7 +39,7 @@
                         </div>
                     </div>
                     <div class="px-5 py-4 bg-gray-50 dark:bg-gray-800/50">
-                        <form action="{% url 'auth_app:generate_personas' site.id %}" method="post">
+                        <form action="{% url 'auth_app:generate_personas_from_site' site.id %}" method="post">
                             {% csrf_token %}
                             <button type="submit" class="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-transform transform hover:scale-105">
                                 Generează Personas pentru acest site

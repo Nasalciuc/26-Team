@@ -86,6 +86,7 @@ class ScrapedData(models.Model):
 
 class AIPersona(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    scraped_site = models.ForeignKey(ScrapedSite, on_delete=models.CASCADE, related_name='personas', null=True, blank=True)
     name = models.CharField(max_length=255)
     age = models.IntegerField()
     location = models.CharField(max_length=255)
@@ -140,3 +141,177 @@ class AIPersona(models.Model):
         if isinstance(self.objections, list):
             return ', '.join(self.objections)
         return str(self.objections)
+
+class Strategy(models.Model):
+    """Model pentru a stoca strategii de marketing bazate pe datele site-ului și persoanele generate"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='strategies')
+    scraped_site = models.ForeignKey(ScrapedSite, on_delete=models.CASCADE, related_name='strategies')
+    personas = models.ManyToManyField(AIPersona, related_name='strategies', blank=True)
+    
+    # Informații de bază
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    strategy_type = models.CharField(max_length=100, choices=[
+        ('marketing', 'Strategie de Marketing'),
+        ('content', 'Strategie de Conținut'),
+        ('social_media', 'Strategie Social Media'),
+        ('seo', 'Strategie SEO'),
+        ('conversion', 'Strategie de Conversie'),
+        ('branding', 'Strategie de Branding'),
+        ('customer_retention', 'Strategie de Retenție Clienți'),
+        ('growth', 'Strategie de Creștere'),
+    ])
+    
+    # Analiza site-ului
+    site_analysis = models.JSONField(default=dict, blank=True)
+    
+    # Analiza persoanelor
+    persona_insights = models.JSONField(default=dict, blank=True)
+    
+    # Strategii detaliate
+    target_audience = models.JSONField(default=dict, blank=True)
+    key_messages = models.JSONField(default=list, blank=True)
+    channels = models.JSONField(default=list, blank=True)
+    tactics = models.JSONField(default=list, blank=True)
+    timeline = models.JSONField(default=dict, blank=True)
+    budget_estimate = models.JSONField(default=dict, blank=True)
+    kpis = models.JSONField(default=list, blank=True)
+    
+    # Implementare
+    implementation_steps = models.JSONField(default=list, blank=True)
+    resources_needed = models.JSONField(default=list, blank=True)
+    risks = models.JSONField(default=list, blank=True)
+    
+    # Status și prioritate
+    status = models.CharField(max_length=20, choices=[
+        ('draft', 'Ciornă'),
+        ('active', 'Activă'),
+        ('implemented', 'Implementată'),
+        ('paused', 'Pusă pe pauză'),
+        ('completed', 'Finalizată'),
+    ], default='draft')
+    
+    priority = models.CharField(max_length=20, choices=[
+        ('low', 'Scăzută'),
+        ('medium', 'Medie'),
+        ('high', 'Ridicată'),
+        ('critical', 'Critică'),
+    ], default='medium')
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    implemented_at = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name_plural = 'Strategies'
+    
+    def __str__(self):
+        return f"{self.title} - {self.scraped_site.domain}"
+    
+    def get_strategy_summary(self):
+        """Returnează un sumar al strategiei"""
+        return {
+            'total_personas': self.personas.count(),
+            'strategy_type': self.get_strategy_type_display(),
+            'status': self.get_status_display(),
+            'priority': self.get_priority_display(),
+            'days_since_creation': (timezone.now() - self.created_at).days,
+        }
+    
+    def get_target_audience_display(self):
+        """Returnează audiența țintă ca string"""
+        if isinstance(self.target_audience, dict):
+            return ', '.join([f"{k}: {v}" for k, v in self.target_audience.items()])
+        return str(self.target_audience)
+    
+    def get_key_messages_display(self):
+        """Returnează mesajele cheie ca string"""
+        if isinstance(self.key_messages, list):
+            return ', '.join(self.key_messages)
+        return str(self.key_messages)
+    
+    def get_channels_display(self):
+        """Returnează canalele ca string"""
+        if isinstance(self.channels, list):
+            return ', '.join(self.channels)
+        return str(self.channels)
+
+class Post(models.Model):
+    """Model pentru a stoca postări generate bazate pe strategii și persoane"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
+    strategy = models.ForeignKey(Strategy, on_delete=models.CASCADE, related_name='posts', null=True, blank=True)
+    personas = models.ManyToManyField(AIPersona, related_name='posts', blank=True)
+    
+    # Informații de bază
+    title = models.CharField(max_length=255)
+    content = models.TextField(help_text="Conținutul postării")
+    image_prompt = models.TextField(help_text="Prompt pentru generarea imaginii")
+    
+    # Tipul postării
+    post_type = models.CharField(max_length=50, choices=[
+        ('social_media', 'Social Media'),
+        ('blog', 'Blog Post'),
+        ('email', 'Email Marketing'),
+        ('advertisement', 'Advertisement'),
+        ('content_marketing', 'Content Marketing'),
+    ], default='social_media')
+    
+    # Platforma țintă
+    platform = models.CharField(max_length=50, choices=[
+        ('facebook', 'Facebook'),
+        ('instagram', 'Instagram'),
+        ('linkedin', 'LinkedIn'),
+        ('twitter', 'Twitter'),
+        ('tiktok', 'TikTok'),
+        ('youtube', 'YouTube'),
+        ('blog', 'Blog'),
+        ('email', 'Email'),
+        ('general', 'General'),
+    ], default='general')
+    
+    # Status și programare
+    status = models.CharField(max_length=20, choices=[
+        ('draft', 'Ciornă'),
+        ('ready', 'Gata de publicare'),
+        ('scheduled', 'Programată'),
+        ('published', 'Publicată'),
+        ('archived', 'Arhivată'),
+    ], default='draft')
+    
+    # Programare
+    scheduled_date = models.DateTimeField(null=True, blank=True)
+    published_date = models.DateTimeField(null=True, blank=True)
+    
+    # Metadate
+    tags = models.JSONField(default=list, blank=True)
+    engagement_metrics = models.JSONField(default=dict, blank=True)
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name_plural = 'Posts'
+    
+    def __str__(self):
+        return f"{self.title} - {self.get_platform_display()}"
+    
+    def get_tags_display(self):
+        """Returnează tag-urile ca string"""
+        if isinstance(self.tags, list):
+            return ', '.join(self.tags)
+        return str(self.tags)
+    
+    def get_engagement_summary(self):
+        """Returnează un sumar al metricilor de engagement"""
+        if isinstance(self.engagement_metrics, dict):
+            return {
+                'likes': self.engagement_metrics.get('likes', 0),
+                'shares': self.engagement_metrics.get('shares', 0),
+                'comments': self.engagement_metrics.get('comments', 0),
+                'views': self.engagement_metrics.get('views', 0),
+            }
+        return {'likes': 0, 'shares': 0, 'comments': 0, 'views': 0}
