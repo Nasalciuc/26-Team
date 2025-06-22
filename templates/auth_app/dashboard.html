@@ -3,121 +3,257 @@
 {% block title %}Dashboard - {{ block.super }}{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <div class="text-center mb-12">
-        <h1 class="text-4xl md:text-5xl font-bold text-gray-800 dark:text-white">Dashboard Principal</h1>
-        <p class="text-lg text-gray-600 dark:text-gray-300 mt-2">Bine ai venit, {{ request.user.username }}! Gestionează-ți analizele și profilurile de aici.</p>
+<div class="min-h-screen bg-gray-50">
+    <!-- Hero Section -->
+    <div class="bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-6 py-16">
+            <div class="text-center">
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                    Welcome back, <span class="gradient-text">{{ request.user.username }}</span>
+                </h1>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Your AI-powered marketing platform is ready to help you grow your business. 
+                    Let's create something amazing together.
+                </p>
+            </div>
+        </div>
     </div>
 
-    <!-- Quick Actions Menu -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto mb-12">
-        <!-- Go to Site Analysis -->
-        <a href="{% url 'auth_app:scraping' %}" class="bg-gray-50 dark:bg-gray-800 p-8 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col items-center text-center">
-            <svg class="w-16 h-16 mb-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9V3m0 18a9 9 0 009-9m-9 9a9 9 0 00-9-9"></path></svg>
-            <h2 class="text-2xl font-semibold text-gray-900 dark:text-white">Analiză Site Nou</h2>
-            <p class="text-gray-600 dark:text-gray-400 mt-2">Introdu un URL pentru a începe o nouă analiză de piață.</p>
-        </a>
-        <!-- Go to AI Personas -->
-        <a href="{% url 'auth_app:ai_personas' %}" class="bg-gray-50 dark:bg-gray-800 p-8 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col items-center text-center">
-            <svg class="w-16 h-16 mb-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-            <h2 class="text-2xl font-semibold text-gray-900 dark:text-white">Generează AI Personas</h2>
-            <p class="text-gray-600 dark:text-gray-400 mt-2">Creează profiluri de clienți folosind datele de la un site analizat.</p>
-        </a>
-        <!-- Go to Strategies -->
-        <a href="{% url 'auth_app:strategies_list' %}" class="bg-gray-50 dark:bg-gray-800 p-8 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col items-center text-center">
-            <svg class="w-16 h-16 mb-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-            <h2 class="text-2xl font-semibold text-gray-900 dark:text-white">Strategii de Marketing</h2>
-            <p class="text-gray-600 dark:text-gray-400 mt-2">Gestionează strategiile bazate pe analiza site-urilor și persoanelor.</p>
-        </a>
-        <!-- Go to Posts -->
-        <a href="{% url 'auth_app:posts_list' %}" class="bg-gray-50 dark:bg-gray-800 p-8 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col items-center text-center">
-            <svg class="w-16 h-16 mb-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path></svg>
-            <h2 class="text-2xl font-semibold text-gray-900 dark:text-white">Postări Generate</h2>
-            <p class="text-gray-600 dark:text-gray-400 mt-2">Gestionează postările generate cu AI bazate pe strategiile tale.</p>
-        </a>
-    </div>
+    <!-- Main Dashboard Content -->
+    <div class="max-w-7xl mx-auto px-6 py-12">
+        <!-- Quick Actions Grid -->
+        <div class="mb-16">
+            <h2 class="text-2xl font-bold text-gray-900 mb-8 text-center">Get Started</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Site Info -->
+                <a href="{% url 'auth_app:scraping' %}" class="group">
+                    <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 hover-lift transition-all duration-300">
+                        <div class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-200 transition-colors">
+                            <i class="bi bi-globe text-2xl text-blue-600"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">Site Info</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed">
+                            Analyze your website to understand your content and structure for better marketing strategies.
+                        </p>
+                    </div>
+                </a>
 
-    <!-- Quick Stats & Recent Activity -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-        <!-- Stats -->
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-            <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Statistici Rapide</h3>
-            <div class="space-y-4">
-                <div class="flex justify-between items-center">
-                    <span class="text-gray-600 dark:text-gray-300">Total Site-uri Analizate:</span>
-                    <span class="font-bold text-2xl text-blue-500">{{ total_sites }}</span>
+                <!-- AI Personas -->
+                <a href="{% url 'auth_app:ai_personas' %}" class="group">
+                    <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 hover-lift transition-all duration-300">
+                        <div class="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-purple-200 transition-colors">
+                            <i class="bi bi-robot text-2xl text-purple-600"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">AI Personas</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed">
+                            Generate detailed customer personas using AI to better understand your target audience.
+                        </p>
+                    </div>
+                </a>
+
+                <!-- Strategies -->
+                <a href="{% url 'auth_app:strategies_list' %}" class="group">
+                    <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 hover-lift transition-all duration-300">
+                        <div class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-green-200 transition-colors">
+                            <i class="bi bi-graph-up text-2xl text-green-600"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">Strategies</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed">
+                            Create and manage marketing strategies based on your website analysis and personas.
+                        </p>
+                    </div>
+                </a>
+
+                <!-- Posts -->
+                <a href="{% url 'auth_app:posts_list' %}" class="group">
+                    <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 hover-lift transition-all duration-300">
+                        <div class="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-orange-200 transition-colors">
+                            <i class="bi bi-megaphone text-2xl text-orange-600"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">Posts</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed">
+                            Manage AI-generated content and posts created from your marketing strategies.
+                        </p>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="mb-16">
+            <h2 class="text-2xl font-bold text-gray-900 mb-8 text-center">Your Progress</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Sites Analyzed</p>
+                            <p class="text-3xl font-bold text-blue-600">{{ total_sites }}</p>
+                        </div>
+                        <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                            <i class="bi bi-globe text-xl text-blue-600"></i>
+                        </div>
+                    </div>
                 </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-gray-600 dark:text-gray-300">Total Profiluri AI Generate:</span>
-                    <span class="font-bold text-2xl text-purple-500">{{ total_personas }}</span>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">AI Personas</p>
+                            <p class="text-3xl font-bold text-purple-600">{{ total_personas }}</p>
+                        </div>
+                        <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                            <i class="bi bi-robot text-xl text-purple-600"></i>
+                        </div>
+                    </div>
                 </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-gray-600 dark:text-gray-300">Total Strategii Create:</span>
-                    <span class="font-bold text-2xl text-green-500">{{ total_strategies|default:0 }}</span>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Strategies</p>
+                            <p class="text-3xl font-bold text-green-600">{{ total_strategies|default:0 }}</p>
+                        </div>
+                        <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                            <i class="bi bi-graph-up text-xl text-green-600"></i>
+                        </div>
+                    </div>
                 </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-gray-600 dark:text-gray-300">Total Postări Generate:</span>
-                    <span class="font-bold text-2xl text-orange-500">{{ total_posts|default:0 }}</span>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Posts Created</p>
+                            <p class="text-3xl font-bold text-orange-600">{{ total_posts|default:0 }}</p>
+                        </div>
+                        <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
+                            <i class="bi bi-megaphone text-xl text-orange-600"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Recent Sites -->
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Site-uri Analizate Recent</h3>
-                <a href="{% url 'auth_app:site_list' %}" class="text-blue-500 hover:underline">Vezi Toate</a>
+        <!-- Your Sites Section -->
+        <div class="mb-16">
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="text-2xl font-bold text-gray-900">Your Websites</h2>
+                <a href="{% url 'auth_app:scraping' %}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    <i class="bi bi-plus-lg mr-2"></i>
+                    Add New Site
+                </a>
             </div>
+
             {% if recent_sites %}
-                <ul class="space-y-3">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {% for site in recent_sites %}
-                    <li class="p-3 rounded-md transition-colors duration-200 {% if site.status == 'completed' %}bg-green-50 dark:bg-green-900/50{% elif site.status == 'failed' %}bg-red-50 dark:bg-red-900/50{% else %}bg-gray-100 dark:bg-gray-700{% endif %}">
-                        <a href="{% url 'auth_app:site_detail' site.id %}" class="flex justify-between items-center">
-                            <div>
-                                <p class="font-semibold text-gray-800 dark:text-gray-100">{{ site.domain }}</p>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">{{ site.scraped_at|date:"d M Y, H:i" }}</p>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 hover-lift transition-all duration-300">
+                        <a href="{% url 'auth_app:site_detail' site.id %}">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="flex-1">
+                                    <h3 class="font-semibold text-gray-900 mb-1 truncate">{{ site.domain }}</h3>
+                                    <p class="text-sm text-gray-500">{{ site.scraped_at|date:"M d, Y" }}</p>
+                                </div>
+                                <div class="ml-4">
+                                    {% if site.status == 'completed' %}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            <i class="bi bi-check-circle mr-1"></i>
+                                            Complete
+                                        </span>
+                                    {% elif site.status == 'failed' %}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                            <i class="bi bi-x-circle mr-1"></i>
+                                            Failed
+                                        </span>
+                                    {% else %}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                            <i class="bi bi-clock mr-1"></i>
+                                            Processing
+                                        </span>
+                                    {% endif %}
+                                </div>
                             </div>
-                            {% if site.status == 'completed' %}
-                                <span class="text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">Completat</span>
-                            {% elif site.status == 'failed' %}
-                                <span class="text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">Eșuat</span>
-                            {% else %}
-                                <span class="text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">În Proces</span>
-                            {% endif %}
+                            <div class="flex items-center text-sm text-gray-600">
+                                <i class="bi bi-arrow-right mr-2"></i>
+                                <span>View details</span>
+                            </div>
                         </a>
-                    </li>
+                    </div>
                     {% endfor %}
-                </ul>
+                </div>
+                
+                {% if recent_sites|length >= 3 %}
+                <div class="text-center mt-8">
+                    <a href="{% url 'auth_app:site_list' %}" class="inline-flex items-center px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                        <span>View all sites</span>
+                        <i class="bi bi-arrow-right ml-2"></i>
+                    </a>
+                </div>
+                {% endif %}
             {% else %}
-                <p class="text-gray-500 dark:text-gray-400">Nu ai analizat încă niciun site.</p>
+                <div class="bg-white p-12 rounded-2xl shadow-sm border border-gray-200 text-center">
+                    <div class="w-20 h-20 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <i class="bi bi-globe text-3xl text-gray-400"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">No websites yet</h3>
+                    <p class="text-gray-600 mb-6 max-w-md mx-auto">
+                        Start by adding your first website to analyze its content and generate marketing strategies.
+                    </p>
+                    <a href="{% url 'auth_app:scraping' %}" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        <i class="bi bi-plus-lg mr-2"></i>
+                        Add Your First Site
+                    </a>
+                </div>
             {% endif %}
         </div>
-    </div>
 
-    <!-- Recent Posts -->
-    {% if recent_posts %}
-    <div class="max-w-6xl mx-auto mt-8">
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Postări Recente</h3>
-                <a href="{% url 'auth_app:posts_list' %}" class="text-orange-500 hover:underline">Vezi Toate</a>
+        <!-- Recent Posts Section -->
+        {% if recent_posts %}
+        <div class="mb-16">
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="text-2xl font-bold text-gray-900">Recent Posts</h2>
+                <a href="{% url 'auth_app:posts_list' %}" class="text-blue-600 hover:text-blue-700 font-medium">
+                    View all posts
+                </a>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {% for post in recent_posts %}
-                <div class="p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 hover-lift transition-all duration-300">
                     <a href="{% url 'auth_app:post_detail' post.id %}">
-                        <h4 class="font-semibold text-gray-800 dark:text-white mb-2">{{ post.title|truncatechars:40 }}</h4>
-                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ post.content|truncatechars:80 }}</p>
-                        <div class="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
-                            <span>{{ post.get_platform_display }}</span>
-                            <span>{{ post.created_at|date:"d M Y" }}</span>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                                {{ post.get_platform_display }}
+                            </span>
+                            <span class="text-sm text-gray-500">{{ post.created_at|date:"M d" }}</span>
+                        </div>
+                        <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2">{{ post.title }}</h3>
+                        <p class="text-sm text-gray-600 line-clamp-3">{{ post.content|truncatechars:120 }}</p>
+                        <div class="flex items-center mt-4 text-sm text-gray-500">
+                            <i class="bi bi-arrow-right mr-2"></i>
+                            <span>Read more</span>
                         </div>
                     </a>
                 </div>
                 {% endfor %}
             </div>
         </div>
+        {% endif %}
     </div>
-    {% endif %}
 </div>
+
+<style>
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>
 {% endblock %} 
