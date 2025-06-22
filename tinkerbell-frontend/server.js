@@ -5,7 +5,9 @@ const path = require('path');
 const port = 8081;
 
 const server = http.createServer((req, res) => {
-    let filePath = path.join(__dirname, req.url === '/' ? 'landing.html' : req.url);
+    // Parse URL to remove query parameters
+    const url = new URL(req.url, `http://localhost:${port}`);
+    let filePath = path.join(__dirname, url.pathname === '/' ? 'landing.html' : url.pathname);
 
     const extname = path.extname(filePath);
     let contentType = 'text/html';
