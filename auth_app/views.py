@@ -1645,27 +1645,50 @@ def export_post(request, post_id):
     response['Content-Disposition'] = f'attachment; filename="post_{post.id}_{post.title.replace(" ", "_")}.json"'
     return response
 
+@csrf_exempt
 def test_facebook_post_view(request):
-    """A simple view to test Facebook posting."""
-    message = f"This is a test post from the app at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-    result = _post_to_facebook(message)
+    """A view to test Facebook posting - handles both GET and POST requests."""
+    if request.method == 'GET':
+        # Original test functionality
+        message = f"This is a test post from the app at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+        result = _post_to_facebook(message)
+    elif request.method == 'POST':
+        # Handle POST requests from React frontend
+        try:
+            data = json.loads(request.body)
+            message = data.get('message')
+            link = data.get('link')
+            
+            if not message:
+                return JsonResponse({'success': False, 'error': 'Message is required'}, status=400)
+            
+            # If link is provided, append it to the message
+            if link:
+                message = f"{message}\n\n{link}"
+            
+            result = _post_to_facebook(message)
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'error': 'Invalid JSON'}, status=400)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'success': False, 'error': 'Method not allowed'}, status=405)
 
     try:
         if result.get('success'):
-            return JsonResponse({'status': 'SUCCESS', 'message': 'Test post sent successfully.', 'details': result})
+            return JsonResponse({'success': True, 'data': result.get('data', {})})
         else:
             error_details = result.get('error', {})
-            status_code = error_details.get('code')
+            status_code = error_details.get('code', 400)
 
             if not isinstance(status_code, int) or not 100 <= status_code <= 599:
                 status_code = 400
             
-            return JsonResponse({'status': 'FAILED', 'message': 'Failed to send test post.', 'details': result}, status=status_code)
+            return JsonResponse({'success': False, 'error': error_details.get('message', 'Unknown error')}, status=status_code)
     except Exception as e:
         return JsonResponse({
-            'status': 'FATAL',
-            'message': 'A server error occurred while trying to format the response.',
-            'details': str(e)
+            'success': False,
+            'error': 'A server error occurred while trying to format the response.'
         }, status=500)
 
 def debug_env_view(request):

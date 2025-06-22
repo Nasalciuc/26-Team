@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook Integration Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        button {
+            background-color: #1877f2;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #166fe5;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1877f2;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Facebook Integration Test</h1>
+        <p>This page tests the integration between the React frontend and Django backend for Facebook posting.</p>
+        
+        <div class="form-group">
+            <label for="message">Message:</label>
+            <textarea id="message" placeholder="Enter your Facebook post message...">Test post from React frontend integration! 🚀</textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="link">Link (optional):</label>
+            <input type="url" id="link" placeholder="https://example.com" value="https://musicstudio.local">
+        </div>
+        
+        <button onclick="testFacebookPost()" id="postButton">📘 Post to Facebook</button>
+        <button onclick="testDjangoAPI()" id="apiButton">🔧 Test Django API</button>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Posting to Facebook...</p>
+        </div>
+        
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        async function testFacebookPost() {
+            const message = document.getElementById('message').value;
+            const link = document.getElementById('link').value;
+            const button = document.getElementById('postButton');
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+            
+            if (!message.trim()) {
+                showResult('Please enter a message', 'error');
+                return;
+            }
+            
+            button.disabled = true;
+            loading.style.display = 'block';
+            result.style.display = 'none';
+            
+            try {
+                const response = await fetch('http://localhost:8000/test-facebook-post/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        link: link
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResult(`✅ Success! Post ID: ${data.data.id}`, 'success');
+                } else {
+                    showResult(`❌ Error: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Network Error: ${error.message}`, 'error');
+            } finally {
+                button.disabled = false;
+                loading.style.display = 'none';
+            }
+        }
+        
+        async function testDjangoAPI() {
+            const button = document.getElementById('apiButton');
+            const result = document.getElementById('result');
+            
+            button.disabled = true;
+            
+            try {
+                const response = await fetch('http://localhost:8000/debug-env/');
+                const data = await response.json();
+                
+                const envInfo = Object.entries(data)
+                    .map(([key, value]) => `${key}: ${value.is_set ? '✅ Set' : '❌ Not set'}`)
+                    .join('<br>');
+                
+                showResult(`🔧 Django API Test:<br><br>${envInfo}`, 'success');
+            } catch (error) {
+                showResult(`❌ API Test Error: ${error.message}`, 'error');
+            } finally {
+                button.disabled = false;
+            }
+        }
+        
+        function showResult(message, type) {
+            const result = document.getElementById('result');
+            result.innerHTML = message;
+            result.className = `result ${type}`;
+            result.style.display = 'block';
+        }
+    </script>
+</body>
+</html> 
