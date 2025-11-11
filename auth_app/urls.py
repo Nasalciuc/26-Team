@@ -41,6 +41,19 @@ urlpatterns = [
     path('api/personas/generate/', views.generate_personas_view, name='generate_personas_api'),
     path('api/facebook/post/', views.post_to_facebook_view, name='post_to_facebook'),
     
+    # Frontend API endpoints (no auth required)
+    path('scrape-website/', views.scrape_website_api, name='scrape_website_api'),
+    path('generate-personas-view/', views.generate_personas_view, name='generate_personas_view'),
+    path('generate-strategy/', views.generate_strategy_api, name='generate_strategy_api'),
+    path('generate-posts/', views.generate_posts_api, name='generate_posts_api'),
+    path('facebook-post/', views.post_to_facebook_view, name='facebook_post_api'),
+    
+    # Frontend data endpoints (no auth required)
+    path('api/sites/', views.sites_api, name='sites_api'),
+    path('api/personas/', views.personas_api, name='personas_api'),
+    path('api/strategies/', views.strategies_api, name='strategies_api'),
+    path('api/posts/', views.posts_api, name='posts_api'),
+    
     # Posts Management
     path('posts/', views.posts_list, name='posts_list'),
     path('posts/<int:post_id>/', views.post_detail, name='post_detail'),

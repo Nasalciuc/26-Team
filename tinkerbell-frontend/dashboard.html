@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tinkerbell - AI Marketing Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dashboard-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Main Dashboard Layout -->
+    <div class="dashboard-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="brand">
+                    <img src="tinkerbell-logo.png" alt="Tinkerbell" class="logo">
+                    <span class="brand-text">Tinkerbell</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-label">Overview</div>
+                    <a href="#dashboard" class="nav-item active" data-page="dashboard">
+                        <i class="bi bi-house-door"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-label">Analysis</div>
+                    <a href="#scraping" class="nav-item" data-page="scraping">
+                        <i class="bi bi-globe"></i>
+                        <span>Website Analysis</span>
+                    </a>
+                    <a href="#sites" class="nav-item" data-page="sites">
+                        <i class="bi bi-collection"></i>
+                        <span>Analyzed Sites</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-label">AI Marketing</div>
+                    <a href="#personas" class="nav-item" data-page="personas">
+                        <i class="bi bi-people"></i>
+                        <span>Customer Personas</span>
+                    </a>
+                    <a href="#strategies" class="nav-item" data-page="strategies">
+                        <i class="bi bi-lightbulb"></i>
+                        <span>Marketing Strategies</span>
+                    </a>
+                    <a href="#posts" class="nav-item" data-page="posts">
+                        <i class="bi bi-chat-square-text"></i>
+                        <span>Social Media Posts</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-label">Publishing</div>
+                    <a href="#facebook" class="nav-item" data-page="facebook">
+                        <i class="bi bi-facebook"></i>
+                        <span>Facebook Integration</span>
+                    </a>
+                    <a href="#campaigns" class="nav-item" data-page="campaigns">
+                        <i class="bi bi-megaphone"></i>
+                        <span>Campaign Manager</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header Bar -->
+            <header class="main-header">
+                <div class="header-left">
+                    <h1 id="page-title">Dashboard</h1>
+                </div>
+                <div class="header-right">
+                    <button class="btn btn-secondary" onclick="location.reload()">
+                        <i class="bi bi-arrow-clockwise"></i>
+                        Refresh
+                    </button>
+                    <div class="user-menu">
+                        <i class="bi bi-person-circle"></i>
+                        Admin
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Page -->
+            <div id="dashboard-page" class="content-page active">
+                <div class="dashboard-grid">
+                    <!-- Stats Cards -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="bi bi-globe"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="stat-sites">0</h3>
+                                <p>Analyzed Websites</p>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="bi bi-people"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="stat-personas">0</h3>
+                                <p>Customer Personas</p>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="bi bi-lightbulb"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="stat-strategies">0</h3>
+                                <p>Marketing Strategies</p>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="bi bi-chat-square-text"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="stat-posts">0</h3>
+                                <p>Generated Posts</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="quick-actions">
+                        <h2>Quick Actions</h2>
+                        <div class="action-grid">
+                            <button class="action-card" data-page="scraping">
+                                <i class="bi bi-globe"></i>
+                                <span>Analyze Website</span>
+                            </button>
+                            <button class="action-card" data-page="personas">
+                                <i class="bi bi-people"></i>
+                                <span>Create Personas</span>
+                            </button>
+                            <button class="action-card" data-page="strategies">
+                                <i class="bi bi-lightbulb"></i>
+                                <span>Generate Strategy</span>
+                            </button>
+                            <button class="action-card" data-page="facebook">
+                                <i class="bi bi-facebook"></i>
+                                <span>Post to Facebook</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="recent-activity">
+                        <h2>Recent Activity</h2>
+                        <div id="activity-list" class="activity-list">
+                            <div class="activity-item">
+                                <i class="bi bi-info-circle"></i>
+                                <span>Welcome to Tinkerbell! Start by analyzing a website.</span>
+                                <time>Just now</time>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Website Analysis Page -->
+            <div id="scraping-page" class="content-page">
+                <div class="page-header">
+                    <h2>Website Analysis</h2>
+                    <p>Analyze any website to understand content, structure, and audience</p>
+                </div>
+
+                <div class="content-card">
+                    <form id="scraping-form" class="scraping-form">
+                        <div class="form-group">
+                            <label for="website-url">Website URL</label>
+                            <input type="url" id="website-url" name="websiteUrl" placeholder="https://example.com" required>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-search"></i>
+                                Analyze Website
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="scraping-results" class="content-card" style="display: none;">
+                    <h3>Analysis Results</h3>
+                    <div id="analysis-content"></div>
+                </div>
+            </div>
+
+            <!-- Sites List Page -->
+            <div id="sites-page" class="content-page">
+                <div class="page-header">
+                    <h2>Analyzed Websites</h2>
+                    <button class="btn btn-primary" data-page="scraping">
+                        <i class="bi bi-plus"></i>
+                        Analyze New Website
+                    </button>
+                </div>
+
+                <div class="content-card">
+                    <div id="sites-list" class="sites-list">
+                        <div class="empty-state">
+                            <i class="bi bi-globe"></i>
+                            <h3>No websites analyzed yet</h3>
+                            <p>Start by analyzing your first website</p>
+                            <button class="btn btn-primary" data-page="scraping">Analyze Website</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Personas Page -->
+            <div id="personas-page" class="content-page">
+                <div class="page-header">
+                    <h2>Customer Personas</h2>
+                    <button class="btn btn-primary" onclick="generatePersonas()">
+                        <i class="bi bi-plus"></i>
+                        Generate New Personas
+                    </button>
+                </div>
+
+                <div class="content-card">
+                    <div id="personas-list" class="personas-list">
+                        <div class="empty-state">
+                            <i class="bi bi-people"></i>
+                            <h3>No personas created yet</h3>
+                            <p>Generate AI-powered customer personas to understand your audience</p>
+                            <button class="btn btn-primary" onclick="generatePersonas()">Generate Personas</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Strategies Page -->
+            <div id="strategies-page" class="content-page">
+                <div class="page-header">
+                    <h2>Marketing Strategies</h2>
+                    <button class="btn btn-primary" onclick="generateStrategy()">
+                        <i class="bi bi-plus"></i>
+                        Generate Strategy
+                    </button>
+                </div>
+
+                <div class="content-card">
+                    <div id="strategies-list" class="strategies-list">
+                        <div class="empty-state">
+                            <i class="bi bi-lightbulb"></i>
+                            <h3>No strategies created yet</h3>
+                            <p>Create AI-powered marketing strategies based on your personas</p>
+                            <button class="btn btn-primary" onclick="generateStrategy()">Generate Strategy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Posts Page -->
+            <div id="posts-page" class="content-page">
+                <div class="page-header">
+                    <h2>Social Media Posts</h2>
+                    <button class="btn btn-primary" onclick="generatePosts()">
+                        <i class="bi bi-plus"></i>
+                        Generate Posts
+                    </button>
+                </div>
+
+                <div class="content-card">
+                    <div id="posts-list" class="posts-list">
+                        <div class="empty-state">
+                            <i class="bi bi-chat-square-text"></i>
+                            <h3>No posts generated yet</h3>
+                            <p>Generate AI-powered social media posts from your strategies</p>
+                            <button class="btn btn-primary" onclick="generatePosts()">Generate Posts</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Facebook Integration Page -->
+            <div id="facebook-page" class="content-page">
+                <div class="page-header">
+                    <h2>Facebook Integration</h2>
+                    <div class="status-indicator">
+                        <i class="bi bi-check-circle-fill" style="color: var(--success-500);"></i>
+                        Connected
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h3>Post to Facebook</h3>
+                    <form id="facebook-post-form">
+                        <div class="form-group">
+                            <label for="post-content">Post Content</label>
+                            <textarea id="post-content" name="content" placeholder="Write your post content..." required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="post-image">Image (optional)</label>
+                            <input type="file" id="post-image" name="image" accept="image/*">
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-facebook"></i>
+                                Post to Facebook
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="content-card">
+                    <h3>Recent Posts</h3>
+                    <div id="facebook-posts-list" class="facebook-posts">
+                        <div class="empty-state">
+                            <i class="bi bi-facebook"></i>
+                            <h3>No posts published yet</h3>
+                            <p>Your Facebook posts will appear here</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Campaigns Page -->
+            <div id="campaigns-page" class="content-page">
+                <div class="page-header">
+                    <h2>Campaign Manager</h2>
+                    <button class="btn btn-primary">
+                        <i class="bi bi-plus"></i>
+                        Create Campaign
+                    </button>
+                </div>
+
+                <div class="content-card">
+                    <div class="campaigns-list">
+                        <div class="empty-state">
+                            <i class="bi bi-megaphone"></i>
+                            <h3>No campaigns created yet</h3>
+                            <p>Create comprehensive marketing campaigns with multiple channels</p>
+                            <button class="btn btn-primary">Create Campaign</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Processing...</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="dashboard-script.js"></script>
+</body>
+
+</html>

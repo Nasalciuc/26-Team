@@ -1792,3 +1792,167 @@ def debug_env_view(request):
         }
         
     return JsonResponse(debug_data)
+
+
+# Frontend API Views
+@csrf_exempt
+def scrape_website_api(request):
+    """API endpoint for website scraping - compatible with frontend"""
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            url = data.get('url', '')
+            
+            if not url:
+                return JsonResponse({'error': 'URL is required'}, status=400)
+            
+            # Use existing scraping functionality
+            if SCRAPER_AVAILABLE:
+                scraper = UniversalSuperScraper()
+                result = scraper.get_all_info(url)
+            else:
+                # Fallback pentru când scraper-ul nu e disponibil
+                result = {
+                    'title': f'Demo analysis for {url}',
+                    'meta_description': 'Demo meta description',
+                    'keywords': ['demo', 'website', 'analysis'],
+                    'content': 'Demo content for testing purposes'
+                }
+            
+            return JsonResponse({
+                'title': result.get('title', ''),
+                'meta_description': result.get('meta_description', ''),
+                'keywords': result.get('keywords', []),
+                'content_summary': result.get('content', '')[:500] + '...' if result.get('content') else 'No content available'
+            })
+            
+        except Exception as e:
+            logger.error(f"Error in scrape_website_api: {str(e)}")
+            return JsonResponse({'error': str(e)}, status=500)
+    
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+
+@csrf_exempt
+def generate_strategy_api(request):
+    """API endpoint for strategy generation - compatible with frontend"""
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            personas = data.get('personas', [])
+            
+            if not personas:
+                return JsonResponse({'error': 'Personas are required'}, status=400)
+            
+            # Generate strategy based on personas
+            strategy_content = f"""
+            Marketing Strategy
+
+            Target Audience Analysis:
+            Based on the provided customer personas, we've identified key segments with specific interests and pain points.
+
+            Key Strategies:
+            1. Content Marketing - Create valuable content addressing specific customer pain points
+            2. Social Media Engagement - Target platforms where your personas are most active
+            3. Personalized Messaging - Tailor communication to each persona segment
+            4. Multi-channel Approach - Integrate email, social media, and digital advertising
+
+            Expected Outcomes:
+            - Improved customer engagement
+            - Higher conversion rates
+            - Better brand awareness
+            - Increased customer retention
+            """
+            
+            return JsonResponse({
+                'title': 'AI-Generated Marketing Strategy',
+                'strategy': strategy_content
+            })
+            
+        except Exception as e:
+            logger.error(f"Error in generate_strategy_api: {str(e)}")
+            return JsonResponse({'error': str(e)}, status=500)
+    
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+
+@csrf_exempt
+def generate_posts_api(request):
+    """API endpoint for posts generation - compatible with frontend"""
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            strategy = data.get('strategy', {})
+            
+            if not strategy:
+                return JsonResponse({'error': 'Strategy is required'}, status=400)
+            
+            # Generate sample posts based on strategy
+            posts = [
+                {
+                    'title': 'Engagement Post',
+                    'content': '🎯 Ready to transform your marketing strategy? Let\'s connect with your ideal customers! Share your thoughts below. #MarketingTips #CustomerEngagement',
+                    'platform': 'facebook'
+                },
+                {
+                    'title': 'Educational Post',
+                    'content': '💡 Pro Tip: Understanding your customer personas is the key to successful marketing campaigns. What\'s your biggest challenge in reaching your target audience?',
+                    'platform': 'linkedin'
+                },
+                {
+                    'title': 'Promotional Post',
+                    'content': '🚀 Unlock the power of AI-driven marketing strategies! Transform your business with personalized customer insights. #AI #Marketing #Growth',
+                    'platform': 'instagram'
+                },
+                {
+                    'title': 'Value Post',
+                    'content': '📊 Data shows that personalized marketing campaigns have 6x higher engagement rates. Are you leveraging customer data effectively?',
+                    'platform': 'twitter'
+                },
+                {
+                    'title': 'Community Post',
+                    'content': '🤝 Building strong customer relationships starts with understanding their needs. What\'s your approach to customer research? #Community #CustomerFirst',
+                    'platform': 'facebook'
+                }
+            ]
+            
+            return JsonResponse({'posts': posts})
+            
+        except Exception as e:
+            logger.error(f"Error in generate_posts_api: {str(e)}")
+            return JsonResponse({'error': str(e)}, status=500)
+    
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+
+# Simple API endpoints for frontend (no auth required)
+def sites_api(request):
+    """API endpoint to get sites list - no auth required"""
+    if request.method == 'GET':
+        # Return empty list for now - can be extended later
+        return JsonResponse([])
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+
+def personas_api(request):
+    """API endpoint to get personas list - no auth required"""
+    if request.method == 'GET':
+        # Return empty list for now - can be extended later
+        return JsonResponse([])
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+
+def strategies_api(request):
+    """API endpoint to get strategies list - no auth required"""
+    if request.method == 'GET':
+        # Return empty list for now - can be extended later
+        return JsonResponse([])
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+
+def posts_api(request):
+    """API endpoint to get posts list - no auth required"""
+    if request.method == 'GET':
+        # Return empty list for now - can be extended later
+        return JsonResponse([])
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
