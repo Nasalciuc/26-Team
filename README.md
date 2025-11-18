@@ -28,48 +28,86 @@ The platform analyzes the user's website and automatically generates the entire 
 
 ---
 
+## 📚 Documentation
+
+- **[LAUNCH_INSTRUCTIONS.md](LAUNCH_INSTRUCTIONS.md)** - Comprehensive launch guide with troubleshooting
+- **[DEPLOYMENT_SUMMARY.md](DEPLOYMENT_SUMMARY.md)** - Complete deployment overview and verification results
+- **README.md** (this file) - Project overview and quick reference
+
+---
+
 ## 🚀 Quick Start
 
 ### Prerequisites
 - Docker and Docker Compose installed
+- Node.js (v14 or higher) installed
 - Git
 - At least 4GB RAM available
 
 ### 1. Clone the Repository
 ```bash
 git clone git@github.com:Nicu106/26-Team.git
-cd team26
+cd 26-Team
 ```
 
-### 2. Environment Setup
-```bash
-# Automatic setup (recommended)
-./setup-env.sh
+### 2. Launch the Application (Automated - Recommended) 🎉
 
-# OR manual setup
+```bash
+./launch_application.sh
+```
+
+**That's it!** The script will automatically:
+- ✅ Create `.env` file from template
+- ✅ Start Docker containers (Django backend + PostgreSQL)
+- ✅ Launch Tinkerbell frontend server
+- ✅ Run migrations and create superuser
+- ✅ Display access URLs and credentials
+
+### Alternative: Manual Launch
+
+If you prefer manual setup:
+
+```bash
+# Step 1: Create environment file
 cp env.example .env
 ```
 
-### 3. Start the Application
+### Step 2: Start Docker Containers
 ```bash
-# Build and start all containers
-docker-compose up --build
+# Build and start backend containers
+docker compose up --build -d
 ```
 
-**That's it!** 🎉
+### Step 3: Start Tinkerbell Frontend
+```bash
+# Navigate to frontend directory and start server
+cd tinkerbell-frontend
+node server.js
+```
 
-The startup script will automatically:
+The startup will automatically:
 - ✅ Wait for the database to be ready
 - ✅ Run all migrations
 - ✅ Create a superuser from environment variables
 - ✅ Start the Django server
+- ✅ Serve the Tinkerbell frontend
 
 ## 🌐 Access the Application
 
+### Frontend (Tinkerbell)
+- **Landing Page**: http://localhost:8081/
+- **App Interface**: http://localhost:8081/app
+- **Dashboard**: http://localhost:8081/dashboard
+
+### Backend (Django)
 - **Main Application**: http://localhost:8000/
-- **Django Admin**: http://localhost:8000/admin/
-  - **Username**: admin (configurable in .env)
-  - **Password**: admin123 (configurable in .env)
+- **Login Page**: http://localhost:8000/auth_app/login/
+- **User Dashboard**: http://localhost:8000/auth_app/dashboard/
+- **Django Admin Panel**: http://localhost:8000/admin/
+
+### Default Credentials
+- **Username**: admin (configurable in .env)
+- **Password**: admin123 (configurable in .env)
 
 ## 🔧 Environment Configuration
 
@@ -185,19 +223,28 @@ docker-compose run web python post_to_facebook.py
 
 ## 🛠️ Useful Commands
 
-### Run in background
+### Stop the Application (Automated - Recommended)
 ```bash
-docker-compose up -d --build
+./stop_application.sh
 ```
 
-### Stop services
+This will gracefully stop all services (Django, PostgreSQL, and Tinkerbell frontend).
+
+### Manual Commands
+
+#### Run in background
 ```bash
-docker-compose down
+docker compose up -d --build
 ```
 
-### Stop and remove volumes
+#### Stop Docker services
 ```bash
-docker-compose down -v
+docker compose down
+```
+
+#### Stop and remove volumes
+```bash
+docker compose down -v
 ```
 
 ### Check logs
